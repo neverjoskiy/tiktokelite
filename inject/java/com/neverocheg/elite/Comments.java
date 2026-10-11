@@ -262,7 +262,7 @@ public final class Comments {
     }
     /** Bind the actual body after recycling; retain native taps on reactions and authors. */
     public static void bindCell(Object cell){
-        try{View root=(View)cell.getClass().getField("itemView").get(cell);if(root==null)return;mark(root);if(!isCopyEnabled())return;
+        try{View root=(View)cell.getClass().getField("itemView").get(cell);if(root==null)return;mark(root);stampTime(cell,root);if(!isCopyEnabled())return;
             String body=CommentText.from(cell);if(TextUtils.isEmpty(body))return;
             View.OnLongClickListener listener=v->{if(openNativeActions(cell))return true;nativeMenu.set(Boolean.TRUE);try{cell.getClass().getMethod("k8").invoke(cell);return true;}catch(Throwable ignored){return false;}finally{nativeMenu.remove();}};root.setOnLongClickListener(listener);
             bindBody(root,body,listener,0,new int[]{128});
@@ -272,6 +272,83 @@ public final class Comments {
         if(view==null||depth>12||remaining[0]--<=0)return;
         if(view instanceof TextView&&((TextView)view).getText()!=null&&body.contentEquals(((TextView)view).getText()))view.setOnLongClickListener(listener);
         if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)bindBody(group.getChildAt(i),body,listener,depth+1,remaining);}
+    }
+    /** Comment timestamps as absolute dates, stamped after TikTok binds the row. */
+    private static final int STAMP_TAG = 0x54544354;
+    private static final java.util.regex.Pattern REL_RU = java.util.regex.Pattern.compile(
+            "\\d+\\s*(с|сек|мин|ч|дн|нед|мес|г)\\.?\\s*(назад)?");
+    private static final java.util.regex.Pattern REL_UK = java.util.regex.Pattern.compile(
+            "\\d+\\s*(с|хв|год|дн|тиж|міс|р)\\.?\\s*(тому)?");
+    private static final java.util.regex.Pattern REL_EN = java.util.regex.Pattern.compile(
+            "\\d+\\s*(s|sec|min|h|d|w|mo|y)\\s*(ago)?");
+    static void stampTime(Object cell, final View root) {
+        if (cell == null || root == null) return;
+        final long time;
+        try {
+            Object model = CommentText.model(cell);
+            if (model == null) return;
+            long got = NativeRead.number(NativeRead.get(model, "getCreateTime"));
+            if (got > 100000000000L) got /= 1000L;
+            if (got < 1000000000L) return;
+            time = got;
+        } catch (Throwable error) {
+            Diary.note("comment date: " + error);
+            return;
+        }
+        final String label = stampLabel(time);
+        root.post(new Runnable() {
+            @Override public void run() {
+                try { stampViews(root, label, time, 0, new int[]{256}); }
+                catch (Throwable error) { Diary.note("comment date: " + error); }
+            }
+        });
+    }
+    /** Today: the time. This year: the date and the time. Older: with the year. */
+    private static String stampLabel(long seconds) {
+        java.util.Calendar then = java.util.Calendar.getInstance();
+        then.setTimeInMillis(seconds * 1000L);
+        java.util.Calendar now = java.util.Calendar.getInstance();
+        boolean sameYear = then.get(java.util.Calendar.YEAR) == now.get(java.util.Calendar.YEAR);
+        boolean today = sameYear
+                && then.get(java.util.Calendar.DAY_OF_YEAR) == now.get(java.util.Calendar.DAY_OF_YEAR);
+        java.util.Locale locale = java.util.Locale.getDefault();
+        String pattern = today ? "HH:mm" : sameYear ? "dd.MM HH:mm" : "dd.MM.yyyy HH:mm";
+        try {
+            return new java.text.SimpleDateFormat(pattern, locale).format(then.getTime());
+        } catch (Throwable ignored) {
+            return String.valueOf(seconds);
+        }
+    }
+    private static void stampViews(View view, String label, long stamp, int depth, int[] remaining) {
+        if (view == null || depth > 14 || remaining[0]-- <= 0) return;
+        if (view instanceof android.widget.EditText) return;
+        if (view instanceof TextView) {
+            TextView text = (TextView) view;
+            Object tagged = text.getTag(STAMP_TAG);
+            if (!(tagged instanceof Long && ((Long) tagged).longValue() == stamp)) {
+                CharSequence showing = text.getText();
+                if (showing != null && isRelative(showing.toString())) {
+                    text.setTag(STAMP_TAG, Long.valueOf(stamp));
+                    text.setText(label);
+                }
+            }
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++)
+                stampViews(group.getChildAt(i), label, stamp, depth + 1, remaining);
+        }
+    }
+    private static boolean isRelative(String text) {
+        if (text == null) return false;
+        String words = text.trim();
+        if (words.length() == 0 || words.length() > 24) return false;
+        String lower = words.toLowerCase(java.util.Locale.ROOT);
+        if (lower.equals("только что") || lower.equals("только сейчас")
+                || lower.equals("щойно") || lower.equals("just now")) return true;
+        return REL_RU.matcher(lower).matches()
+                || REL_UK.matcher(lower).matches()
+                || REL_EN.matcher(lower).matches();
     }
     private static boolean showCommentActions(Context context,String comment,Runnable nativeAction) {
         return false;

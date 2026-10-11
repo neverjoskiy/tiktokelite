@@ -68,6 +68,14 @@ def icon_ids(axml: Axml) -> List[int]:
     return out
 
 
+def set_application_icon(axml: Axml, icon: int) -> None:
+    """Point the application -- icon and round icon alike -- at `icon`."""
+    app = application(axml)
+    axml.set_attr(app, "icon", TYPE_REFERENCE, icon)
+    if axml.attr(app, "roundIcon") is not None:
+        axml.set_attr(app, "roundIcon", TYPE_REFERENCE, icon)
+
+
 def launcher_elements(axml: Axml) -> List[Node]:
     """Every activity or alias that puts an entry on the launcher."""
     stack: List[Node] = []

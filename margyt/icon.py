@@ -7,12 +7,9 @@ the id, the table entry and the density it was chosen for all stay exactly as
 TikTok left them.
 
 What goes back is shaped like what was there: a PNG path gets a PNG scaled to
-the size the old one was. An adaptive icon would hide those PNGs behind its
-own vector layers on Android 8 and up, and a picture cannot go where a vector
-is expected -- so the adaptive file is dropped and the launcher falls back to
-the bitmaps. The resource table is only written to when a layer turns out to
-be a colour rather than a file, and then only the four bytes of the colour
-itself.
+the size the old one was, an XML path gets a compiled vector. The resource
+table is only written to when a layer turns out to be a colour rather than a
+file, and then only the four bytes of the colour itself.
 """
 
 from __future__ import annotations
@@ -94,12 +91,17 @@ class Icon:
         self.log.append("  %s: vector (%s)" % (path, layer or "whole icon"))
 
     def _replace_adaptive(self, path: str, axml: Axml) -> None:
-        # The launcher on Android 8 and up draws this file and never the
-        # bitmaps, and a picture cannot go where a vector is expected -- so
-        # the file goes instead, and every density falls back to the bitmaps
-        # scaled from the master above.
-        self.apk.remove(path)
-        self.log.append("  %s: adaptive icon dropped, densities win" % path)
+        self.log.append("  %s: adaptive icon, following its layers" % path)
+        for layer in ("background", "foreground"):
+            for node in axml.elements(layer):
+                attr = axml.attr(node, "drawable")
+                if attr is None:
+                    self.log.append("    <%s> draws something inline, left alone" % layer)
+                    continue
+                if attr.kind != TYPE_REFERENCE:
+                    self.log.append("    <%s> is not a reference, left alone" % layer)
+                    continue
+                self._replace_layer(attr.data, layer)
 
     def _replace_layer(self, res_id: int, layer: str) -> None:
         values = self.arsc.values(res_id)

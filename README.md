@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="TikTokElite" width="640">
-
 **A TikTok mod for Android.**
 Maintained as TikTokElite.
 Built from the official apk with the patches in this repository.

@@ -291,6 +291,7 @@ public final class Badge {
     public static void setText(TextView view, CharSequence text) {
         long probe = Probe.start();
         Fonts.apply(view);
+        TabLabels.gone(view, text);
         if (view instanceof android.widget.EditText) {
             view.setText(typed(view, text));
             return;
@@ -310,6 +311,7 @@ public final class Badge {
     public static void setText(TextView view, CharSequence text, TextView.BufferType type) {
         long probe = Probe.start();
         Fonts.apply(view);
+        TabLabels.gone(view, text);
         if (view instanceof android.widget.EditText) {
             view.setText(typed(view, text), type);
             return;

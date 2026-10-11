@@ -112,6 +112,17 @@ class AxmlTest(unittest.TestCase):
         self.assertEqual(attr.kind, TYPE_STRING)
         self.assertEqual(again.pool.get(attr.data), "MargyT")
 
+    def test_application_icon_moves_to_the_crown(self):
+        axml = Axml.parse(self.raw)
+        manifest_module.set_application_icon(axml, 0x30010008)
+        again = Axml.parse(axml.build())
+        application = manifest_module.application(again)
+        for name in ("icon", "roundIcon"):
+            attr = again.attr(application, name)
+            self.assertEqual(attr.kind, TYPE_REFERENCE)
+            self.assertEqual(attr.data, 0x30010008)
+        self.assertEqual(manifest_module.icon_ids(again), [0x30010008])
+
     def test_added_activity_survives_a_rebuild(self):
         """The mod's screen: declared, exported, and off the home screen.
 
@@ -684,8 +695,14 @@ class IconTest(unittest.TestCase):
             self.assertEqual(self.apk.read(path),
                              png.encode(master.resized(max(size))))
 
-        # the adaptive icon is gone: every density falls back to the bitmaps
-        self.assertFalse(self.apk.has("res/mipmap-anydpi-v26/ic_app.xml"))
+        # the adaptive icon still points where it did; its layers are ours now
+        adaptive = Axml.parse(self.apk.read("res/mipmap-anydpi-v26/ic_app.xml"))
+        self.assertEqual(len(adaptive.elements("adaptive-icon")), 1)
+        for path, expected in (("res/drawable/ic_back.xml", artwork.BACKGROUND),
+                               ("res/drawable/ic_front.xml", artwork.GLYPH)):
+            layer = Axml.parse(self.apk.read(path))
+            colours = [layer.attr(p, "fillColor").data for p in layer.elements("path")]
+            self.assertEqual(colours, [colour for colour, _d in expected])
 
     def test_the_resource_table_is_not_disturbed(self):
         before = bytes(self.arsc.data)

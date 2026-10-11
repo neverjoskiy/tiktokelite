@@ -665,6 +665,13 @@ class Build:
                 apk.add(path, handle.read())
             names.append((key, path))
 
+        # the crown the app itself wears is one more file in the same table
+        # but not a choice: the manifest points straight at it, on every
+        # Android version, instead of at TikTok's own adaptive icon
+        with open(os.path.join(self.root, artwork.MASTER_PNG), "rb") as handle:
+            apk.add("res/elite/crown.png", handle.read())
+        names.append(("crown", "res/elite/crown.png"))
+
         extended = resadd.add_files(arsc.build(), self.ICON_PACKAGE, "mipmap", names)
         self.detail("%d icons added to the resource table as package 0x%02X"
                     % (len(names), self.ICON_PACKAGE))
@@ -676,6 +683,10 @@ class Build:
                 label, enabled=False)
         self.detail("%d launcher entries declared, all off but %s"
                     % (len(self.ICONS), entry.rsplit(".", 1)[-1]))
+
+        crown = (self.ICON_PACKAGE << 24) | (1 << 16) | (len(names) - 1)
+        manifest_module.set_application_icon(manifest, crown)
+        self.detail("application icon is res/elite/crown.png")
         return extended
 
     def find_anchors(self, apk: Apk) -> None:
