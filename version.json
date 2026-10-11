@@ -1,0 +1,8 @@
+{
+  "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
+  "version": "1.0",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v1.0/tiktokolite.apk",
+  "notes": "TikTok 47.2.41 and a new settings screen in Material 3. The phone's own colours as the theme, TikTok's speed lock for everybody, a save button in the sticker's own sheet, and much less stutter. Texture packs, profile banners and patches are gone.",
+  "notes_ru": "TikTok 47.2.41 и новые настройки в стиле Material 3. Тема в цветах своего телефона, родная фиксация скорости у всех, скачивание стикера прямо из его шторки и намного меньше лагов. Текстурпаки, баннеры профиля и заплатки убраны.",
+  "notes_uk": "TikTok 47.2.41 і нові налаштування у стилі Material 3. Тема в кольорах свого телефона, рідна фіксація швидкості в усіх, завантаження стікера просто з його шторки і набагато менше лагів. Текстурпаки, банери профілю та латки прибрано."
+}

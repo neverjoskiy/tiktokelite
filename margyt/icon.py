@@ -1,0 +1,129 @@
+"""Swapping the launcher icon without touching a resource id.
+
+The apk already has an icon: a resource id, a file for every density, and for
+Android 8 and up an adaptive icon pointing at two more. Every one of those is
+a path in the zip, so the icon changes by rewriting what is at those paths --
+the id, the table entry and the density it was chosen for all stay exactly as
+TikTok left them.
+
+What goes back is shaped like what was there: a PNG path gets a PNG scaled to
+the size the old one was. An adaptive icon would hide those PNGs behind its
+own vector layers on Android 8 and up, and a picture cannot go where a vector
+is expected -- so the adaptive file is dropped and the launcher falls back to
+the bitmaps. The resource table is only written to when a layer turns out to
+be a colour rather than a file, and then only the four bytes of the colour
+itself.
+"""
+
+from __future__ import annotations
+
+from typing import List, Optional
+
+from . import artwork, png, vector
+from .apkzip import Apk
+from .arsc import Arsc, Value
+from .axml import Axml, TYPE_REFERENCE
+
+COLOUR_TYPES = (0x1C, 0x1D, 0x1E, 0x1F)
+
+
+class Icon:
+    """Replaces every file behind an icon resource, reporting as it goes."""
+
+    def __init__(self, apk: Apk, arsc: Arsc, master_png: bytes):
+        self.apk = apk
+        self.arsc = arsc
+        self.master = png.decode(master_png)
+        self.log: List[str] = []
+        self._scaled = {}
+
+    # ------------------------------------------------------------ the sizes
+
+    def bitmap(self, size: int) -> bytes:
+        if size not in self._scaled:
+            self._scaled[size] = png.encode(self.master.resized(size))
+        return self._scaled[size]
+
+    # ------------------------------------------------------------- the work
+
+    def replace(self, res_id: int) -> None:
+        for value in self.arsc.values(res_id):
+            path = self.arsc.file_path(value)
+            if path is None:
+                self.log.append("  0x%08x: not a file, left alone" % res_id)
+                continue
+            self._replace_file(path, value, layer=None)
+
+    def _replace_file(self, path: str, value: Value, layer: Optional[str]) -> None:
+        if not self.apk.has(path):
+            self.log.append("  %s: named by the table, missing from the apk" % path)
+            return
+        if path.endswith(".png"):
+            self._replace_png(path, layer)
+        elif path.endswith(".xml"):
+            self._replace_xml(path, value, layer)
+        else:
+            self.log.append("  %s: not a drawable this build knows" % path)
+
+    def _replace_png(self, path: str, layer: Optional[str]) -> None:
+        width, height = png.size_of(self.apk.read(path))
+        size = max(width, height)
+        self.apk.replace(path, self.bitmap(size))
+        self.log.append("  %s: %dx%d bitmap" % (path, size, size))
+
+    def _replace_xml(self, path: str, value: Value, layer: Optional[str]) -> None:
+        """An XML drawable: an adaptive icon to follow, or a vector to replace."""
+        if layer is None:
+            try:
+                axml = Axml.parse(self.apk.read(path))
+                root = next(
+                    (axml.pool.get(n.name) for n in axml.nodes if n.kind == 0x0102), None
+                )
+            except Exception:
+                root = None
+            if root == "adaptive-icon":
+                self._replace_adaptive(path, axml)
+                return
+
+        paths = {
+            "background": artwork.BACKGROUND,
+            "foreground": artwork.GLYPH,
+            None: artwork.COMBINED,
+        }[layer]
+        self.apk.replace(path, vector.build(artwork.VIEWPORT, paths))
+        self.log.append("  %s: vector (%s)" % (path, layer or "whole icon"))
+
+    def _replace_adaptive(self, path: str, axml: Axml) -> None:
+        # The launcher on Android 8 and up draws this file and never the
+        # bitmaps, and a picture cannot go where a vector is expected -- so
+        # the file goes instead, and every density falls back to the bitmaps
+        # scaled from the master above.
+        self.apk.remove(path)
+        self.log.append("  %s: adaptive icon dropped, densities win" % path)
+
+    def _replace_layer(self, res_id: int, layer: str) -> None:
+        values = self.arsc.values(res_id)
+        if not values:
+            self.log.append("    <%s> 0x%08x: nothing in the table" % (layer, res_id))
+            return
+        for value in values:
+            if value.kind in COLOUR_TYPES:
+                self.arsc.set_value(value, value.kind, artwork.MINT)
+                self.log.append("    <%s> a colour, repainted mint" % layer)
+                continue
+            path = self.arsc.file_path(value)
+            if path is None:
+                self.log.append("    <%s> 0x%08x: not a file" % (layer, res_id))
+                continue
+            self._replace_file(path, value, layer)
+
+
+def replace_everywhere(apk: Apk, arsc: Arsc, manifest: Axml, master_png: bytes) -> List[str]:
+    """Redraw every icon the manifest points the launcher at."""
+    from . import manifest as manifest_module
+
+    icon = Icon(apk, arsc, master_png)
+    for res_id in manifest_module.icon_ids(manifest):
+        icon.log.append("  icon resource 0x%08x" % res_id)
+        icon.replace(res_id)
+    return icon.log
