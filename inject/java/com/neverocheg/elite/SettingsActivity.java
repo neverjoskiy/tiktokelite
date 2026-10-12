@@ -3136,8 +3136,8 @@ public class SettingsActivity extends Activity {
                 .quiet("Обучение",() -> Tutorial.show(this)).primary("Понятно",null).show();
     }
 
+    /** The shelves as a grid of rounded tiles instead of a list of rows. */
     private View groupNavigation() {
-        LinearLayout list = card();
         String[] icons = {"palette", "group", "play_circle", "tune", "info", "extension", "chat"};
         String[] notes = {"Акцент, тема и шрифты",
                 "Значки, градиент и аккаунт",
@@ -3147,26 +3147,75 @@ public class SettingsActivity extends Activity {
                 "Друзья, серии и уведомления"};
         // Shelf order on screen: what people touch daily first, the project itself last.
         int[] shelf = {1, 2, 3, 7, 4, 6, 5};
+        LinearLayout grid = new LinearLayout(this);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout line = null;
         for (int n = 0; n < shelf.length; n++) {
-            final int i = shelf[n];
-            final int chosen = i;
-            if (n > 0) list.addView(line());
-            LinearLayout entry = row();
-            entry.setPadding(dp(16),dp(14),dp(20),dp(14));
-            entry.addView(icon(icons[i-1],false,52));
-            LinearLayout words = new LinearLayout(this); words.setOrientation(LinearLayout.VERTICAL);
-            TextView head = label(groupName(i)); head.setTextSize(19);
-            head.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
-            words.addView(head);words.addView(detail(notes[i-1]));entry.setContentDescription(groupName(i)+". "+notes[i-1]);
-            entry.addView(words,grow()); entry.addView(away());
-            entry.setMinimumHeight(dp(80));Motion.touch(entry);
-            entry.setOnClickListener(v -> {
-                if(navigating)return;navigating=true;
-                Motion.navigate(column,1f,()->{settingsGroup=chosen;page.scrollTo(0,0);rebuild();navigating=false;});
+            if (n % 2 == 0) {
+                line = new LinearLayout(this);
+                line.setOrientation(LinearLayout.HORIZONTAL);
+                grid.addView(line, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            final int chosen = shelf[n];
+            LinearLayout tile = new LinearLayout(this);
+            tile.setOrientation(LinearLayout.VERTICAL);
+            tile.setGravity(Gravity.CENTER_HORIZONTAL);
+            tile.setPadding(dp(12), dp(18), dp(12), dp(16));
+            tile.setBackground(Expressive.tile(this, skin.card,
+                    (Accent.colour() & 0xFFFFFF) | 0x33000000, dp(22), dp(22), dp(10)));
+            tile.setContentDescription(groupName(chosen) + ". " + notes[chosen - 1]);
+            tile.setFocusable(true);
+
+            View badge = icon(icons[chosen - 1], false, 52);
+            LinearLayout.LayoutParams badgeSize =
+                    new LinearLayout.LayoutParams(dp(52), dp(52));
+            badgeSize.gravity = Gravity.CENTER_HORIZONTAL;
+            badge.setLayoutParams(badgeSize);
+            tile.addView(badge);
+
+            TextView head = label(groupName(chosen));
+            head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            head.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            head.setGravity(Gravity.CENTER);
+            head.setMaxLines(2);
+            head.setPadding(0, dp(10), 0, 0);
+            tile.addView(head, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            tile.setMinimumHeight(dp(148));
+            Motion.touch(tile);
+            tile.setOnClickListener(v -> {
+                if (navigating) return;
+                navigating = true;
+                Motion.navigate(column, 1f, () -> {
+                    settingsGroup = chosen;
+                    page.scrollTo(0, 0);
+                    rebuild();
+                    navigating = false;
+                });
             });
-            list.addView(entry);
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            int gap = dp(6);
+            place.setMargins(gap, gap, gap, gap);
+            line.addView(tile, place);
         }
-        return wrap(list);
+        // an odd shelf leaves the last row half empty: hold its width
+        if (shelf.length % 2 != 0 && line != null) {
+            View spacer = new View(this);
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            int gap = dp(6);
+            place.setMargins(gap, gap, gap, gap);
+            line.addView(spacer, place);
+        }
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(12), dp(6), dp(12), dp(6));
+        box.addView(grid, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return box;
     }
 
     /**
