@@ -22,12 +22,12 @@ final class Probe {
     static final int THEME = 0, FONTS = 1, DATES = 2, COLOURS = 3, BADGES = 4, ACCENT = 5,
             DIM_PRINT = 6, DIM_PASS = 7, DIM_FRAME = 8, PINK = 9, TEXT = 10, PAINT = 11,
             ALPHA = 12, NAMES = 13, RAIL = 14, FEED = 15, THEME_COLOUR = 16, DATE_FRAME = 17,
-            FONT_ONE = 18, SHOWN = 19;
+            FONT_ONE = 18, SHOWN = 19, SLICE = 20;
     private static final String[] NAMES_OF = {
             "theme walk", "font walk", "date walk", "role colours walk", "badge walk",
             "accent walk", "dim fingerprint", "dim pass", "dim per frame", "pink sweep",
             "setText", "paint colour", "setAlpha", "names", "rail visibility", "feed filter",
-            "theme colour", "date per frame", "font one", "screen shown"};
+            "theme colour", "date per frame", "font one", "screen shown", "sliced walk"};
 
     private static final long[] spent = new long[NAMES_OF.length];
     private static final int[] calls = new int[NAMES_OF.length];

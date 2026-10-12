@@ -605,7 +605,7 @@ public final class Themes {
             if (Boolean.TRUE.equals(root.getTag(WATCHING))) {
                 repaint(root);
                 Badge.rewrite(root);
-                Accent.repaintTree(root);
+                sweep(root);
                 Dim.watch(activity);
                 return;
             }
@@ -660,23 +660,41 @@ public final class Themes {
                             DateOverlay.resume(root);
                             Probe.stop(Probe.DATES, probe);
                             probe = Probe.start();
-                            AppearanceColors.repaint(root);
-                            Probe.stop(Probe.COLOURS, probe);
-                            probe = Probe.start();
                             Badge.rewrite(root);
                             Probe.stop(Probe.BADGES, probe);
-                            probe = Probe.start();
-                            Accent.repaintTree(root);
-                            Probe.stop(Probe.ACCENT, probe);
+                            sweep(root);
                         }
                     });
             repaint(root);
             Badge.rewrite(root);
-            Accent.repaintTree(root);
+            sweep(root);
             Dim.watch(activity);
         } catch (Throwable error) {
             Diary.note("theme: " + error);
         }
+    }
+
+    /**
+     * The accent and the role colours, over the whole screen but not all at
+     * once: a few milliseconds before each frame until it is done. These are
+     * the two walks that cost the most on a screen nobody has looked at yet,
+     * and a screen nobody has looked at yet is one that is just coming up.
+     */
+    private static final Sliced.Visit ACCENT = new Sliced.Visit() {
+        @Override
+        public void view(View view) {
+            Accent.look(view);
+        }
+    };
+    private static final Sliced.Visit ROLES = new Sliced.Visit() {
+        @Override
+        public void view(View view) {
+            AppearanceColors.look(view);
+        }
+    };
+
+    private static void sweep(View root) {
+        Sliced.walk(root, ACCENT, ROLES);
     }
 
     private static volatile long last;

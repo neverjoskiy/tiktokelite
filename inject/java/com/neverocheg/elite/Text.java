@@ -344,6 +344,45 @@ final class Text {
     static final String UNAVAILABLE = pick(
             "Функция недоступна", "Функція недоступна", "This feature is unavailable");
 
+    static final String TIKTOK_FEATURES = pick("Функции TikTok", "Функції TikTok", "TikTok features");
+    static final String TIKTOK_FEATURES_NOTE = pick(
+            "Это функции самого TikTok, которые он пока включает не всем. Здесь их "
+                    + "можно включить себе. Что-то может работать не до конца.",
+            "Це функції самого TikTok, які він поки вмикає не всім. Тут їх можна "
+                    + "увімкнути собі. Щось може працювати не до кінця.",
+            "These are TikTok's own features that it has not switched on for everybody yet. "
+                    + "Here you can switch them on for yourself. Some may not fully work.");
+    static final String COMMENT_REPOST = pick("Репост комментариев", "Репост коментарів",
+            "Repost comments");
+    static final String SELF_REPOST = pick("Репост своих видео", "Репост своїх відео",
+            "Repost your own videos");
+    static final String NEW_PROFILE = pick("Новый вид профиля TikTok", "Новий вигляд профілю TikTok",
+            "TikTok's new profile look");
+
+    static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");
+    static final String TAB_READ_ALL_NOTE = pick(
+            "Число на кнопке пропадёт и вернётся, когда придёт что-то новое.",
+            "Число на кнопці зникне й повернеться, коли надійде щось нове.",
+            "The number on the tab goes away and comes back when something new arrives.");
+    static final String TAB_READ_ALL_YES = pick("Прочитать", "Прочитати", "Mark as read");
+    static final String TAB_UNREAD_BACK = pick("Вернуть число?", "Повернути число?", "Bring the number back?");
+    static final String TAB_UNREAD_BACK_NOTE = pick(
+            "Сейчас число на этой кнопке скрыто.", "Зараз число на цій кнопці приховано.",
+            "The number on this tab is hidden at the moment.");
+    static final String TAB_UNREAD_BACK_YES = pick("Вернуть", "Повернути", "Bring it back");
+
+    static final String AVATAR_SHAPE = pick("Форма аватарок", "Форма аватарок", "Avatar shape");
+    static final String SHAPE_CIRCLE = pick("Круг", "Коло", "Circle");
+    static final String SHAPE_ROUNDED = pick("Скруглённый", "Заокруглений", "Rounded");
+    static final String SHAPE_SQUARE = pick("Квадрат", "Квадрат", "Square");
+    static final String SHAPE_COOKIE = pick("Печенье", "Печиво", "Cookie");
+    static final String SHAPE_CLOVER = pick("Клевер", "Конюшина", "Clover");
+    static final String SHAPE_BURST = pick("Вспышка", "Спалах", "Burst");
+    static final String SHAPE_SUN = pick("Солнце", "Сонце", "Sun");
+    static final String SHAPE_PENTAGON = pick("Пятиугольник", "П'ятикутник", "Pentagon");
+    static final String SHAPE_HEXAGON = pick("Шестиугольник", "Шестикутник", "Hexagon");
+    static final String SHAPE_HEART = pick("Сердце", "Серце", "Heart");
+
     static final String NO_HDR = pick(
             "Убрать HDR", "Прибрати HDR", "Take the HDR off");
 

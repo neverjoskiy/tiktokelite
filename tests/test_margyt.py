@@ -873,28 +873,40 @@ class FeedSpeedLockSourceTest(unittest.TestCase):
         self.assertNotIn("requestDisallowInterceptTouchEvent", source)
         self.assertNotIn("addView", source)
 
-    def test_tiktoks_own_speed_lock_is_answered_by_the_mod(self):
-        asks = (".class public final LX/09nD;\n.super LX/0D4z;\n\n"
-                ".method public final invoke()Ljava/lang/Object;\n"
-                "    .registers 6\n\n"
-                '    const-string v3, "long_press_speed_up_lock"\n\n'
-                "    invoke-virtual {v4, v1, v0, v3, v2}, LX/09tK;->LJIIJJI(IILjava/lang/String;Z)I\n\n"
-                "    move-result v0\n.end method\n")
-        other = asks.replace("long_press_speed_up_lock", "some_other_flag")
+    def test_tiktoks_flag_reader_asks_the_mod_first(self):
+        reader = (".class public final LX/09tK;\n.super Ljava/lang/Object;\n\n"
+                  ".method public final LJIIJJI(IILjava/lang/String;Z)I\n"
+                  "    .registers 13\n\n    .prologue\n    .line 1\n    move-object v6, p3\n\n"
+                  "    const/4 v0, 0x0\n\n    return v0\n.end method\n\n"
+                  ".method public final LJIILIIL(IJLjava/lang/String;Z)J\n"
+                  "    .registers 16\n\n    const-wide/16 v0, 0x0\n\n    return-wide v0\n.end method\n\n"
+                  ".method public final LJIJJ(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;\n"
+                  "    .registers 4\n\n    return-object p2\n.end method\n")
         with tempfile.TemporaryDirectory() as room:
-            for name, text in (("09nD.smali", asks), ("Other.smali", other)):
-                with open(os.path.join(room, name), "w", encoding="utf-8") as handle:
-                    handle.write(text)
-            self.assertEqual(dexpatch.rewrite_native_flags(room), {"native speed lock": 1})
-            with open(os.path.join(room, "09nD.smali"), encoding="utf-8") as handle:
+            path = os.path.join(room, "09tK.smali")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(reader)
+            with open(os.path.join(room, "Other.smali"), "w", encoding="utf-8") as handle:
+                handle.write(reader.replace("LX/09tK;", "LX/Other;"))
+            self.assertEqual(dexpatch.rewrite_flag_reader(room), {dexpatch.FLAG_LABEL: 2})
+            with open(path, encoding="utf-8") as handle:
                 patched = handle.read()
-            self.assertIn("invoke-static {v4, v1, v0, v3, v2}, Lcom/neverocheg/elite/Flags;"
-                          "->nativeInt(Ljava/lang/Object;IILjava/lang/String;Z)I", patched)
+            # the key is the fourth register of one and, past a long, the fifth of the other
+            self.assertIn("    .prologue\n    invoke-static/range {p3 .. p3}, Lcom/neverocheg/elite/Flags;"
+                          "->forcedInt(Ljava/lang/String;)Ljava/lang/Integer;", patched)
+            self.assertIn("invoke-static/range {p4 .. p4}, Lcom/neverocheg/elite/Flags;"
+                          "->forcedLong(Ljava/lang/String;)Ljava/lang/Long;", patched)
+            self.assertIn("    move-result-wide v0\n\n    return-wide v0\n\n    :elite_flag\n", patched)
+            # an object is not something the mod can answer with
+            self.assertEqual(patched.count("\n    :elite_flag\n"), 2)
             with open(os.path.join(room, "Other.smali"), encoding="utf-8") as handle:
-                self.assertEqual(handle.read(), other)
-            # a dex that never spells the key is not searched for the class
-            self.assertEqual(dexpatch.rewrite_native_flags(room, b"nothing"), {})
-        self.assertTrue(dexpatch.interesting(b"..long_press_speed_up_lock.."))
+                self.assertNotIn("elite", handle.read())
+            # a second pass finds it done and says so, rather than doing it again
+            self.assertEqual(dexpatch.rewrite_flag_reader(room), {dexpatch.FLAG_LABEL: 2})
+            with open(path, encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), patched)
+            # a dex that only names the reader is not searched for it
+            self.assertEqual(dexpatch.rewrite_flag_reader(room, b"LX/09tK; but not here"), {})
 
     def test_a_dex_holding_a_renamed_authority_is_taken_apart(self):
         self.assertFalse(dexpatch.interesting(b"nothing", {"com.example.p": "x"}))

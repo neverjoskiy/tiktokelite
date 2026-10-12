@@ -268,6 +268,12 @@ public class SettingsActivity extends Activity {
         loading.addView(liveToggleRow("palette", Text.LOADING_SHAPES, Loading.isEnabled(),
                 Loading::setEnabled));
         loading.addView(quiet(Text.LOADING_NOTE));
+        loading.addView(line());
+        loading.addView(actionRow("account_circle", Text.AVATAR_SHAPE,
+                AvatarShape.nameOf(AvatarShape.chosen()), this::chooseAvatarShape));
+        loading.addView(line());
+        loading.addView(toggleRow("view_compact", Text.NEW_PROFILE, Flags.isOn(Flags.KEY_NEW_PROFILE),
+                on -> Flags.set(Flags.KEY_NEW_PROFILE, on)));
         column.addView(wrap(loading));
 
         column.addView(section(Text.THEME));
@@ -433,6 +439,16 @@ public class SettingsActivity extends Activity {
         comments.addView(liveToggleRow("article", Text.COMMENT_COPY_ON, Comments.isCopyEnabled(),
                 Comments::setCopyEnabled));
         column.addView(wrap(comments));
+
+        column.addView(section(Text.TIKTOK_FEATURES));
+        LinearLayout features = card();
+        features.addView(quiet(Text.TIKTOK_FEATURES_NOTE));
+        features.addView(toggleRow("repeat", Text.COMMENT_REPOST, Flags.isOn(Flags.KEY_COMMENT_REPOST),
+                on -> Flags.set(Flags.KEY_COMMENT_REPOST, on)));
+        features.addView(line());
+        features.addView(toggleRow("repeat", Text.SELF_REPOST, Flags.isOn(Flags.KEY_SELF_REPOST),
+                on -> Flags.set(Flags.KEY_SELF_REPOST, on)));
+        column.addView(wrap(features));
 
         column.addView(section(BURN));
         LinearLayout burn = card();
@@ -663,6 +679,12 @@ public class SettingsActivity extends Activity {
     }
 
     /** A setting changed: redraw, and from now on the bar is up. */
+    /** Something that needs a restart was changed on another screen: the store, say. */
+    static void restartOwed() {
+        pending = true;
+        Unsaved.other();
+    }
+
     private void markChanged() {
         // not simply "yes": put everything back as it was and there is
         // nothing left for a restart to apply
@@ -1818,6 +1840,48 @@ public class SettingsActivity extends Activity {
         panel.quiet(Text.CANCEL,null); panel.show();
     }
 
+    /** Every shape as a picture of itself, four to a row. */
+    private void chooseAvatarShape() {
+        final Panel panel = Panel.with(this, skin, Text.AVATAR_SHAPE);
+        LinearLayout grid = new LinearLayout(this);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        final String now = AvatarShape.chosen();
+        LinearLayout line = null;
+        for (int i = 0; i < AvatarShape.ALL.length; i++) {
+            final String shape = AvatarShape.ALL[i];
+            if (i % 4 == 0) {
+                line = new LinearLayout(this);
+                grid.addView(line, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            LinearLayout tile = Panel.tile(this, skin, AvatarShape.picture(shape, dp(36), 0xFFFFFFFF),
+                    shape.equals(now) ? Accent.colour() : skin.text, AvatarShape.nameOf(shape),
+                    shape.equals(now));
+            tile.setOnClickListener(v -> {
+                panel.close();
+                if (shape.equals(now)) return;
+                AvatarShape.choose(this, shape);
+                // a picture already cut keeps its shape until it is cut again
+                markChanged();
+                rebuild();
+            });
+            Motion.press(tile);
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            place.setMargins(dp(3), dp(3), dp(3), dp(3));
+            line.addView(tile, place);
+        }
+        // the last row is not full: keep its tiles the width of the others
+        for (int i = AvatarShape.ALL.length; i % 4 != 0; i++) {
+            line.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1f));
+            ((LinearLayout.LayoutParams) line.getChildAt(line.getChildCount() - 1).getLayoutParams())
+                    .setMargins(dp(3), dp(3), dp(3), dp(3));
+        }
+        panel.view(grid);
+        panel.quiet(Text.CLOSE, null);
+        panel.show();
+    }
+
     /** Keep theme presets together in one menu row instead of three buttons. */
     private void chooseThemePreset() {
         final String[] choices = {Text.THEME_PRESET_DARK, Text.THEME_PRESET_BLUE,
@@ -2338,12 +2402,12 @@ public class SettingsActivity extends Activity {
     }
 
     private void activatePlugin(final Plugins.Info info,boolean enabled){
-        if(!enabled){Net.away("plugin stop",()->{Plugins.setEnabled(info.id,false);runOnUiThread(()->{if(!isFinishing())rebuild();});});return;}
+        if(!enabled){Net.away("plugin stop",()->{Plugins.setEnabled(info.id,false);runOnUiThread(()->{if(!isFinishing()){markChanged();rebuild();}});});return;}
         Net.away("plugin check",()->{
             try{final PluginAudit.Report report=Plugins.inspectInstalled(info.id);
                 runOnUiThread(()->{if(isFinishing())return;
                     if(report.blocked){Panel.with(this,skin,"Плагин заблокирован").text(report.summary()).quiet("Назад",null).show();rebuild();return;}
-                    Runnable enable=()->Net.away("plugin activation",()->{Plugins.approve(this,info.id,report.digest);Plugins.setEnabled(info.id,true);runOnUiThread(()->{if(!isFinishing())rebuild();});});
+                    Runnable enable=()->Net.away("plugin activation",()->{Plugins.approve(this,info.id,report.digest);Plugins.setEnabled(info.id,true);runOnUiThread(()->{if(!isFinishing()){markChanged();rebuild();}});});
                     if(report.findings.isEmpty())enable.run();else Panel.with(this,skin,"Возможности плагина").text(report.summary()).primary("Разрешить и включить",()->enable.run()).quiet("Назад",()->rebuild()).show();
                 });
             }catch(Throwable error){Screen.say(String.valueOf(error.getMessage()));runOnUiThread(()->{if(!isFinishing())rebuild();});}
@@ -2427,7 +2491,7 @@ public class SettingsActivity extends Activity {
                     if(isFinishing())return;
                     Panel panel=Panel.with(this,skin,"Проверка плагина").text(report.summary());
                     if(!report.blocked)panel.primary("Установить выключенным",()->Net.away("plugin install",()->{
-                        try {Plugins.install(this,source,report.digest);runOnUiThread(()->{if(!isFinishing())rebuild();});Screen.say(Text.PLUGIN_INSTALLED);}
+                        try {Plugins.install(this,source,report.digest);runOnUiThread(()->{if(!isFinishing()){markChanged();rebuild();}});Screen.say(Text.PLUGIN_INSTALLED);}
                         catch(Throwable error){Screen.say(String.valueOf(error.getMessage()));}
                     }));
                     panel.quiet("Назад",null).show();
@@ -2978,6 +3042,10 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.VIDEO,Text.NO_HDR,Hdr.isEnabled());
         found+=searchControl(results,Text.BADGES,Text.BADGES_ON,Badges.isEnabled());
         found+=searchHit(results,Text.FPS,Text.FPS,()->{});
+        found+=searchControl(results,Text.TIKTOK_FEATURES,Text.COMMENT_REPOST,Flags.isOn(Flags.KEY_COMMENT_REPOST));
+        found+=searchControl(results,Text.TIKTOK_FEATURES,Text.SELF_REPOST,Flags.isOn(Flags.KEY_SELF_REPOST));
+        found+=searchControl(results,Text.APPEARANCE,Text.NEW_PROFILE,Flags.isOn(Flags.KEY_NEW_PROFILE));
+        found+=searchHit(results,Text.APPEARANCE,Text.AVATAR_SHAPE,()->{});
         found+=searchHit(results,Text.TAGS,Text.TAGS+" "+Text.TAGS_ADD,()->{});
         found+=searchHit(results,Text.GRADIENT,Text.GRADIENT,()->{});
         if(found==0){
@@ -3114,6 +3182,7 @@ public class SettingsActivity extends Activity {
                 || section.equals(Text.FEED) || section.equals(Text.VIDEO)
                 || section.equals(Text.RAIL) || section.equals(Text.COMMENTS)
                 || section.equals(Text.TAGS) || section.equals(Text.FPS)
+                || section.equals(Text.TIKTOK_FEATURES)
                 || section.equals(BURN)) return 3;
         if (section.equals(Text.PINNED_FRIENDS) || section.equals(Text.STREAKS)
                 || section.equals(Text.NOTIFICATIONS)) return 7;

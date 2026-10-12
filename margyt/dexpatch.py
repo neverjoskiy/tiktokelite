@@ -395,6 +395,29 @@ ANCHORED_SOURCES.append(("LX/0HCj;", "Landroid/widget/ImageView;", "setImageDraw
     "(Landroid/graphics/drawable/Drawable;)V",
     "(Landroid/widget/ImageView;Landroid/graphics/drawable/Drawable;)V", "Lcom/neverocheg/elite/Heart;"))
 CLASS_ANCHORED_SOURCES.add("LX/0HCj;")
+
+# The image loader's three drawables that cut a picture round: the one that
+# fills a path with a bitmap, the one that lays a colour over the corners, and
+# the one that is a colour and nothing else. Each adds a circle to a path --
+# once for the picture and once for its border -- and each of those is handed
+# to the mod, which adds the shape that was chosen.
+AVATAR_SHAPE = "Lcom/neverocheg/elite/AvatarShape;"
+ROUND_DRAWABLES = ("LX/1Fnt;", "LX/0HEe;", "LX/0GvU;")
+for anchor in ROUND_DRAWABLES:
+    ANCHORED_SOURCES.append((anchor, "Landroid/graphics/Path;", "addCircle",
+        "(FFFLandroid/graphics/Path$Direction;)V",
+        "(Landroid/graphics/Path;FFFLandroid/graphics/Path$Direction;)V", AVATAR_SHAPE))
+    CLASS_ANCHORED_SOURCES.add(anchor)
+
+# A story ring is neither a picture nor anything cut out of a path: it is a
+# view laid over the avatar that strokes an arc round an oval -- whole for one
+# story, in pieces for several or while one loads. That view's arcs go to the
+# mod, which strokes the avatar's shape instead.
+STORY_RING = "LX/11Wv;"
+ANCHORED_SOURCES.append((STORY_RING, "Landroid/graphics/Canvas;", "drawArc",
+    "(Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V",
+    "(Landroid/graphics/Canvas;Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V", AVATAR_SHAPE))
+CLASS_ANCHORED_SOURCES.add(STORY_RING)
 ANCHORED_SOURCES.append(("Lcom/ss/android/ugc/aweme/commentv2/commentlist/powercell/BaseCommentCell;",
     VIEW,"findViewById","(I)Landroid/view/View;","(Landroid/view/View;I)Landroid/view/View;",COMMENTS))
 for method in ("setIconRes", "setTintColor"):
@@ -1118,40 +1141,128 @@ def rewrite_anchored(root: str) -> Dict[str, int]:
 
 #: TikTok's own "swipe down while holding to keep the speed". It is an
 #: experiment, on for some accounts; the mod answers for it, and says yes.
-NATIVE_SPEED_LOCK = "long_press_speed_up_lock"
+#: The class every experiment is read through, and what it is in a dex.
+FLAG_READER = "LX/09tK;"
+#: What each of its methods hands back, and the mod's answer of that type.
+FLAG_ANSWERS = {
+    "Z": ("forcedBoolean", "Ljava/lang/Boolean;", "booleanValue()Z", ""),
+    "I": ("forcedInt", "Ljava/lang/Integer;", "intValue()I", ""),
+    "J": ("forcedLong", "Ljava/lang/Long;", "longValue()J", "-wide"),
+    "F": ("forcedFloat", "Ljava/lang/Float;", "floatValue()F", ""),
+    "D": ("forcedDouble", "Ljava/lang/Double;", "doubleValue()D", "-wide"),
+    "Ljava/lang/String;": ("forcedString", "Ljava/lang/String;", None, "-object"),
+}
+FLAG_LABEL = "native flag reader"
 
 
-def rewrite_native_flags(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
-    counts = {}
-    keys = ('"audio_comment_publish"','"profile_bg_in_allow_list"','"profile_bg_enable_consumption_group"')
-    lock = '"%s"' % NATIVE_SPEED_LOCK
-    # the class that asks about the lock has no name to know it by, so it is
-    # known by asking -- and looked for only in the dex that spells the key
-    anywhere = dex is None or NATIVE_SPEED_LOCK.encode() in dex
-    pattern = re.compile(r"invoke-virtual(?P<range>/range)? (?P<registers>\{[^}]+\}), LX/09tK;->LJIIJJI\(IILjava/lang/String;Z\)I")
+def _parameters(descriptor: str) -> List[str]:
+    """`IJLjava/lang/String;Z` as the types it is made of."""
+    out = []
+    at = 0
+    while at < len(descriptor):
+        start = at
+        while descriptor[at] == "[":
+            at += 1
+        at = descriptor.index(";", at) + 1 if descriptor[at] == "L" else at + 1
+        out.append(descriptor[start:at])
+    return out
+
+
+def defines(dex: bytes, descriptor: str) -> bool:
+    """Whether a dex is where a class lives, rather than one of the many that name it."""
+    wanted = descriptor.encode()
+    if wanted not in dex or len(dex) < 112:
+        return False
+    string_ids_off = struct.unpack_from("<I", dex, 60)[0]
+    type_ids_off = struct.unpack_from("<I", dex, 68)[0]
+    class_defs_size, class_defs_off = struct.unpack_from("<2I", dex, 96)
+    for i in range(class_defs_size):
+        index = struct.unpack_from("<I", dex, class_defs_off + 32 * i)[0]
+        string = struct.unpack_from("<I", dex, type_ids_off + 4 * index)[0]
+        at = struct.unpack_from("<I", dex, string_ids_off + 4 * string)[0]
+        length, at = _uleb(dex, at)
+        if length == len(wanted) and dex[at:at + length] == wanted:
+            return True
+    return False
+
+
+def rewrite_flag_reader(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
+    """Have TikTok's experiment reader ask the mod before it answers.
+
+    A flag used to be answered where it was asked: three call sites found by
+    the key they spelled, and a fourth for the speed lock. That is a patch a
+    flag, and there are twenty thousand flags. The reader itself has one
+    method a type, each taking the key, and every one of them now begins by
+    asking the mod -- so which flags are answered is a table in the mod and
+    nothing here has to know their names.
+
+    The question goes at the very top, where the method's own registers hold
+    nothing yet and two of them can be borrowed. A method that takes no key,
+    or hands back an object the mod could not build, is left as it was.
+    """
+    counts: Dict[str, int] = {}
+    if dex is not None and not defines(dex, FLAG_READER):
+        return counts
     for directory, _, files in os.walk(root):
         for name in files:
-            # On Windows, baksmali disambiguates class files whose descriptors
-            # differ only by case by appending a numeric suffix (for example,
-            # ``0A7j.1.smali``). Keep the exact class allow-list, but include
-            # those deterministic collision suffixes so the profile banner
-            # gate is not silently skipped.
-            listed = name == 'AFwS227S0000000_3.smali' or re.fullmatch(r'0A7j(?:\.\d+)?\.smali', name)
-            if not listed and not (anywhere and name.endswith(".smali")): continue
-            path=os.path.join(directory,name)
-            with open(path,encoding="utf-8") as handle: text=handle.read()
-            if not listed and lock not in text: continue
-            def edit(match):
-                method=match.group(0)
-                asks = lock in method
-                if not asks and not (listed and any(key in method for key in keys)): return method
-                method,hits=pattern.subn(lambda m:"invoke-static"+(m.group('range') or '')+" "+m.group('registers')+", "+FLAGS+"->nativeInt(Ljava/lang/Object;IILjava/lang/String;Z)I",method)
-                label = 'native speed lock' if asks else 'native experiment overrides'
-                if hits: counts[label]=counts.get(label,0)+hits
-                return method
-            changed=re.sub(r"(?ms)^\.method .*?^\.end method",edit,text)
-            if changed!=text:
-                with open(path,"w",encoding="utf-8") as handle:handle.write(changed)
+            # baksmali on Windows tells apart names that differ only by case
+            # with a number, so the file may be 09tK.1.smali
+            if not re.fullmatch(r"09tK(?:\.\d+)?\.smali", name):
+                continue
+            path = os.path.join(directory, name)
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            if not text.startswith(".class") or FLAG_READER not in text.split("\n", 1)[0]:
+                continue
+
+            def ask(match):
+                head, descriptor, returned, registers, body = match.groups()
+                answer = FLAG_ANSWERS.get(returned)
+                types = _parameters(descriptor)
+                if answer is None or "Ljava/lang/String;" not in types or " static " in head:
+                    return match.group(0)
+                if FLAGS + "->forced" in body:
+                    counts[FLAG_LABEL] = counts.get(FLAG_LABEL, 0) + 1
+                    return match.group(0)
+                # p0 is the reader; a long or a double takes two registers
+                key = 1
+                for kind in types[:types.index("Ljava/lang/String;")]:
+                    key += 2 if kind in ("J", "D") else 1
+                taken = 1 + sum(2 if kind in ("J", "D") else 1 for kind in types)
+                if int(registers) - taken < 2:
+                    raise RuntimeError("TikTok's experiment reader has no register to spare in %s" % head)
+                method, boxed, unbox, wide = answer
+                lines = ["    invoke-static/range {p%d .. p%d}, %s->%s(Ljava/lang/String;)%s"
+                         % (key, key, FLAGS, method, boxed),
+                         "    move-result-object v0",
+                         "    if-eqz v0, :elite_flag"]
+                if unbox:
+                    lines += ["    invoke-virtual {v0}, %s->%s" % (boxed, unbox),
+                              "    move-result%s v0" % wide]
+                lines += ["    return%s v0" % wide, "    :elite_flag"]
+                counts[FLAG_LABEL] = counts.get(FLAG_LABEL, 0) + 1
+                # after whatever describes the method and before what it does
+                rows = body.split("\n")
+                inside = False
+                at = 0
+                for at, row in enumerate(rows):
+                    word = row.strip()
+                    if inside:
+                        inside = not word.startswith(".end annotation")
+                    elif word.startswith(".annotation"):
+                        inside = True
+                    elif word and not word.startswith((".prologue", ".param", ".end param")):
+                        break
+                rows[at:at] = ["\n\n".join(lines) + "\n"]
+                return "%s(%s)%s\n    .registers %s\n%s" % (head, descriptor, returned, registers,
+                                                             "\n".join(rows))
+
+            changed = re.sub(
+                r"(?ms)^(\.method [^\n(]*)\(([^)\n]*)\)(\S+)\n    \.registers (\d+)\n(.*?^\.end method)",
+                ask, text)
+            if changed != text:
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write(changed)
     return counts
 
 def carries_an_anchor(dex: bytes) -> bool:
@@ -1173,7 +1284,7 @@ def carries_an_anchor(dex: bytes) -> bool:
             or b"Lcom/ss/android/ugc/aweme/offlinemode/ui/bottom/OfflineModeDetailBottomComponent;" in dex
             or b"Lcom/ss/android/ugc/aweme/offlinemode/ui/sheet/OfflineModeSheetPageAssem;" in dex
             or b"audio_comment_publish" in dex or b"profile_bg_in_allow_list" in dex
-            or NATIVE_SPEED_LOCK.encode() in dex
+            or defines(dex, FLAG_READER)
             or b"Lcom/ss/android/ugc/aweme/feed/assem/videoauthorinfo/VideoAuthorInfoRelationAssem;" in dex
             or any(owner.encode() in dex for owner in RAIL_CLASSES)
             or PLAYER_CONTROLLER.encode() in dex
@@ -1597,7 +1708,8 @@ def rewrite_targets() -> List[str]:
     out.append(RAIL+"->bindNative(Ljava/lang/Object;)V")
     out.append("Lcom/neverocheg/elite/PlayerTools;->resumed(Ljava/lang/Object;Ljava/lang/String;)V")
     out.extend(["Lcom/neverocheg/elite/Repost;->bind(Ljava/lang/Object;)V","Lcom/neverocheg/elite/Repost;->anchor(Ljava/lang/Object;)V","Lcom/neverocheg/elite/ProfileLayout;->bind(Ljava/lang/Object;Landroid/view/View;)V","Lcom/neverocheg/elite/MessageTimes;->before(Ljava/lang/Object;)V","Lcom/neverocheg/elite/MessageTimes;->bind(Ljava/lang/Object;Ljava/lang/Object;)V","Lcom/neverocheg/elite/ModNotifications;->noPrompts()Z"])
-    out.append(FLAGS+"->nativeInt(Ljava/lang/Object;IILjava/lang/String;Z)I")
+    out.extend("%s->%s(Ljava/lang/String;)%s" % (FLAGS, method, boxed)
+               for method, boxed, _unbox, _wide in FLAG_ANSWERS.values())
     out.append(DATES+"->bindAuthor(Ljava/lang/Object;)V")
     out.append(DATES+"->bindPost(Ljava/lang/Object;Ljava/lang/Object;)V")
     for name, _original, replacement, target in WILD_SOURCES:
@@ -1757,7 +1869,7 @@ def rewrite_everything(root: str, literals: Optional[Dict[str, str]] = None,
     counts.update(rewrite_literals(root, literals or {}))
     counts.update(force_false(root))
     counts.update(rewrite_models(root))
-    counts.update(rewrite_native_flags(root, dex))
+    counts.update(rewrite_flag_reader(root, dex))
     # Class-specific heart hooks must claim the feed heart's Tux tint calls
     # before the generic accent pass rewrites every TuxIconView tint. The
     # latter would otherwise swallow the exact native heart hook and leave

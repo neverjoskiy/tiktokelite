@@ -44,6 +44,10 @@ public final class Watch implements Application.ActivityLifecycleCallbacks {
             Tester.mark(activity);
         } catch (Throwable ignored) {
         }
+        try {
+            TabBadges.attach(activity);
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

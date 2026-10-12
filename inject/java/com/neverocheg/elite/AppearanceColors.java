@@ -198,13 +198,18 @@ public final class AppearanceColors {
         return all;
     }
 
-    private static void repaintText(View view, int depth, int[] visited) {
-        if (view == null || depth > 40 || ++visited[0] > 12000) return;
+    /** One view, looked at if it has changed since the last time: what a walk calls. */
+    static void look(View view) {
         Object last = view.getTag(LOOKED);
         if (!(last instanceof Integer) || ((Integer) last).intValue() != wearing(view)) {
             repaintOne(view);
             view.setTag(LOOKED, Integer.valueOf(wearing(view)));
         }
+    }
+
+    private static void repaintText(View view, int depth, int[] visited) {
+        if (view == null || depth > 40 || ++visited[0] > 12000) return;
+        look(view);
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;
             for (int i = 0, count = group.getChildCount(); i < count; i++)

@@ -94,6 +94,11 @@ final class Unsaved {
         return one == null ? two == null : one.equals(two);
     }
 
+    /** A change that is not written in any preference, and so cannot be seen to be undone. */
+    static void other() {
+        elsewhere = true;
+    }
+
     /** Every preference the mod keeps, under the name of the file it is in. */
     private static Map<String, Object> read(Context context) {
         Set<String> files = new HashSet<String>();

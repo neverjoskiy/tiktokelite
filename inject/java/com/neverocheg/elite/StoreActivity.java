@@ -286,6 +286,8 @@ public class StoreActivity extends Activity {
                         },control);
                 final boolean ok = got && put(app,into,plugin);
                 installed=ok;
+                // the settings screen under this one offers the restart when it comes back
+                if(ok)SettingsActivity.restartOwed();
                 if(!control.cancelled())Screen.say(ok ? Text.STORE_GOT : Text.STORE_FAILED);
                 } finally {DownloadTasks.finish(job,installed);into.delete();if(installed)Screen.progressDone(job);else Screen.progressGone(job);
                     synchronized(activeDownloads){activeDownloads.remove(plugin.id);}}

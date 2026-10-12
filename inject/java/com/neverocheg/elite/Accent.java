@@ -582,13 +582,19 @@ public final class Accent {
         return all;
     }
 
-    private static void paintViews(View view, int depth, int[] seen) {
-        if (view == null || depth > 40 || ++seen[0] > 12000) return;
+    /** One view, looked at if it has changed since the last time: what a walk calls. */
+    static void look(View view) {
+        if (colour() == TIKTOK && owned.isEmpty() && ownedColours.isEmpty()) return;
         Object last = view.getTag(LOOKED);
         if (!(last instanceof Integer) || ((Integer) last).intValue() != wearing(view)) {
             paintView(view);
             view.setTag(LOOKED, Integer.valueOf(wearing(view)));
         }
+    }
+
+    private static void paintViews(View view, int depth, int[] seen) {
+        if (view == null || depth > 40 || ++seen[0] > 12000) return;
+        look(view);
         if (view instanceof android.view.ViewGroup) {
             android.view.ViewGroup group = (android.view.ViewGroup) view;
             for (int i = 0, many = group.getChildCount(); i < many; i++)

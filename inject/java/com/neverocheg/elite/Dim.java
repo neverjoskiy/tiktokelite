@@ -252,7 +252,7 @@ public final class Dim {
         if(depth>40 || budget[0]--<=0)return 15;
         View anchor=commentBoundary(view);
         if(anchor!=null || blockedPanel(view)) {
-            int flags=4|(chatInput(view)?32:0)|(actualCommentPanel(view)?64:0)|(commentField(view)?128:0);commentSources.put(view,anchor==null?view:anchor);inspection.put(view,flags);
+            int flags=4|(chatInput(view)||(anchor!=null&&chatInput(anchor))?32:0)|(actualCommentPanel(view)?64:0)|(commentField(view)?128:0);commentSources.put(view,anchor==null?view:anchor);inspection.put(view,flags);
             if((flags&128)!=0)markZone(view,true);
             else if(anchor!=null || ((flags&64)!=0 && !Boolean.TRUE.equals(view.getTag(0x5454434D))))markZone(view,false);
             return flags;
@@ -346,8 +346,17 @@ public final class Dim {
     }
     private static boolean chatInput(View view){
         if(view instanceof android.widget.EditText){CharSequence hint=((android.widget.EditText)view).getHint();String text=hint==null?"":hint.toString().trim().toLowerCase(java.util.Locale.ROOT);if(text.contains("коммент") || text.contains("comment"))return false;return text.startsWith("написать") || text.startsWith("сообщение") || text.startsWith("message");}
-        String name=typeName(view);return name.contains("messagelist") || name.contains("chatinput") || name.contains("chatroom");
+        // The box a message is typed into is a class with a real name, and that is what a conversation is
+        // known by now. It used to be known by the hint in that box, which is "написать" in one language
+        // only, and by class names TikTok no longer uses -- so the eye sat on top of the chat's title and
+        // the dimming turned the sticker panel into an empty one.
+        // And it has to be on the screen: a conversation that was left may still be in the tree for a while.
+        String name=typeName(view);
+        if(name.contains(CHAT))return view.isAttachedToWindow() && view.getGlobalVisibleRect(new android.graphics.Rect());
+        return name.contains("messagelist") || name.contains("chatinput") || name.contains("chatroom");
     }
+    /** Where the views of a conversation live, in lower case as type names are kept here. */
+    private static final String CHAT = ".im.sdk.chat.";
     private static boolean blockedPanel(View view) {
         if(Boolean.TRUE.equals(view.getTag(0x5454434D))||Boolean.TRUE.equals(view.getTag(0x54544349)))return true;
         if(view instanceof android.widget.TextView) {
@@ -361,7 +370,7 @@ public final class Dim {
         boolean blocked=type.equals("x.0h10") || type.contains("commentlist") || type.contains("commentpanel")
                 || type.contains("commentsheet") || type.contains("commentinput")
                 || type.contains("commenttext") || type.contains("commentcomposer") || type.contains("chatroom")
-                || type.contains("messagelist") || type.contains("chatinput");
+                || type.contains("messagelist") || type.contains("chatinput") || type.contains(CHAT);
         if(!blocked && resource>0)try{
             String id=Names.of(view);
             blocked=id.contains("comment") && (id.contains("panel") || id.contains("list") || id.contains("input") || id.contains("sheet") || id.contains("edit"));
