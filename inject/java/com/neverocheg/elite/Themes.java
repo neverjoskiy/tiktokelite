@@ -421,6 +421,14 @@ public final class Themes {
                               View view, int depth) {
         if (drawable == null || depth > 3) return;
         try {
+            // a fade this made earlier is made again from what it was made of,
+            // so a change of theme starts from TikTok's colours and not ours
+            android.graphics.drawable.Drawable first = brushed.get(drawable);
+            if (first != null) drawable = first;
+            if (drawable instanceof android.graphics.drawable.ShapeDrawable) {
+                brush((android.graphics.drawable.ShapeDrawable) drawable, view);
+                return;
+            }
             if (drawable instanceof android.graphics.drawable.ColorDrawable) {
                 int was = ((android.graphics.drawable.ColorDrawable) drawable).getColor();
                 int now = recolour(was, true);
@@ -484,8 +492,125 @@ public final class Themes {
                 return;
             }
             other(drawable);
+            if (Probe.ON && view != null) unknown(drawable, view);
         } catch (Throwable ignored) {
         }
+    }
+
+    private static final java.util.Set<String> told = new java.util.HashSet<String>();
+
+    /** A test build writes down each kind of background this could do nothing with. */
+    private static void unknown(android.graphics.drawable.Drawable drawable, View view) {
+        String what = drawable.getClass().getName() + " on " + view.getClass().getName()
+                + " " + view.getWidth() + "x" + view.getHeight();
+        if (told.size() < 80 && told.add(what)) android.util.Log.e("TikTokElite", "background: " + what);
+    }
+
+    /** The fades this has rebuilt, and the brushes they were rebuilt from. */
+    private static final java.util.Map<android.graphics.drawable.Drawable,
+            android.graphics.drawable.Drawable> brushed = java.util.Collections.synchronizedMap(
+            new java.util.WeakHashMap<android.graphics.drawable.Drawable,
+                    android.graphics.drawable.Drawable>());
+
+    private static final int SAMPLES = 32;
+
+    /** Set when a view could not be dealt with yet and must not be marked as seen. */
+    private static boolean later;
+
+    /**
+     * A background painted with a brush rather than described as a shape.
+     *
+     * The fade under a profile's banner is one of these, and it is the hard
+     * case: the colours are inside a shader, and a shader does not say what
+     * it is made of. But it can be asked to paint. So it paints a square the
+     * size of a thumbnail, once, and what it painted is read back: if every
+     * row is one colour it is a fade from top to bottom, if every column is,
+     * from side to side, and either way the colours along it are now known.
+     * Those are moved to the theme and the fade is built again as a plain
+     * gradient that says what it is.
+     *
+     * Only for a rectangle. A brush that fills a circle or a rounded corner
+     * would come back as a rectangle, and is left alone.
+     */
+    private static void brush(android.graphics.drawable.ShapeDrawable shape, View view) {
+        android.graphics.Paint paint = shape.getPaint();
+        if (shape.getShaderFactory() == null && paint.getShader() == null) {
+            // no shader: the brush is one colour, and says so
+            int was = paint.getColor();
+            int now = recolour(was, true);
+            if (now != was) {
+                paint.setColor(now);
+                shape.invalidateSelf();
+            }
+            return;
+        }
+        if (view == null || android.os.Build.VERSION.SDK_INT < 24) return;
+        android.graphics.drawable.shapes.Shape form = shape.getShape();
+        if (form != null && form.getClass() != android.graphics.drawable.shapes.RectShape.class) {
+            return;
+        }
+        // A brush is made for the size it will be painted at, and a view that
+        // has not been laid out has no size yet: looked at again once it has.
+        int wide = view.getWidth(), tall = view.getHeight();
+        if (wide <= 0 || tall <= 0) {
+            later = true;
+            return;
+        }
+        if (shape.getBounds().isEmpty()) shape.setBounds(0, 0, wide, tall);
+        android.graphics.Rect bounds = shape.getBounds();
+
+        int[] seen = new int[SAMPLES * SAMPLES];
+        android.graphics.Bitmap square = android.graphics.Bitmap.createBitmap(
+                SAMPLES, SAMPLES, android.graphics.Bitmap.Config.ARGB_8888);
+        try {
+            // painted at its own size and looked at small, so that a brush
+            // which was not made to be resized is still the brush it is
+            android.graphics.Canvas canvas = new android.graphics.Canvas(square);
+            canvas.scale(SAMPLES / (float) bounds.width(), SAMPLES / (float) bounds.height());
+            canvas.translate(-bounds.left, -bounds.top);
+            shape.draw(canvas);
+            square.getPixels(seen, 0, SAMPLES, 0, 0, SAMPLES, SAMPLES);
+        } finally {
+            square.recycle();
+        }
+
+        boolean down = true, across = true;
+        for (int y = 0; y < SAMPLES && (down || across); y++) {
+            for (int x = 0; x < SAMPLES; x++) {
+                int here = seen[y * SAMPLES + x];
+                if (!near(here, seen[y * SAMPLES])) down = false;
+                if (!near(here, seen[x])) across = false;
+            }
+        }
+        if (!down && !across) return;   // not a fade along one line: left as it is
+
+        int[] stops = new int[SAMPLES];
+        boolean moved = false;
+        for (int i = 0; i < SAMPLES; i++) {
+            int was = down ? seen[i * SAMPLES] : seen[i];
+            // nothing of the colour shows where it is clear, and the reading
+            // comes back as black: it is the colour next to it, unseen
+            int solid = recolour(was | 0xFF000000, true);
+            stops[i] = (was & 0xFF000000) | (solid & 0x00FFFFFF);
+            // where it can be seen, that is: a fade of some colour that is
+            // not the theme's is clear at one end too, and is not ours to redo
+            if (stops[i] != was && (was >>> 24) > 40) moved = true;
+        }
+        if (!moved) return;
+        android.graphics.drawable.GradientDrawable rebuilt =
+                new android.graphics.drawable.GradientDrawable(down
+                        ? android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM
+                        : android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT, stops);
+        brushed.put(rebuilt, shape);
+        view.setBackground(rebuilt);
+    }
+
+    /** The same colour, give or take what drawing it small does to it. */
+    private static boolean near(int one, int two) {
+        return Math.abs((one >>> 24) - (two >>> 24)) <= 6
+                && Math.abs(((one >> 16) & 0xFF) - ((two >> 16) & 0xFF)) <= 6
+                && Math.abs(((one >> 8) & 0xFF) - ((two >> 8) & 0xFF)) <= 6
+                && Math.abs((one & 0xFF) - (two & 0xFF)) <= 6;
     }
 
     /** How a drawable the framework does not know says its colour, per class. */
@@ -558,9 +683,12 @@ public final class Themes {
             } else {
                 Settled now = settled;
                 if (view.getTag(WORE) != wears || view.getTag(UNDER) != now) {
+                    later = false;
                     paint(wears, view, 0);
-                    view.setTag(WORE, view.getBackground());
-                    view.setTag(UNDER, now);
+                    if (!later) {
+                        view.setTag(WORE, view.getBackground());
+                        view.setTag(UNDER, now);
+                    }
                 }
             }
         }
