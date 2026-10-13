@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "2.1.1",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v2.1.1/tiktokolite.apk",
-  "notes": "TikTok 47.2.41 and a new settings screen in Material 3. The phone's own colours as the theme, TikTok's speed lock for everybody, a save button in the sticker's own sheet, and much less stutter. Texture packs, profile banners and patches are gone.",
-  "notes_ru": "TikTok 47.2.41 и новые настройки в стиле Material 3. Тема в цветах своего телефона, родная фиксация скорости у всех, скачивание стикера прямо из его шторки и намного меньше лагов. Текстурпаки, баннеры профиля и заплатки убраны.",
-  "notes_uk": "TikTok 47.2.41 і нові налаштування у стилі Material 3. Тема в кольорах свого телефона, рідна фіксація швидкості в усіх, завантаження стікера просто з його шторки і набагато менше лагів. Текстурпаки, банери профілю та латки прибрано."
+  "version": "3.0",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0/tiktokolite.apk",
+  "notes": "Material 3 bottom bar, feed, profile and inbox, each with a switch; the TikTokElite row in TikTok's own settings; TikTok leaves the brightness alone; story rings keep the avatar's shape; much less stutter and the commonest crashes gone.",
+  "notes_ru": "Нижняя панель, лента, профиль и входящие в стиле Material 3, всё отключается; кнопка TikTokElite прямо в списке настроек TikTok; TikTok больше не выкручивает яркость; кольца историй повторяют форму аватарки; гораздо меньше лагов и убраны самые частые вылеты.",
+  "notes_uk": "Нижня панель, стрічка, профіль і вхідні у стилі Material 3, усе вимикається; кнопка TikTokElite просто у списку налаштувань TikTok; TikTok більше не викручує яскравість; кільця історій повторюють форму аватарки; набагато менше лагів і прибрано найчастіші вильоти."
 }
