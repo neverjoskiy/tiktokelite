@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "3.0.2",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0.2/tiktokolite.apk",
-  "notes": "Short counts (100.8K), Material 3 comments, a switch to keep the bottom bar dimmed, and the owner's badge and gradient. Material 3 bottom bar, feed, profile and inbox; the TikTokElite row in TikTok's own settings; TikTok leaves the brightness alone.",
-  "notes_ru": "Короткие счётчики (100,8K), комментарии в стиле Material 3, можно не прятать нижнюю панель при затемнении, значок и градиент владельца. Нижняя панель, лента, профиль и входящие в стиле Material 3; кнопка TikTokElite в настройках TikTok; TikTok не выкручивает яркость.",
-  "notes_uk": "Короткі лічильники (100,8K), коментарі у стилі Material 3, перемикач не ховати нижню панель під час затемнення, значок і градієнт власника. Нижня панель, стрічка, профіль і вхідні у стилі Material 3; кнопка TikTokElite в налаштуваннях TikTok; TikTok не викручує яскравість."
+  "version": "3.0.3",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0.3/tiktokolite.apk",
+  "notes": "Counts that work (100.8K everywhere), comments on cards with no dislike, and the update offer retried past a cold start. Short counts, Material 3 comments, keep-the-bar switch, owner badge and gradient.",
+  "notes_ru": "Работающие счётчики (100,8K везде), комментарии на карточках без дизлайка, повтор предложения обновления после холодного старта. Короткие счётчики, комментарии в Material 3, тумблер панели, значок и градиент владельца.",
+  "notes_uk": "Лічильники, що працюють (100,8K усюди), коментарі на картках без дизлайка, повтор пропозиції оновлення після холодного старту. Короткі лічильники, коментарі у Material 3, перемикач панелі, значок і градієнт власника."
 }
