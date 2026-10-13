@@ -50,6 +50,9 @@ public final class Updater {
 
     /** Refused in this run of the app, so it is not asked again until a restart. */
     private static volatile boolean refused;
+
+    /** Offers that found no screen yet, and are waiting for one. */
+    private static volatile int homeless;
     private static volatile boolean started;
 
     // -------------------------------------------------------------- knowing
@@ -180,7 +183,23 @@ public final class Updater {
             @Override
             public void run() {
                 android.app.Activity activity = Screen.now();
-                if (activity == null || activity.isFinishing()) return;
+                if (activity == null || activity.isFinishing()) {
+                    // Cold start: TikTok has not put a screen up yet, and in
+                    // five minutes the person may be gone. Ask again shortly,
+                    // a few times, rather than dropping the news silently.
+                    if (homeless < 3) {
+                        homeless++;
+                        Diary.detail("update: no screen yet, asking again in half a minute");
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                offer(context);
+                            }
+                        }, 30000L);
+                    }
+                    return;
+                }
+                homeless = 0;
                 String message = Text.UPDATE_THERE_IS + " " + latest
                         + (notes == null || notes.length() == 0 ? "" : "\n\n" + notes);
                 Popup.askUpdate(activity, Text.UPDATE, message,

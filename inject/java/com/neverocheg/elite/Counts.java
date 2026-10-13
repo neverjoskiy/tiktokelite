@@ -94,14 +94,22 @@ final class Counts {
 
     /** A number and a word for thousand, million or billion, in any of our languages. */
     private static final Pattern COMPACT = Pattern.compile(
-            "^(\\d{1,3}(?:[.,]\\d+)?)[\\s\\u00A0]+([A-Za-z\\u0400-\\u045F\\u0401\\u0451.]+)$");
+            "^(\\d{1,3}(?:[.,]\\d+)?)[\\s\\u00A0\\u2000-\\u200A\\u202F\\u205F\\u3000]+([A-Za-z\\u0400-\\u045F\\u0401\\u0451.]+)$");
 
     /** What was on a view before it was shortened, so a shortened count is left alone. */
     private static final int WAS = 0x436E7431;
 
+    private static volatile boolean told;
+
+    /** One line for whoever reads the diary, so a silent pass can be told from a dead one. */
+    private static void tell(String line) {
+        if (told) return;
+        told = true;
+        Diary.detail("counts: " + line);
+    }
+
     /** The shortened form of a compact count, or null when it is short already. */
-    static String format(String text) {
-        if (text == null) return null;
+    static String format(String text) {        if (text == null) return null;
         Matcher match = COMPACT.matcher(text.trim());
         if (!match.matches()) return null;
         String word = match.group(2).replace(".", "").toLowerCase(java.util.Locale.ROOT);
@@ -133,6 +141,7 @@ final class Counts {
             if (shorted != null && !shorted.equals(text)) {
                 view.setTag(WAS, text);
                 view.setText(shorted);
+                tell(text + " -> " + shorted);
             }
         } catch (Throwable ignored) {
         }
@@ -158,6 +167,17 @@ final class Counts {
             if (old != null && old.isAlive()) old.removeOnGlobalLayoutListener(layout);
             watched = new WeakReference<ViewTreeObserver>(next);
             if (next.isAlive()) next.addOnGlobalLayoutListener(layout);
+            // rows that arrive without laying anything out are caught on the next passes anyway;
+            // one more look a moment later catches what was mid-flight when the screen came up
+            root.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (isEnabled()) sweep(root);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }, 1500L);
         } catch (Throwable error) {
             Diary.detail("counts: " + error);
         }
@@ -183,15 +203,14 @@ final class Counts {
             };
 
     static void sweep(View root) {
-        walk(root, 0, new int[]{4000});
+        walk(root, 0, new int[]{30000});
     }
 
     private static void walk(View view, int depth, int[] left) {
         if (view == null || depth > 24 || left[0]-- <= 0) return;
         try {
             if (view.getVisibility() != View.VISIBLE) return;
-            if (view instanceof TextView && !(view instanceof EditText)
-                    && !(view instanceof android.widget.Button)) {
+            if (view instanceof TextView && !(view instanceof EditText)) {
                 shorten((TextView) view);
                 return;
             }

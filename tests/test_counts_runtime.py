@@ -8,7 +8,7 @@ class CountsTest(unittest.TestCase):
   sources={k:STUBS[k] for k in ['android/content/Context.java','android/content/SharedPreferences.java']}
   sources.update({
    'android/os/SystemClock.java':'package android.os;public class SystemClock{public static long uptimeMillis(){return 100000;}}',
-   'android/view/View.java':'package android.view;public class View{public static int VISIBLE=0;int visibility;java.util.Map tags=new java.util.HashMap();public int getVisibility(){return visibility;}public Object getTag(int k){return tags.get(k);}public void setTag(int k,Object v){if(v==null)tags.remove(k);else tags.put(k,v);}public android.view.ViewTreeObserver getViewTreeObserver(){return new ViewTreeObserver();}}',
+   'android/view/View.java':'package android.view;public class View{public static int VISIBLE=0;int visibility;java.util.Map tags=new java.util.HashMap();public int getVisibility(){return visibility;}public Object getTag(int k){return tags.get(k);}public void setTag(int k,Object v){if(v==null)tags.remove(k);else tags.put(k,v);}public boolean postDelayed(Runnable r,long t){return true;}public android.view.ViewTreeObserver getViewTreeObserver(){return new ViewTreeObserver();}}',
    'android/view/ViewGroup.java':'package android.view;import java.util.*;public class ViewGroup extends View{List<View> kids=new ArrayList<View>();public int getChildCount(){return kids.size();}public View getChildAt(int i){return kids.get(i);}}',
    'android/view/ViewTreeObserver.java':'package android.view;public class ViewTreeObserver{public interface OnGlobalLayoutListener{void onGlobalLayout();}public boolean isAlive(){return true;}public void addOnGlobalLayoutListener(OnGlobalLayoutListener l){}public void removeOnGlobalLayoutListener(OnGlobalLayoutListener l){}}',
    'android/view/Window.java':'package android.view;public class Window{public View getDecorView(){return new View();}}',
@@ -24,6 +24,7 @@ class CountsTest(unittest.TestCase):
 static void check(boolean b,String s){if(!b)throw new AssertionError(s);}public static void main(String[] a){
 check("100,8K".equals(Counts.format("100,8 тыс.")),"thousands");
 check("100,8K".equals(Counts.format("100,8 тыс")),"no dot");
+check("100,8K".equals(Counts.format("100,8\\u202fтыс.")),"narrow no-break space");
 check("1,2M".equals(Counts.format("1,2 млн.")),"millions");
 check("3B".equals(Counts.format("3 млрд")),"billions");
 check("2,5K".equals(Counts.format("2,5 тис.")),"ukrainian thousands");

@@ -108,29 +108,108 @@ final class CommentSheets {
     /** A sheet whose top corners were taken off. */
     private static final int ROUNDED = 0x436D7432;
 
-    /** A comment row TikTok has just bound: a card behind it, and the sheet rounded. */
+    /** A comment row TikTok has just bound: a card behind it, buttons dressed, sheet rounded. */
     static void dress(View root) {
         if (root == null || !isEnabled()) return;
         try {
             Object worn = root.getTag(DRESSED);
-            if (worn instanceof Card) {
-                if (root.getBackground() == worn) return;  // still ours
-            } else if (root.getBackground() != null) {
-                return;  // painted by TikTok itself
-            }
-            float unit = root.getResources().getDisplayMetrics().density;
-            int ground = Md3.behind(root);
-            int shell = NavBar.mix(ground, Md3.ink(ground), 0.07f);
             Card card = worn instanceof Card ? (Card) worn : new Card();
-            card.left = card.right = 8f * unit;
-            card.top = card.bottom = 3f * unit;
-            card.radius = 16f * unit;
-            card.dress(shell);
-            if (root.getBackground() != card) root.setBackground(card);
-            root.setTag(DRESSED, card);
-            roundSheet(root);
+            if (root.getBackground() != card) {
+                float unit = root.getResources().getDisplayMetrics().density;
+                int ground = Md3.behind(root);
+                card.left = card.right = 8f * unit;
+                card.top = card.bottom = 3f * unit;
+                card.radius = 16f * unit;
+                card.dress(NavBar.mix(ground, Md3.ink(ground), 0.07f));
+                root.setBackground(card);
+                root.setTag(DRESSED, card);
+            }
+            buttons(root, 0, new int[]{200});
+            View sheet = roundSheet(root);
+            if (sheet != null) header(sheet, 0, new int[]{400});
         } catch (Throwable error) {
             Diary.detail("comment cards: " + error);
+        }
+    }
+
+    /** Words a button that takes a like back carries, in our languages. */
+    private static boolean says(CharSequence words, String... looks) {
+        if (words == null) return false;
+        String text = words.toString().trim().toLowerCase(java.util.Locale.ROOT);
+        if (text.length() == 0 || text.length() > 48) return false;
+        for (String look : looks) {
+            if (text.contains(look)) return true;
+        }
+        return false;
+    }
+
+    private static boolean dislike(CharSequence desc) {
+        return says(desc, "не нравится", "не подобається", "dislike");
+    }
+
+    private static boolean like(CharSequence desc) {
+        return !dislike(desc) && says(desc, "нравится", "подобається", "like");
+    }
+
+    private static boolean replies(CharSequence text) {
+        return says(text, "ответ", "replies", "reply", "відповід");
+    }
+
+    private static CharSequence description(View view) {
+        try {
+            return view.getContentDescription();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    /** Small enough to be an icon button, and it does something when tapped. */
+    private static boolean iconButton(View view, float unit) {
+        return view.isClickable() && view.getWidth() > 0 && view.getWidth() <= 64f * unit
+                && view.getHeight() > 0 && view.getHeight() <= 64f * unit;
+    }
+
+    /** The like on a disc of its own, the dislike gone, the replies link on a card. */
+    private static void buttons(View view, int depth, int[] left) {
+        if (view == null || depth > 8 || left[0]-- <= 0) return;
+        float unit = view.getResources().getDisplayMetrics().density;
+        if (iconButton(view, unit)) {
+            CharSequence desc = description(view);
+            if (dislike(desc)) {
+                if (view.getVisibility() != View.GONE) view.setVisibility(View.GONE);
+                return;
+            }
+            if (like(desc) && view.getTag(DRESSED) == null) {
+                int ground = Md3.behind(view);
+                Card disc = new Card();
+                float inset = 2f * unit;
+                disc.left = disc.right = inset;
+                disc.top = disc.bottom = inset;
+                disc.radius = 48f * unit;
+                disc.dress(NavBar.mix(ground, Md3.ink(ground), 0.07f));
+                view.setBackground(disc);
+                view.setTag(DRESSED, disc);
+            }
+            return;
+        }
+        if (view instanceof android.widget.TextView && !(view instanceof android.widget.EditText)) {
+            CharSequence text = ((android.widget.TextView) view).getText();
+            if (replies(text) && view.getTag(DRESSED) == null
+                    && view.getWidth() > 0 && view.getWidth() < 320f * unit) {
+                int ground = Md3.behind(view);
+                Card card = new Card();
+                card.left = card.right = 10f * unit;
+                card.top = card.bottom = 4f * unit;
+                card.radius = 12f * unit;
+                card.dress(NavBar.mix(ground, Md3.ink(ground), 0.07f));
+                view.setBackground(card);
+                view.setTag(DRESSED, card);
+            }
+            return;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) buttons(group.getChildAt(i), depth + 1, left);
         }
     }
 
@@ -145,27 +224,29 @@ final class CommentSheets {
     };
 
     /** The sheet a row sits in: the full-width container anchored to the screen's foot. */
-    static void roundSheet(View root) {
-        if (root == null || !isEnabled()) return;
+    static View roundSheet(View root) {
+        if (root == null || !isEnabled()) return null;
         try {
             View decor = root.getRootView();
-            if (decor == null || decor.getWidth() == 0) return;
+            if (decor == null || decor.getWidth() == 0) return null;
             float unit = root.getResources().getDisplayMetrics().density;
             int[] at = new int[2], origin = new int[2];
             decor.getLocationOnScreen(origin);
             int foot = origin[1] + decor.getHeight();
             View view = root;
             for (int i = 0; i < 12 && view != null && view != decor; i++) {
-                if (view.getTag(ROUNDED) == null && view.getWidth() >= decor.getWidth() * 0.9f) {
+                if (view.getWidth() >= decor.getWidth() * 0.9f) {
                     view.getLocationOnScreen(at);
                     int bottom = at[1] + view.getHeight();
                     if (bottom >= foot - Math.round(8 * unit)
                             && view.getHeight() > Math.round(200 * unit)
                             && view.getHeight() < decor.getHeight() * 0.95f) {
-                        view.setTag(ROUNDED, Boolean.TRUE);
-                        view.setOutlineProvider(TOP_ROUNDED);
-                        view.setClipToOutline(true);
-                        return;
+                        if (view.getTag(ROUNDED) == null) {
+                            view.setTag(ROUNDED, Boolean.TRUE);
+                            view.setOutlineProvider(TOP_ROUNDED);
+                            view.setClipToOutline(true);
+                        }
+                        return view;
                     }
                 }
                 Object parent = view.getParent();
@@ -173,6 +254,43 @@ final class CommentSheets {
             }
         } catch (Throwable error) {
             Diary.detail("comment cards: " + error);
+        }
+        return null;
+    }
+
+    /** How many comments the sheet holds, said in one line. */
+    private static final java.util.regex.Pattern HEADLINE = java.util.regex.Pattern.compile(
+            "^\\d+[\\s\\u00A0\\u2000-\\u200A\\u202F\\u205F\\u3000]+(комментар|коментар|comment).*$",
+            java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+
+    /** The head of the sheet -- its count and its menu -- on one card. */
+    private static void header(View view, int depth, int[] left) {
+        if (view == null || depth > 10 || left[0]-- <= 0) return;
+        try {
+            if (view instanceof android.widget.TextView && !(view instanceof android.widget.EditText)) {
+                CharSequence text = ((android.widget.TextView) view).getText();
+                if (text != null && HEADLINE.matcher(text.toString().trim()).matches()) {
+                    Object parent = view.getParent();
+                    View bar = parent instanceof View ? (View) parent : null;
+                    if (bar != null && bar.getTag(ROUNDED) == null && bar.getWidth() > 0) {
+                        float unit = view.getResources().getDisplayMetrics().density;
+                        int ground = Md3.behind(bar);
+                        Card card = new Card();
+                        card.left = card.right = 8f * unit;
+                        card.top = card.bottom = 3f * unit;
+                        card.radius = 16f * unit;
+                        card.dress(NavBar.mix(ground, Md3.ink(ground), 0.07f));
+                        bar.setBackground(card);
+                        bar.setTag(ROUNDED, card);
+                    }
+                    return;
+                }
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int i = 0; i < group.getChildCount(); i++) header(group.getChildAt(i), depth + 1, left);
+            }
+        } catch (Throwable ignored) {
         }
     }
 
