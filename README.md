@@ -29,6 +29,24 @@ than quietly left broken.
 ## What it adds
 
 <details>
+<summary><b>The bottom bar, the feed, the profile and the inbox in Material 3</b></summary>
+
+The bottom bar is one capsule: the tab you are on opens into a pill with its
+name, and your avatar sits on the profile tab. The feed, the profile and the
+inbox wear cards, capsules and discs in the same shapes, and the buttons beside
+a video get rounded icons. Each screen has its own switch; the feed and the
+rounded icons are off by default. The row that opens these settings is the
+first row of TikTok's own settings list.
+
+TikTok no longer turns the brightness up by itself: not in the camera, and not
+for HDR video, which plays as an ordinary one. Story rings keep the avatar's
+shape beside a video too. The feed stalls less, crash reports say what crashed
+and where, and the two commonest crashes are gone: closing when a message
+arrived while the app was open, and closing on sign-in, account switch or theme
+change with another launcher icon chosen.
+</details>
+
+<details>
 <summary><b>The country the app thinks you are in</b></summary>
 
 TikTok asks the device where it is: the SIM's country, the carrier, the MCC/MNC

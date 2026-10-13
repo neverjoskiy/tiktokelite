@@ -68,14 +68,17 @@ final class CrashReports {
  static void save(Throwable error)throws Exception{
   File dir=directory();if(!dir.exists()&&!dir.mkdirs())return;File[] files=dir.listFiles();if(files!=null&&files.length>=5){java.util.Arrays.sort(files,java.util.Comparator.comparingLong(File::lastModified));for(int i=0;i<=files.length-5;i++)files[i].delete();}
   Thread dying=Thread.currentThread();Throwable root=error;java.util.Set<Throwable> seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Throwable,Boolean>());
-  for(int depth=0;root!=null&&depth<5&&seen.add(root);depth++,root=root.getCause());
+  // The cause at the bottom of it. This used to walk past the last cause into nothing,
+  // so every report said "java.lang.Throwable" and no message, whatever had happened.
+  for(int depth=0;root!=null&&root.getCause()!=null&&depth<5&&seen.add(root);depth++)root=root.getCause();
+  final Throwable thrown=error;
   JSONObject body=new JSONObject().put("id",java.util.UUID.randomUUID().toString()).put("version",Version.MOD).put("sdk",android.os.Build.VERSION.SDK_INT).put("time",System.currentTimeMillis());
   StringBuilder trace=new StringBuilder();java.util.Set<Throwable> walked=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Throwable,Boolean>());
   for(int depth=0;error!=null&&depth<5&&walked.add(error);depth++,error=error.getCause()){
    trace.append(error.getClass().getName());
    String detail=error.getMessage();if(detail!=null)trace.append(": ").append(detail.replace('\n',' '));
    trace.append('\n');StackTraceElement[] frames=error.getStackTrace();for(int i=0;i<Math.min(48,frames.length);i++)trace.append(" at ").append(frames[i]).append('\n');}
-  JSONObject meta=new JSONObject().put("crash",new JSONObject().put("type",truncate(root==null?"java.lang.Throwable":root.getClass().getName())).put("message",truncate(root!=null&&root.getMessage()!=null?root.getMessage():"").replace('\n',' ')).put("thread",truncate(dying.getName())).put("threadId",dying.getId()).put("threadState",String.valueOf(dying.getState())).put("androidRelease",truncate(android.os.Build.VERSION.RELEASE)).put("fatal",true).put("site",truncate(site(dying)).replace('\n',' ')));
+  JSONObject meta=new JSONObject().put("crash",new JSONObject().put("type",truncate(root==null?"java.lang.Throwable":root.getClass().getName())).put("message",truncate(root!=null&&root.getMessage()!=null?root.getMessage():"").replace('\n',' ')).put("thread",truncate(dying.getName())).put("threadId",dying.getId()).put("threadState",String.valueOf(dying.getState())).put("androidRelease",truncate(android.os.Build.VERSION.RELEASE)).put("fatal",true).put("site",truncate(site(root!=null?root:thrown)).replace('\n',' ')));
   JSONObject device=new JSONObject().put("manufacturer",truncate(android.os.Build.MANUFACTURER)).put("brand",truncate(android.os.Build.BRAND)).put("model",truncate(android.os.Build.MODEL)).put("device",truncate(android.os.Build.DEVICE)).put("hardware",truncate(android.os.Build.HARDWARE)).put("product",truncate(android.os.Build.PRODUCT)).put("board",truncate(android.os.Build.BOARD)).put("fingerprint",truncate(android.os.Build.FINGERPRINT)).put("abis",joins(android.os.Build.SUPPORTED_ABIS));
   JSONObject memory=new JSONObject().put("javaHeapMb",megabytes(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())).put("javaHeapMaxMb",megabytes(Runtime.getRuntime().maxMemory())).put("nativeHeapMb",megabytes(nativeHeap())).put("freeMb",megabytes(ram()[0])).put("totalMb",megabytes(ram()[1])).put("thresholdMb",megabytes(ram()[2])).put("lowMemory",lowMemory()).put("storageFreeMb",megabytes(freeStorage())).put("uptimeSeconds",(System.currentTimeMillis()-started)/1000L);
   meta.put("device",device);meta.put("memory",memory).put("mod",new JSONObject().put("version",Version.MOD).put("tiktok",Version.TIKTOK)).put("threads",threads());
@@ -86,16 +89,17 @@ final class CrashReports {
  }
 
  /**
-  * Where the crashing thread was, which the throwable alone cannot say: a
-  * handler runs on whichever thread died, and save is not always given one.
+  * Where it was thrown, in one line, for whoever reads the list of reports.
   *
-  * The first frame that is not ours is the interesting one -- the mod's own
-  * frames are the same in every report -- and it doubles as the one-line
-  * "where" for whoever reads it.
+  * Taken from what was thrown. It used to be taken from the thread that
+  * died, as it stood while this very handler was running on it -- so every
+  * report gave the same place, the call that reads a thread's stack.
   */
- private static String site(Thread dying){
-  try{StackTraceElement[] frames=dying.getStackTrace();if(frames.length==0)return "";
-   for(int i=0;i<frames.length;i++){if(!frames[i].getClassName().startsWith("com.neverocheg.elite"))return frames[i].toString();}
+ private static String site(Throwable error){
+  try{StackTraceElement[] frames=error==null?null:error.getStackTrace();if(frames==null||frames.length==0)return "";
+   // the first frame that is somebody's code rather than Android's own plumbing
+   for(int i=0;i<frames.length;i++){String type=frames[i].getClassName();
+    if(!type.startsWith("android.")&&!type.startsWith("java.")&&!type.startsWith("com.android.")&&!type.startsWith("dalvik.")&&!type.startsWith("libcore."))return frames[i].toString();}
    return frames[0].toString();}catch(Throwable ignored){return "";}
  }
 

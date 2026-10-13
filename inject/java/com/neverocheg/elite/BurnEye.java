@@ -118,6 +118,8 @@ final class BurnEye {
     }
 
     static boolean owns(View view){return view instanceof Slot || replacedAnchors.containsKey(view);}
+    /** The eye itself, as opposed to the button of TikTok's it stands in for. */
+    static boolean eye(View view){return view instanceof Slot;}
 
     /** True when this screen has no visible eye (never installed, or it left). */
     static boolean missing(View root){

@@ -401,6 +401,23 @@ CLASS_ANCHORED_SOURCES.add("LX/0HCj;")
 # the one that is a colour and nothing else. Each adds a circle to a path --
 # once for the picture and once for its border -- and each of those is handed
 # to the mod, which adds the shape that was chosen.
+BRIGHTNESS = "Lcom/neverocheg/elite/Brightness;"
+# TikTok asks a window for a brightness of its own -- the camera asks for all
+# of it -- and every such request is a call to change the window. They all go
+# by the mod, which takes the brightness off and passes the rest on.
+MODEL_SOURCES.append(("Landroid/view/Window;", "setAttributes",
+                      "(Landroid/view/WindowManager$LayoutParams;)V",
+                      "(Landroid/view/Window;Landroid/view/WindowManager$LayoutParams;)V", BRIGHTNESS))
+WINDOW_LABEL = "Window->setAttributes"
+
+# The player's own answer to "is HDR switched off", which TikTok keeps for an
+# accessibility setting. The class has a real name, so this holds from one
+# release to the next.
+PLAYER_CONFIG = "Lcom/ss/android/ugc/aweme/video/simplayer/PlayerConfigImpl;"
+HDR_LABEL = "native hdr switch"
+HDR_QUESTION = "%s->flat()Z" % BRIGHTNESS
+
+
 AVATAR_SHAPE = "Lcom/neverocheg/elite/AvatarShape;"
 ROUND_DRAWABLES = ("LX/1Fnt;", "LX/0HEe;", "LX/0GvU;")
 for anchor in ROUND_DRAWABLES:
@@ -418,6 +435,12 @@ ANCHORED_SOURCES.append((STORY_RING, "Landroid/graphics/Canvas;", "drawArc",
     "(Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V",
     "(Landroid/graphics/Canvas;Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V", AVATAR_SHAPE))
 CLASS_ANCHORED_SOURCES.add(STORY_RING)
+FEED_RING = "LX/11Ww;"
+STORY_RINGS = (STORY_RING, FEED_RING)
+ANCHORED_SOURCES.append((FEED_RING, "Landroid/graphics/Canvas;", "drawArc",
+    "(Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V",
+    "(Landroid/graphics/Canvas;Landroid/graphics/RectF;FFZLandroid/graphics/Paint;)V", AVATAR_SHAPE))
+CLASS_ANCHORED_SOURCES.add(FEED_RING)
 ANCHORED_SOURCES.append(("Lcom/ss/android/ugc/aweme/commentv2/commentlist/powercell/BaseCommentCell;",
     VIEW,"findViewById","(I)Landroid/view/View;","(Landroid/view/View;I)Landroid/view/View;",COMMENTS))
 for method in ("setIconRes", "setTintColor"):
@@ -1265,6 +1288,212 @@ def rewrite_flag_reader(root: str, dex: Optional[bytes] = None) -> Dict[str, int
                     handle.write(changed)
     return counts
 
+
+
+
+def rewrite_hdr_switch(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
+    """Have TikTok's player ask the mod whether HDR is switched off.
+
+    `isForceHdrOff` is what the player reads before it chooses which rendition
+    of a video to play: true, and the HDR ones are left out. It answers from a
+    setting of TikTok's own; it now asks the mod first and says yes when the
+    mod does, and goes on to its own answer otherwise.
+    """
+    counts: Dict[str, int] = {}
+    if dex is not None and not defines(dex, PLAYER_CONFIG):
+        return counts
+    path = os.path.join(root, *PLAYER_CONFIG[1:-1].split("/")) + ".smali"
+    if not os.path.exists(path):
+        return counts
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    match = re.search(r"(?ms)^\.method public isForceHdrOff\(\)Z\n    \.registers (\d+)\n(.*?)^\.end method", text)
+    if match is None:
+        return counts
+    counts[HDR_LABEL] = 1
+    if HDR_QUESTION in match.group(2):
+        return counts
+    if int(match.group(1)) < 2:
+        raise RuntimeError("TikTok's HDR switch has no register to spare")
+    rows = match.group(2).split("\n")
+    at = 0
+    for at, row in enumerate(rows):
+        word = row.strip()
+        if word and not word.startswith((".prologue", ".param", ".end param", ".annotation", ".end annotation")):
+            break
+    rows[at:at] = ["    invoke-static {}, %s\n\n    move-result v0\n\n    if-eqz v0, :elite_hdr\n\n"
+                   "    const/4 v0, 0x1\n\n    return v0\n\n    :elite_hdr\n" % HDR_QUESTION]
+    text = text[:match.start(2)] + "\n".join(rows) + text[match.end(2):]
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    return counts
+
+
+# When a message arrives while the app is open, the code that shows the banner
+# for it asks for a string an apk installed by hand does not have, and the app
+# closes: nine crash reports in ten, in every version. In those two classes
+# the string is asked for through the mod, which gives nothing back where
+# there is nothing.
+SAFELY = "Lcom/neverocheg/elite/Safely;"
+for anchor in ("LX/0TFu;", "LX/0TVv;"):
+    ANCHORED_SOURCES.append((anchor, "Landroid/content/Context;", "getString",
+        "(I)Ljava/lang/String;", "(Landroid/content/Context;I)Ljava/lang/String;", SAFELY))
+    CLASS_ANCHORED_SOURCES.add(anchor)
+
+
+# Every screen of TikTok's starts another through this one class, which is
+# androidx and has kept its name. The start is shown to the mod first: with
+# another icon chosen, the entry TikTok starts by name is switched off.
+STARTER = "Landroidx/activity/ComponentActivity;"
+START_LABEL = "native start"
+START_ROUTE = "Lcom/neverocheg/elite/Launcher;->route(Landroid/content/Intent;)V"
+
+
+def rewrite_starts(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
+    """Show the mod every screen TikTok is about to start."""
+    counts: Dict[str, int] = {}
+    if dex is not None and not defines(dex, STARTER):
+        return counts
+    path = os.path.join(root, *STARTER[1:-1].split("/")) + ".smali"
+    if not os.path.exists(path):
+        return counts
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+
+    def shown(match):
+        head, body = match.group(1), match.group(2)
+        counts[START_LABEL] = counts.get(START_LABEL, 0) + 1
+        if START_ROUTE in body:
+            return match.group(0)
+        rows = body.split("\n")
+        inside = False
+        at = 0
+        for at, row in enumerate(rows):
+            word = row.strip()
+            if inside:
+                inside = not word.startswith(".end annotation")
+            elif word.startswith(".annotation"):
+                inside = True
+            elif word and not word.startswith((".registers", ".prologue", ".param", ".end param")):
+                break
+        rows[at:at] = ["    invoke-static {p1}, %s\n" % START_ROUTE]
+        return head + "\n".join(rows)
+
+    changed = re.sub(
+        r"(?ms)^(\.method public startActivityForResult\(Landroid/content/Intent;I(?:Landroid/os/Bundle;)?\)V\n)(.*?^\.end method)",
+        shown, text)
+    if changed != text:
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(changed)
+    return counts
+
+
+SETTINGS_CELL = "Lcom/neverocheg/elite/SettingsCell;"
+SETTINGS_LABEL = "native settings row"
+# The function that draws the "Display" row of TikTok's settings, and the one
+# that draws the rows of the first group. Both are obfuscated, so this is for
+# 47.2 and is looked for again in whatever comes after it.
+SETTINGS_ROWS = "LX/0MUp;"
+SETTINGS_GROUP = "LX/1Htf;"
+SETTINGS_ROW_METHOD = ".method public static final LIZ(LX/0MUl;ZZLX/0Lx7;I)V"
+SETTINGS_FIRST_ROW = ("    invoke-static/range {v9 .. v14}, LX/1HtZ;->LIZIZ(ZZLcom/ss/android/ugc/aweme/setting/ui/"
+                      "rvmpcompose/group/top/cell/ManagePostsVM;LX/0Lx7;II)V\n")
+
+
+def _declares(path: str, descriptor: str) -> bool:
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return descriptor in handle.read().split("\n", 1)[0]
+    except OSError:
+        return False
+
+
+def _class_file(root: str, descriptor: str) -> Optional[str]:
+    path = os.path.join(root, *descriptor[1:-1].split("/")) + ".smali"
+    if _declares(path, descriptor):
+        return path
+    # baksmali on Windows tells apart names that differ only by case with a
+    # number, so the file may be 0MUp.1.smali -- and 0MUp.smali itself may
+    # resolve to its case twin 0MUP.smali, which declares another class. Take
+    # the sibling whose first line declares it.
+    folder, name = os.path.split(path)
+    stem = name[:-len(".smali")]
+    if os.path.isdir(folder):
+        for entry in sorted(os.listdir(folder)):
+            if entry != name and not (entry.startswith(stem + ".") and entry.endswith(".smali")):
+                continue
+            candidate = os.path.join(folder, entry)
+            if candidate != path and _declares(candidate, descriptor):
+                return candidate
+    return None
+
+
+def rewrite_settings_row(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
+    """Put the TikTokElite row into TikTok's settings list, as one of its rows.
+
+    The screen is Compose: a row is a function, and the only way to have a row
+    of our own drawn like the others is to have their function draw it. So the
+    function for the Display row is copied under the name `margyt`. The copy
+    asks the mod for its title instead of reading TikTok's string, wears the
+    music row's icon, and when Compose wants it drawn again is drawn again by
+    the mod rather than by the class that would draw Display. And the first
+    group, where it draws its first row, asks the mod to draw the copy first;
+    the answer is whether the row after it is still the first of the group,
+    kept in a register nothing reads until the row has been drawn.
+    """
+    counts: Dict[str, int] = {}
+    if dex is None or defines(dex, SETTINGS_ROWS):
+        path = _class_file(root, SETTINGS_ROWS)
+        if path:
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            if ".method public static final margyt(LX/0MUl;ZZLX/0Lx7;I)V" in text:
+                counts[SETTINGS_LABEL] = counts.get(SETTINGS_LABEL, 0) + 1
+            else:
+                start = text.find(SETTINGS_ROW_METHOD)
+                end = text.find(".end method", start) if start >= 0 else -1
+                if end >= 0:
+                    body = text[start:end + len(".end method")]
+                    copy = body.replace(SETTINGS_ROW_METHOD,
+                                        ".method public static final margyt(LX/0MUl;ZZLX/0Lx7;I)V", 1)
+                    copy, titled = re.subn(
+                        r"    const v0, 0x[0-9a-f]+\n(?:[ \t]*\n|[ \t]*\.line \d+\n)*"
+                        r"    invoke-static \{v0, v6\}, LX/0L52;->LIZIZ\(ILX/0Lx7;\)Ljava/lang/String;",
+                        "    invoke-static {}, %s->title()Ljava/lang/String;" % SETTINGS_CELL, copy)
+                    copy, pictured = re.subn(r"sget-object v0, LX/0LMt;->n:LX/0LPz;",
+                                             "sget-object v0, LX/0LMt;->o:LX/0LPz;", copy)
+                    copy, again = re.subn(
+                        r"    new-instance v0, Lkotlin/jvm/internal/AwS1S0121000_8;\n.*?"
+                        r"invoke-direct/range \{v6 \.\. v11\}, Lkotlin/jvm/internal/AwS1S0121000_8;-><init>\(LX/0MUl;ZZII\)V",
+                        "    invoke-static {v5, v4, v3, v2}, %s->again(Ljava/lang/Object;ZZI)Ljava/lang/Object;\n\n"
+                        "    move-result-object v0\n\n"
+                        "    check-cast v0, Lkotlin/jvm/functions/Function2;" % SETTINGS_CELL, copy, flags=re.S)
+                    if titled == 1 and pictured == 1 and again == 1:
+                        text = text[:end + len(".end method")] + "\n\n" + copy + text[end + len(".end method"):]
+                        with open(path, "w", encoding="utf-8") as handle:
+                            handle.write(text)
+                        counts[SETTINGS_LABEL] = counts.get(SETTINGS_LABEL, 0) + 1
+    if dex is None or defines(dex, SETTINGS_GROUP):
+        path = _class_file(root, SETTINGS_GROUP)
+        if path:
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            asks = "%s->draw(ZLjava/lang/Object;)Z" % SETTINGS_CELL
+            if asks in text:
+                counts[SETTINGS_LABEL] = counts.get(SETTINGS_LABEL, 0) + 1
+            elif text.count(SETTINGS_FIRST_ROW) == 1:
+                text = text.replace(SETTINGS_FIRST_ROW,
+                                    "    move v1, v9\n\n"
+                                    "    invoke-static {v9, v6}, %s\n\n"
+                                    "    move-result v9\n\n" % asks
+                                    + SETTINGS_FIRST_ROW
+                                    + "\n    move v9, v1\n")
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write(text)
+                counts[SETTINGS_LABEL] = counts.get(SETTINGS_LABEL, 0) + 1
+    return counts
+
+
 def carries_an_anchor(dex: bytes) -> bool:
     return (any(anchor.encode() in dex for anchor, *_rest in ANCHORED_SOURCES)
             or FEED_ITEM_LIST.encode() in dex
@@ -1571,6 +1800,9 @@ def interesting(dex: bytes, literals: Optional[Dict[str, str]] = None) -> bool:
     for class_name, _signature in FORCED_FALSE:
         if ("L%s;" % class_name).encode() in dex:
             return True
+    if (defines(dex, PLAYER_CONFIG) or defines(dex, SETTINGS_ROWS) or defines(dex, SETTINGS_GROUP)
+            or defines(dex, STARTER)):
+        return True
     if TELEPHONY.encode() not in dex:
         return False
     return any(name.encode() in dex for name, _o, _r in TARGETS)
@@ -1710,6 +1942,11 @@ def rewrite_targets() -> List[str]:
     out.extend(["Lcom/neverocheg/elite/Repost;->bind(Ljava/lang/Object;)V","Lcom/neverocheg/elite/Repost;->anchor(Ljava/lang/Object;)V","Lcom/neverocheg/elite/ProfileLayout;->bind(Ljava/lang/Object;Landroid/view/View;)V","Lcom/neverocheg/elite/MessageTimes;->before(Ljava/lang/Object;)V","Lcom/neverocheg/elite/MessageTimes;->bind(Ljava/lang/Object;Ljava/lang/Object;)V","Lcom/neverocheg/elite/ModNotifications;->noPrompts()Z"])
     out.extend("%s->%s(Ljava/lang/String;)%s" % (FLAGS, method, boxed)
                for method, boxed, _unbox, _wide in FLAG_ANSWERS.values())
+    out.append(HDR_QUESTION)
+    out.append(START_ROUTE)
+    out.extend(["%s->title()Ljava/lang/String;" % SETTINGS_CELL,
+                "%s->again(Ljava/lang/Object;ZZI)Ljava/lang/Object;" % SETTINGS_CELL,
+                "%s->draw(ZLjava/lang/Object;)Z" % SETTINGS_CELL])
     out.append(DATES+"->bindAuthor(Ljava/lang/Object;)V")
     out.append(DATES+"->bindPost(Ljava/lang/Object;Ljava/lang/Object;)V")
     for name, _original, replacement, target in WILD_SOURCES:
@@ -1870,6 +2107,9 @@ def rewrite_everything(root: str, literals: Optional[Dict[str, str]] = None,
     counts.update(force_false(root))
     counts.update(rewrite_models(root))
     counts.update(rewrite_flag_reader(root, dex))
+    counts.update(rewrite_hdr_switch(root, dex))
+    counts.update(rewrite_settings_row(root, dex))
+    counts.update(rewrite_starts(root, dex))
     # Class-specific heart hooks must claim the feed heart's Tux tint calls
     # before the generic accent pass rewrites every TuxIconView tint. The
     # latter would otherwise swallow the exact native heart hook and leave

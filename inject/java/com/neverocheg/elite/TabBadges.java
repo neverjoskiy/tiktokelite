@@ -41,7 +41,7 @@ final class TabBadges {
     private static final String KEY = "tab_read_";
     /** How long a tab has to go without a number before it is taken to have none. */
     private static final long SETTLED = 20000L;
-    private static final int TRIES = 10;
+    private static final int TRIES = 20;
     private static final long BETWEEN = 600L;
 
     private static final class Tab {
@@ -92,7 +92,10 @@ final class TabBadges {
                     next.addOnPreDrawListener(EVERY_FRAME);
                     watched = new WeakReference<ViewTreeObserver>(next);
                 }
-            } else if (attempt < TRIES && screen.isAttachedToWindow()) {
+            } else if (attempt < TRIES) {
+                // No asking whether the window is up: on a cold start it is not
+                // yet when the screen says it has come, and a wait posted to a
+                // view is kept until it is.
                 screen.postDelayed(() -> look(screen, attempt + 1), BETWEEN);
             }
         } catch (Throwable error) {

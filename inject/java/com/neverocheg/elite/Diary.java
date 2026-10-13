@@ -49,6 +49,7 @@ public final class Diary {
             new SimpleDateFormat("HH:mm:ss", Locale.US);
 
     public static void note(String line) {
+        if (flooding(line)) return;
         String stamped = stamp() + "  " + line;
         synchronized (LINES) {
             load();
@@ -69,6 +70,37 @@ public final class Diary {
     /** A line only a developer wants. Written when the developer switch is on. */
     public static void detail(String line) {
         if (DevMode.isOn()) note("· " + line);
+    }
+
+    private static final java.util.HashMap<String, long[]> SAID = new java.util.HashMap<String, long[]>();
+
+    /**
+     * Whether a line has been said enough for now. Something that fails does
+     * so every time it is tried, and what is tried on every video or every
+     * frame would otherwise fill the diary with one line and spend the app's
+     * time writing it: six times a minute is as often as any one line is
+     * written. Numbers are left out of the comparison, so "took 812 ms" and
+     * "took 790 ms" are the same line.
+     */
+    private static boolean flooding(String line) {
+        if (line == null) return true;
+        String kind = line.length() > 80 ? line.substring(0, 80) : line;
+        kind = kind.replaceAll("[0-9]+", "#");
+        long now = android.os.SystemClock.uptimeMillis();
+        synchronized (SAID) {
+            long[] count = SAID.get(kind);
+            if (count == null) {
+                if (SAID.size() > 300) SAID.clear();
+                SAID.put(kind, new long[] {now, 1});
+                return false;
+            }
+            if (now - count[0] > 60000L) {
+                count[0] = now;
+                count[1] = 1;
+                return false;
+            }
+            return ++count[1] > 6;
+        }
     }
 
     public static List<String> lines() {

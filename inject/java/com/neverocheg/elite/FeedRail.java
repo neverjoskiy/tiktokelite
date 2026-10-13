@@ -66,5 +66,27 @@ public final class FeedRail {
         if(state==null)return;
         int next=state.kind==2&&Repost.replacing(view)?View.INVISIBLE:shown(state.kind)?state.wanted:View.GONE;
         if(view.getVisibility()!=next)view.setVisibility(next);
+        Md3.rail(view,state.kind);
+    }
+    /** The icons of the buttons on screen, looked at before each frame: a tap changes one without anything being laid out. */
+    private static View[] seen=new View[0];private static int[] kinds=new int[0];private static long listed;
+    static void icons(){
+        long now=android.os.SystemClock.uptimeMillis();
+        if(now-listed>500L){
+            listed=now;
+            synchronized(slots){
+                java.util.List<View> views=new java.util.ArrayList<View>();java.util.List<Integer> which=new java.util.ArrayList<Integer>();
+                for(Map.Entry<View,State> entry:slots.entrySet()){View v=entry.getKey();if(v!=null&&v.isAttachedToWindow()){views.add(v);which.add(entry.getValue().kind);}}
+                seen=views.toArray(new View[0]);kinds=new int[which.size()];for(int i=0;i<kinds.length;i++)kinds[i]=which.get(i);
+            }
+        }
+        View[] views=seen;int[] which=kinds;
+        for(int i=0;i<views.length&&i<which.length;i++)Md3.icons(views[i],which[i]);
+    }
+    /** Every button the mod has been handed, for what dresses them to look at again. */
+    static void restyle(){
+        java.util.List<View> views;
+        synchronized(slots){views=new java.util.ArrayList<View>(slots.keySet());}
+        for(View v:views)if(v!=null&&v.isAttachedToWindow()){State state;synchronized(slots){state=slots.get(v);}if(state!=null)Md3.rail(v,state.kind);}
     }
 }

@@ -359,6 +359,18 @@ final class Text {
     static final String NEW_PROFILE = pick("Новый вид профиля TikTok", "Новий вигляд профілю TikTok",
             "TikTok's new profile look");
 
+    static final String NAV_CAPSULE = pick("Нижняя панель в стиле Material 3",
+            "Нижня панель у стилі Material 3", "Material 3 bottom bar");
+
+    static final String MD3_FEED = pick("Лента в стиле Material 3", "Стрічка у стилі Material 3",
+            "Material 3 feed");
+    static final String MD3_PROFILE = pick("Профиль в стиле Material 3", "Профіль у стилі Material 3",
+            "Material 3 profile");
+    static final String MD3_ICONS = pick("Округлые иконки у кнопок видео", "Округлі іконки біля кнопок відео",
+            "Rounded icons on a video's buttons");
+    static final String MD3_INBOX = pick("Входящие в стиле Material 3", "Вхідні у стилі Material 3",
+            "Material 3 inbox");
+
     static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");
     static final String TAB_READ_ALL_NOTE = pick(
             "Число на кнопке пропадёт и вернётся, когда придёт что-то новое.",
@@ -383,21 +395,18 @@ final class Text {
     static final String SHAPE_HEXAGON = pick("Шестиугольник", "Шестикутник", "Hexagon");
     static final String SHAPE_HEART = pick("Сердце", "Серце", "Heart");
 
-    static final String NO_HDR = pick(
-            "Убрать HDR", "Прибрати HDR", "Take the HDR off");
+    static final String OWN_BRIGHTNESS = pick(
+            "TikTok не меняет яркость", "TikTok не змінює яскравість", "TikTok leaves the brightness alone");
 
-    static final String NO_HDR_NOTE = pick(
-            "HDR-видео светят ярче всего остального и бьют по глазам ночью. "
-                    + "Видео останется, лишняя яркость — нет.",
-            "HDR-відео світять яскравіше за все інше й б'ють по очах уночі. "
-                    + "Відео залишиться, зайва яскравість — ні.",
-            "An HDR video is allowed more brightness than everything else, which "
-                    + "at night is a lot. The video stays; the extra brightness does not.");
-
-    static final String NO_HDR_OLD = pick(
-            "На этом Android можно только попросить — получится не везде",
-            "На цьому Android можна лише попросити — вийде не всюди",
-            "On this Android it can only be asked for, and not every phone listens");
+    static final String OWN_BRIGHTNESS_NOTE = pick(
+            "TikTok сам выкручивает яркость на максимум в камере и на HDR-видео. "
+                    + "С этой настройкой она остаётся такой, какую выставил ты. "
+                    + "HDR-видео играют как обычные.",
+            "TikTok сам викручує яскравість на максимум у камері й на HDR-відео. "
+                    + "Із цим налаштуванням вона лишається такою, яку виставив ти. "
+                    + "HDR-відео грають як звичайні.",
+            "TikTok turns the brightness all the way up in the camera and on HDR videos. "
+                    + "With this on it stays where you set it. HDR videos play as ordinary ones.");
 
     // ------------------------------------------------------------ the gradient
 

@@ -774,6 +774,11 @@ class Build:
         feature_hits[dexpatch.FLAG_LABEL]=0
         feature_hits["native avatar shape"]=0
         feature_hits["native avatar ring"]=0
+        feature_hits[dexpatch.HDR_LABEL]=0
+        feature_hits[dexpatch.START_LABEL]=0
+        feature_hits["native missing string"]=0
+        feature_hits[dexpatch.SETTINGS_LABEL]=0
+        feature_hits["native window brightness"]=0
         feature_hits["native right-area slots"]=0
         feature_hits["native player resume"]=0
         feature_hits["native offline choices"]=0
@@ -807,7 +812,12 @@ class Build:
             feature_hits["native comment text actions"] += counts.get("native comment text actions",0)
             feature_hits["native loading indicator"] += counts.get("native loading indicator",0)
             feature_hits[dexpatch.FLAG_LABEL] += counts.get(dexpatch.FLAG_LABEL,0)
-            feature_hits["native avatar ring"] += sum(v for key,v in counts.items() if key.startswith("Canvas->drawArc") and dexpatch.STORY_RING in key)
+            feature_hits[dexpatch.HDR_LABEL] += counts.get(dexpatch.HDR_LABEL,0)
+            feature_hits[dexpatch.START_LABEL] += counts.get(dexpatch.START_LABEL,0)
+            feature_hits["native missing string"] += sum(v for key,v in counts.items() if "getString" in key and ("0TFu" in key or "0TVv" in key))
+            feature_hits[dexpatch.SETTINGS_LABEL] += counts.get(dexpatch.SETTINGS_LABEL,0)
+            feature_hits["native window brightness"] += sum(v for key,v in counts.items() if key.startswith(dexpatch.WINDOW_LABEL))
+            feature_hits["native avatar ring"] += sum(v for key,v in counts.items() if key.startswith("Canvas->drawArc") and any(ring in key for ring in dexpatch.STORY_RINGS))
             feature_hits["native avatar shape"] += sum(v for key,v in counts.items() if key.startswith("Path->addCircle"))
             feature_hits["native right-area slots"] += counts.get("native right-area slots",0)
             feature_hits["native player resume"] += counts.get("native player resume",0)

@@ -5,16 +5,41 @@ final class SocialLibrary {
  private static final Handler main=new Handler(Looper.getMainLooper());
  private static final java.util.concurrent.atomic.AtomicBoolean busy=new java.util.concurrent.atomic.AtomicBoolean();
  private static String account;private static long last;private static boolean started;
+ private static volatile boolean missing;
  static synchronized void start(){if(started)return;started=true;main.postDelayed(new Runnable(){public void run(){NativeStreaks.prepare();refresh(null);main.postDelayed(this,60000);}},3000);}
- static void refresh(Runnable ready){String uid=Account.liveId();if(uid==null)return;
+ static void refresh(Runnable ready){if(missing)return;String uid=Account.liveId();if(uid==null)return;
   synchronized(SocialLibrary.class){if(!uid.equals(account)){account=uid;last=0;PinnedFriends.reload();}if(last!=0&&android.os.SystemClock.uptimeMillis()-last<300000)return;if(!busy.compareAndSet(false,true))return;last=android.os.SystemClock.uptimeMillis();}
   main.post(()->{try{FavouriteStickers.load(ready);}catch(Throwable e){Diary.note("sticker library: "+e);}});
-  Net.away("friends-library",()->{try{load(uid,ready);}catch(Throwable e){Diary.note("friends library: "+e.getClass().getSimpleName());synchronized(SocialLibrary.class){last=0;}}finally{busy.set(false);}});
+  Net.away("friends-library",()->{try{load(uid,ready);}catch(ClassNotFoundException|NoSuchMethodException|NoSuchFieldException e){
+   // this TikTok does not have what is asked for, and will not have it a minute from now either
+   missing=true;Diary.note("friends library is not in this TikTok: "+e);
+  }catch(Throwable e){
+   // Tried again when the five minutes are up, like a read that worked. It used to be tried
+   // again on the next minute, and every try began by reloading the stickers on the main thread.
+   Diary.note("friends library: "+e.getClass().getSimpleName()+(e.getMessage()==null?"":": "+e.getMessage()));
+  }finally{busy.set(false);}});
+ }
+ /**
+  * The coroutine context that holds nothing, for a call made from outside any coroutine.
+  * Kotlin's own is renamed from one TikTok to the next, so it is asked for by its name,
+  * then by the name it has in 47.2, and made here when it is under neither.
+  */
+ static Object emptyContext()throws Exception{
+  for(String name:new String[]{"kotlin.coroutines.EmptyCoroutineContext","X.0D4q"}){
+   // a name of TikTok's own may be some other class in another release; Kotlin's is what it says
+   try{Object found=Class.forName(name).getField("INSTANCE").get(null);if(found!=null&&(name.startsWith("kotlin.")||"EmptyCoroutineContext".equals(found.toString())))return found;}catch(Throwable ignored){}
+  }
+  Class<?> kind=Class.forName("kotlin.coroutines.CoroutineContext");
+  return Proxy.newProxyInstance(kind.getClassLoader(),new Class<?>[]{kind},(proxy,m,args)->{
+   String name=m.getName();
+   if(name.equals("fold"))return args[0];if(name.equals("plus"))return args[0];if(name.equals("minusKey"))return proxy;
+   if(name.equals("toString"))return "EmptyCoroutineContext";if(name.equals("hashCode"))return 0;if(name.equals("equals"))return proxy==args[0];
+   return null;});
  }
  static void load(String uid,Runnable ready)throws Exception{
   Class<?> api=Class.forName("X.1M7B"),continuation=Class.forName("X.01K8");Object service=api.getField("LIZIZ").get(null);
   Object scene=Class.forName("X.0Xou").getField("TT_RELATION_PAGE").get(null);int source=((Number)scene.getClass().getMethod("getValue").invoke(scene)).intValue();
-  Object context=Class.forName("kotlin.coroutines.EmptyCoroutineContext").getField("INSTANCE").get(null);
+  Object context=emptyContext();
   Method request=api.getMethod("LIZIZ",int.class,int.class,String.class,String.class,continuation);
   Object accountService=Class.forName("X.14EI").getMethod("LJFF").invoke(null);
   if(!uid.equals(NativeRead.string(NativeRead.get(accountService,"getCurUserId"))))return;

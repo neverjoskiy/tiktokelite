@@ -144,6 +144,11 @@ public final class AvatarShape {
         canvas.drawArc(oval, start, sweep, useCentre, paint);
     }
 
+    /** The shape avatars are in at the moment, in a square two across. */
+    static Path chosenUnit() {
+        return unit(index());
+    }
+
     /** A shape in a square two across, centred on nothing. Built once and never changed. */
     static Path unit(int shape) {
         Path known = UNIT[shape];

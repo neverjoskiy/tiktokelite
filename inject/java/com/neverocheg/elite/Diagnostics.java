@@ -44,6 +44,8 @@ final class Diagnostics {
                 .append(" dex, ").append(BuildInfo.STATIC_TARGETS)
                 .append(" version-specific targets\n");
 
+        out.append("\n== lag ==\n").append(Lag.report());
+
         out.append("\n== appearance ==\n");
         out.append("accent: #").append(String.format(java.util.Locale.US, "%06X",
                 Accent.colour() & 0xFFFFFF)).append(" (built with #")

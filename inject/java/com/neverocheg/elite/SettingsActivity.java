@@ -274,6 +274,16 @@ public class SettingsActivity extends Activity {
         loading.addView(line());
         loading.addView(toggleRow("view_compact", Text.NEW_PROFILE, Flags.isOn(Flags.KEY_NEW_PROFILE),
                 on -> Flags.set(Flags.KEY_NEW_PROFILE, on)));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.NAV_CAPSULE, NavBar.isEnabled(), NavBar::setEnabled));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.MD3_FEED, Md3.isOn(Md3.KEY_FEED), on -> Md3.set(Md3.KEY_FEED, on)));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.MD3_ICONS, Md3.isOn(Md3.KEY_ICONS), on -> Md3.set(Md3.KEY_ICONS, on)));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.MD3_PROFILE, Md3.isOn(Md3.KEY_PROFILE), on -> Md3.set(Md3.KEY_PROFILE, on)));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.MD3_INBOX, Md3.isOn(Md3.KEY_INBOX), on -> Md3.set(Md3.KEY_INBOX, on)));
         column.addView(wrap(loading));
 
         column.addView(section(Text.THEME));
@@ -411,12 +421,11 @@ public class SettingsActivity extends Activity {
         video.addView(liveToggleRow("info", Text.ALWAYS_DATE, Dates.isEnabled(),
                 Dates::setEnabled));
         video.addView(line());
-        video.addView(toggleRow("hdr_off", Text.NO_HDR, Hdr.isEnabled(), on -> {
-            Hdr.setEnabled(on);
+        video.addView(toggleRow("hdr_off", Text.OWN_BRIGHTNESS, Brightness.isEnabled(), on -> {
+            Brightness.setEnabled(on);
             markChanged();
         }));
-        video.addView(caption(Text.NO_HDR_NOTE));
-        if (!Hdr.reachable()) video.addView(quiet(Text.NO_HDR_OLD));
+        video.addView(caption(Text.OWN_BRIGHTNESS_NOTE));
         column.addView(wrap(video));
 
         column.addView(section(Text.FPS));
@@ -3039,12 +3048,17 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.VIDEO,Text.ALWAYS_DATE,Dates.isEnabled());
         found+=searchControl(results,BURN,Text.DIM,Dim.isConfigured());
         found+=searchControl(results,Text.COMMENTS,Text.COMMENT_COPY_ON,Comments.isCopyEnabled());
-        found+=searchControl(results,Text.VIDEO,Text.NO_HDR,Hdr.isEnabled());
+        found+=searchControl(results,Text.VIDEO,Text.OWN_BRIGHTNESS,Brightness.isEnabled());
         found+=searchControl(results,Text.BADGES,Text.BADGES_ON,Badges.isEnabled());
         found+=searchHit(results,Text.FPS,Text.FPS,()->{});
         found+=searchControl(results,Text.TIKTOK_FEATURES,Text.COMMENT_REPOST,Flags.isOn(Flags.KEY_COMMENT_REPOST));
         found+=searchControl(results,Text.TIKTOK_FEATURES,Text.SELF_REPOST,Flags.isOn(Flags.KEY_SELF_REPOST));
         found+=searchControl(results,Text.APPEARANCE,Text.NEW_PROFILE,Flags.isOn(Flags.KEY_NEW_PROFILE));
+        found+=searchControl(results,Text.APPEARANCE,Text.NAV_CAPSULE,NavBar.isEnabled());
+        found+=searchControl(results,Text.APPEARANCE,Text.MD3_FEED,Md3.isOn(Md3.KEY_FEED));
+        found+=searchControl(results,Text.APPEARANCE,Text.MD3_ICONS,Md3.isOn(Md3.KEY_ICONS));
+        found+=searchControl(results,Text.APPEARANCE,Text.MD3_PROFILE,Md3.isOn(Md3.KEY_PROFILE));
+        found+=searchControl(results,Text.APPEARANCE,Text.MD3_INBOX,Md3.isOn(Md3.KEY_INBOX));
         found+=searchHit(results,Text.APPEARANCE,Text.AVATAR_SHAPE,()->{});
         found+=searchHit(results,Text.TAGS,Text.TAGS+" "+Text.TAGS_ADD,()->{});
         found+=searchHit(results,Text.GRADIENT,Text.GRADIENT,()->{});

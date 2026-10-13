@@ -52,22 +52,45 @@ public final class Account {
     public static String getCurUserId(IAccountUserService service) {
         if (service == null) return null;
         String answer = service.getCurUserId();
-        activeId=answer!=null && answer.matches("[0-9]{1,24}") ? answer : null;
+        // asked on every cell the feed binds; the same answer as last time changes nothing
+        if (answer != null && answer.equals(activeId)) return answer;
+        activeId=numeric(answer) ? answer : null;
         if(activeId==null)AccountAppearance.select(null);
         remember(KEY_ID, answer);
         return answer;
+    }
+
+    /** How long what was learnt from the signed-in profile is taken as still true. */
+    private static final long LOOK_AGAIN = 1000L;
+    private static volatile String lookedUid;
+    private static volatile long lookedAt;
+
+    /** Digits and nothing else, one to twenty-four of them, without a pattern compiled to say so. */
+    static boolean numeric(String uid) {
+        if (uid == null || uid.length() == 0 || uid.length() > 24) return false;
+        for (int i = 0; i < uid.length(); i++) {
+            char one = uid.charAt(i);
+            if (one < '0' || one > '9') return false;
+        }
+        return true;
     }
 
     /** Read the profile TikTok already knows for the signed-in account. */
     public static User getCurUser(IAccountUserService service) {
         if (service == null) return null;
         User user = service.getCurUser();
-        if (user == null) {activeId=null;AccountAppearance.select(null);return null;}
+        if (user == null) {activeId=null;lookedUid=null;AccountAppearance.select(null);return null;}
         try {
             String uid = user.getUid();
-            activeId=uid!=null && uid.matches("[0-9]{1,24}") ? uid : null;
-            remember(KEY_ID, uid);
             long now = android.os.SystemClock.uptimeMillis();
+            // TikTok asks who is signed in many times a second, from the main
+            // thread, and nothing below can have changed since the last time
+            // it asked a moment ago. This is the answer it is waiting for.
+            if (uid != null && uid.equals(lookedUid) && now - lookedAt < LOOK_AGAIN) return user;
+            lookedUid = uid;
+            lookedAt = now;
+            activeId=numeric(uid) ? uid : null;
+            remember(KEY_ID, uid);
             rememberProfile(user);
             BioProof.recover();
             if (uid != null && (!uid.equals(currentUserUid)

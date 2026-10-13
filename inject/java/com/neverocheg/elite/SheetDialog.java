@@ -121,7 +121,12 @@ final class SheetDialog extends Dialog {
         backdrop = android.animation.ValueAnimator.ofFloat(from,to);
         backdrop.setDuration(duration);
         backdrop.addUpdateListener(a -> {
-            if (getWindow() != null) getWindow().setDimAmount((Float)a.getAnimatedValue());
+            // the sheet may have been taken off the screen between two frames of this
+            try {
+                if (getWindow() != null && isShowing()) getWindow().setDimAmount((Float)a.getAnimatedValue());
+            } catch (IllegalArgumentException gone) {
+                a.cancel();
+            }
         });
         backdrop.start();
     }

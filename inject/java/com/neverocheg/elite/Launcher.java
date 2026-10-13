@@ -56,6 +56,29 @@ public final class Launcher {
     }
 
     /**
+     * TikTok is about to start a screen. Given what it is starting.
+     *
+     * With another icon chosen the entry TikTok came with is switched off --
+     * that is the only way to take its icon off the home screen -- and that
+     * entry is the very screen TikTok starts by name when it restarts
+     * itself: after signing in, after switching accounts, after a change of
+     * theme. Starting what is switched off is refused, and the refusal was a
+     * crash. The icon that was chosen is another name for the same screen,
+     * so the start is sent there.
+     */
+    public static void route(android.content.Intent intent) {
+        try {
+            ComponentName wanted = intent == null ? null : intent.getComponent();
+            if (wanted == null || !Shots.DEFAULT.equals(wanted.getClassName())) return;
+            int at = indexOf(chosen());
+            if (at < 0 || at >= Shots.COMPONENTS.length) return;
+            intent.setComponent(new ComponentName(wanted.getPackageName(), Shots.COMPONENTS[at]));
+        } catch (Throwable ignored) {
+            // started as TikTok asked
+        }
+    }
+
+    /**
      * Turn on the one that was chosen, and everything else off.
      *
      * DONT_KILL_APP matters: without it Android stops the app the moment one
