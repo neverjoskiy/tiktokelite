@@ -262,7 +262,7 @@ public final class Comments {
     }
     /** Bind the actual body after recycling; retain native taps on reactions and authors. */
     public static void bindCell(Object cell){
-        try{View root=(View)cell.getClass().getField("itemView").get(cell);if(root==null)return;mark(root);stampTime(cell,root);if(!isCopyEnabled())return;
+        try{View root=(View)cell.getClass().getField("itemView").get(cell);if(root==null)return;mark(root);stampTime(cell,root);CommentSheets.dress(root);if(!isCopyEnabled())return;
             String body=CommentText.from(cell);if(TextUtils.isEmpty(body))return;
             View.OnLongClickListener listener=v->{if(openNativeActions(cell))return true;nativeMenu.set(Boolean.TRUE);try{cell.getClass().getMethod("k8").invoke(cell);return true;}catch(Throwable ignored){return false;}finally{nativeMenu.remove();}};root.setOnLongClickListener(listener);
             bindBody(root,body,listener,0,new int[]{128});

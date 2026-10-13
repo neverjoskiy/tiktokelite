@@ -373,6 +373,10 @@ final class Text {
             "Rounded icons on a video's buttons");
     static final String MD3_INBOX = pick("Входящие в стиле Material 3", "Вхідні у стилі Material 3",
             "Material 3 inbox");
+    static final String COMMENT_CARDS = pick("Комментарии в стиле Material 3", "Коментарі у стилі Material 3",
+            "Material 3 comments");
+    static final String SHORT_COUNTS = pick("Короткие счётчики (100,8K)", "Короткі лічильники (100,8K)",
+            "Short counts (100.8K)");
     static final String KEEP_BAR = pick("Не прятать нижнюю панель", "Не ховати нижню панель",
             "Keep the bottom bar in sight");
 

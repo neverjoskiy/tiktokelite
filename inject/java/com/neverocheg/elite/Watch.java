@@ -47,6 +47,7 @@ public final class Watch implements Application.ActivityLifecycleCallbacks {
         Lag.frames(activity);
         NavBar.attach(activity);
         Md3.attach(activity);
+        Counts.attach(activity);
         try {
             TabBadges.attach(activity);
         } catch (Throwable ignored) {

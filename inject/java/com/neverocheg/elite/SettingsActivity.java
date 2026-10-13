@@ -284,6 +284,8 @@ public class SettingsActivity extends Activity {
         loading.addView(toggleRow("tune", Text.MD3_PROFILE, Md3.isOn(Md3.KEY_PROFILE), on -> Md3.set(Md3.KEY_PROFILE, on)));
         loading.addView(line());
         loading.addView(toggleRow("tune", Text.MD3_INBOX, Md3.isOn(Md3.KEY_INBOX), on -> Md3.set(Md3.KEY_INBOX, on)));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.SHORT_COUNTS, Counts.isEnabled(), Counts::setEnabled));
         column.addView(wrap(loading));
 
         column.addView(section(Text.THEME));
@@ -447,6 +449,8 @@ public class SettingsActivity extends Activity {
         LinearLayout comments = card();
         comments.addView(liveToggleRow("article", Text.COMMENT_COPY_ON, Comments.isCopyEnabled(),
                 Comments::setCopyEnabled));
+        comments.addView(line());
+        comments.addView(toggleRow("tune", Text.COMMENT_CARDS, CommentSheets.isEnabled(), CommentSheets::setEnabled));
         column.addView(wrap(comments));
 
         column.addView(section(Text.TIKTOK_FEATURES));
@@ -3050,6 +3054,7 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.VIDEO,Text.ALWAYS_DATE,Dates.isEnabled());
         found+=searchControl(results,BURN,Text.DIM,Dim.isConfigured());
         found+=searchControl(results,Text.COMMENTS,Text.COMMENT_COPY_ON,Comments.isCopyEnabled());
+        found+=searchControl(results,Text.COMMENTS,Text.COMMENT_CARDS,CommentSheets.isEnabled());
         found+=searchControl(results,Text.VIDEO,Text.OWN_BRIGHTNESS,Brightness.isEnabled());
         found+=searchControl(results,Text.BADGES,Text.BADGES_ON,Badges.isEnabled());
         found+=searchHit(results,Text.FPS,Text.FPS,()->{});
@@ -3061,6 +3066,7 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.APPEARANCE,Text.MD3_ICONS,Md3.isOn(Md3.KEY_ICONS));
         found+=searchControl(results,Text.APPEARANCE,Text.MD3_PROFILE,Md3.isOn(Md3.KEY_PROFILE));
         found+=searchControl(results,Text.APPEARANCE,Text.MD3_INBOX,Md3.isOn(Md3.KEY_INBOX));
+        found+=searchControl(results,Text.APPEARANCE,Text.SHORT_COUNTS,Counts.isEnabled());
         found+=searchHit(results,Text.APPEARANCE,Text.AVATAR_SHAPE,()->{});
         found+=searchHit(results,Text.TAGS,Text.TAGS+" "+Text.TAGS_ADD,()->{});
         found+=searchHit(results,Text.GRADIENT,Text.GRADIENT,()->{});
