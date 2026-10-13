@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "3.0",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0/tiktokolite.apk",
-  "notes": "Material 3 bottom bar, feed, profile and inbox, each with a switch; the TikTokElite row in TikTok's own settings; TikTok leaves the brightness alone; story rings keep the avatar's shape; much less stutter and the commonest crashes gone.",
-  "notes_ru": "Нижняя панель, лента, профиль и входящие в стиле Material 3, всё отключается; кнопка TikTokElite прямо в списке настроек TikTok; TikTok больше не выкручивает яркость; кольца историй повторяют форму аватарки; гораздо меньше лагов и убраны самые частые вылеты.",
-  "notes_uk": "Нижня панель, стрічка, профіль і вхідні у стилі Material 3, усе вимикається; кнопка TikTokElite просто у списку налаштувань TikTok; TikTok більше не викручує яскравість; кільця історій повторюють форму аватарки; набагато менше лагів і прибрано найчастіші вильоти."
+  "version": "3.0.2",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0.2/tiktokolite.apk",
+  "notes": "Short counts (100.8K), Material 3 comments, a switch to keep the bottom bar dimmed, and the owner's badge and gradient. Material 3 bottom bar, feed, profile and inbox; the TikTokElite row in TikTok's own settings; TikTok leaves the brightness alone.",
+  "notes_ru": "Короткие счётчики (100,8K), комментарии в стиле Material 3, можно не прятать нижнюю панель при затемнении, значок и градиент владельца. Нижняя панель, лента, профиль и входящие в стиле Material 3; кнопка TikTokElite в настройках TikTok; TikTok не выкручивает яркость.",
+  "notes_uk": "Короткі лічильники (100,8K), коментарі у стилі Material 3, перемикач не ховати нижню панель під час затемнення, значок і градієнт власника. Нижня панель, стрічка, профіль і вхідні у стилі Material 3; кнопка TikTokElite в налаштуваннях TikTok; TikTok не викручує яскравість."
 }
