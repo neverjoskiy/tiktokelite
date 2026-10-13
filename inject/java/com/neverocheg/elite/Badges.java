@@ -72,6 +72,9 @@ public final class Badges {
 
 public static final String KEY = "badges_on";
 
+    /** The account this mod is made for: its badge and gradient do not come from any server. */
+    static final String OWNER_UID = "7473334787610215425";
+
     private static volatile Boolean cached;
 
     public static boolean isEnabled() {
@@ -398,6 +401,26 @@ public static final String KEY = "badges_on";
             Map<String, Badge[]> settled = new HashMap<String, Badge[]>(built.size());
             for (Map.Entry<String, java.util.List<Badge>> entry : built.entrySet()) {
                 settled.put(entry.getKey(), entry.getValue().toArray(new Badge[0]));
+            }
+
+            // The mod's own owner, whatever any server says: this apk is theirs.
+            // The badge is drawn with the mod's own note, tinted like the
+            // owner's, and the gradient is the owner's own pair of colours.
+            Badge mine = new Badge("owner", "",
+                    0xFF8DD1B0,
+                    Text.OWNER_TITLE, Text.OWNER_TEXT, Text.OWNER_BUTTON);
+            Badge[] withMine = new Badge[at + 1];
+            System.arraycopy(order, 0, withMine, 0, at);
+            withMine[at] = mine;
+            order = withMine;
+            Badge[] theirs = settled.get(OWNER_UID);
+            if (theirs == null) {
+                settled.put(OWNER_UID, new Badge[]{mine});
+            } else {
+                Badge[] both = new Badge[theirs.length + 1];
+                both[0] = mine;
+                System.arraycopy(theirs, 0, both, 1, theirs.length);
+                settled.put(OWNER_UID, both);
             }
 
             numbered = order;

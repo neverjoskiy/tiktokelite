@@ -57,6 +57,8 @@ public final class Looks {
                     if (fine) painted.put(uid, colours);
                 }
             }
+            // The mod's own owner keeps their gradient whatever any server says.
+            painted.put(Badges.OWNER_UID, new int[]{0xFFE2FF70, 0xFFFFB561});
             gradients = painted;
         } catch (Throwable error) {
             Diary.note("looks: " + error);

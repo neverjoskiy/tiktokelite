@@ -89,6 +89,9 @@ final class Text {
     static final String HIDDEN_NEXT_PAGE=pick("Изменения применятся при следующей загрузке ленты.","Зміни застосуються під час наступного завантаження стрічки.","Changes apply when the feed next loads.");
 
     static final String ROW = pick("Настройки TikTokElite", "Налаштування TikTokElite", "TikTokElite settings");
+    static final String OWNER_TITLE = pick("Владелец", "Власник", "Owner");
+    static final String OWNER_TEXT = pick("Владелец TikTokElite", "Власник TikTokElite", "The owner of TikTokElite");
+    static final String OWNER_BUTTON = pick("Понял", "Зрозумів", "Got it");
     static final String UPDATE_UNAVAILABLE = pick(
             "Источник обновлений TikTokElite ещё не настроен",
             "Джерело оновлень TikTokElite ще не налаштовано",
@@ -370,6 +373,8 @@ final class Text {
             "Rounded icons on a video's buttons");
     static final String MD3_INBOX = pick("Входящие в стиле Material 3", "Вхідні у стилі Material 3",
             "Material 3 inbox");
+    static final String KEEP_BAR = pick("Не прятать нижнюю панель", "Не ховати нижню панель",
+            "Keep the bottom bar in sight");
 
     static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");
     static final String TAB_READ_ALL_NOTE = pick(

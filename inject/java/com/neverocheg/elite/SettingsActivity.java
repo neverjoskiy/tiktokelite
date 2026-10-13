@@ -468,8 +468,10 @@ public class SettingsActivity extends Activity {
         if (Dim.isConfigured()) {
             burn.addView(line());
             burn.addView(slider("contrast", Text.DIM_HOW, Dim.strength(), 90, 0, "%", value -> Dim.setStrength(value)));
+            burn.addView(line());
+            burn.addView(toggleRow("visibility_off", Text.KEEP_BAR, NavBar.isKept(), NavBar::setKept));
         }
-        burn.addView(quiet("Глаз в ленте и на видео включает и выключает затемнение на лету. Поле ввода комментария не затемняется."));
+        burn.addView(quiet("Глаз в ленте и на видео включает и выключает затемнение на лету. Поле ввода комментария не затемняется. Нижняя панель при затемнении прячется и возвращается на несколько секунд, если нажать на её место, а с включённым «Не прятать» остаётся на месте и темнеет вместе со всем экраном."));
         column.addView(wrap(burn));
 
         column.addView(section(Text.DOWNLOADS));

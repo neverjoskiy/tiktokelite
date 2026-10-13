@@ -52,6 +52,20 @@ final class NavBar {
     private NavBar() {}
 
     static final String KEY = "nav_capsule";
+    /** Whether the bar stays in sight, dimmed like the rest, while the screen saver is on. */
+    static final String KEY_KEEP = "nav_keep_dimmed";
+    /** How long a touch where the bar was brings it back for. */
+    private static final long PEEK = 5000L;
+
+    static boolean isKept() {
+        SharedPreferences prefs = prefs();
+        return prefs != null && prefs.getBoolean(KEY_KEEP, false);
+    }
+
+    static void setKept(boolean kept) {
+        SharedPreferences prefs = prefs();
+        if (prefs != null) prefs.edit().putBoolean(KEY_KEEP, kept).apply();
+    }
 
     private static final int HOME = 0, FRIENDS = 1, CREATE = 2, INBOX = 3, PROFILE = 4, OTHER = 5;
     private static final String[] FRIEND_WORDS = {"друзья", "friends", "друзі"};
@@ -381,6 +395,9 @@ final class NavBar {
         private int ground = Color.BLACK, accent;
         private Drawable sampledFrom;
         private long sampledAt;
+        /** Until when the bar is back in sight after a touch where it was. */
+        private long peekUntil;
+        private boolean listening;
         /** How far out of sight the screen saver has put the bar, nought to one, and where that is heading. */
         private float away, awayFrom, awayTo;
         private long awaySince;
@@ -457,7 +474,20 @@ final class NavBar {
             // rest: it goes altogether, and cannot be touched where it was.
             boolean dimmed = false;
             for (Tab tab : tabs) if (tab.shown < 0.99f) dimmed = true;
-            float out = dimmed && Dim.isEnabled() ? 1f : 0f;
+            // ...unless it is kept, or the place it was has just been touched
+            float out = dimmed && Dim.isEnabled() && !isKept() && now >= peekUntil ? 1f : 0f;
+            if (!listening) {
+                listening = true;
+                bar.setOnTouchListener((touched, event) -> {
+                    // its tabs are off the screen while it is away, so a touch
+                    // where it was comes here: it brings the bar back for a while
+                    if (awayTo < 1f || event.getActionMasked() != android.view.MotionEvent.ACTION_DOWN) return false;
+                    peekUntil = SystemClock.uptimeMillis() + PEEK;
+                    touched.invalidate();
+                    touched.postDelayed(touched::invalidate, PEEK + 50L);
+                    return true;
+                });
+            }
             if (out != awayTo) {
                 awayFrom = away;
                 awayTo = out;
@@ -513,6 +543,8 @@ final class NavBar {
             bar.getOverlay().remove(this);
             for (Tab tab : tabs) release(tab.view);
             tabs = new Tab[0];
+            if (listening) bar.setOnTouchListener(null);
+            listening = false;
             if (ownKept && bar.getBackground() == null) bar.setBackground(own);
             own = null;
             ownKept = false;
