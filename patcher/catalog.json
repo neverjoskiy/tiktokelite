@@ -25,7 +25,7 @@
    },
    "releases": [
     {
-     "version": "3.1",
+     "version": "3.2",
      "beta": false,
      "base": {
       "name": "TikTok 47.2.41",
@@ -40,18 +40,18 @@
       ]
      },
      "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/elite.mpatch",
-      "sha256": "102b0e0b0b713691f9c586f9305387a7a1f684e21841d2a5620153225152425c",
-      "size": 72653532
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.2/elite.mpatch",
+      "sha256": "9737c2a5a7732966d14f084ff7328c43b27853adb9b5258f86fe66d7b0730d2d",
+      "size": 72654924
      },
      "result": {
-      "sha256": "3a3e9c2acda82efe87e060c609a1f0f2ac511288798d90cc35ee0c40d6d7c794",
+      "sha256": "d7d12381743022725d1723c68dc6c5084c07d0b60c764dca43d6f1725dd147cd",
       "size": 396546905
      },
      "notes": {
-      "ru": "Меньше подлагиваний: мод больше не обходит экран перед каждым кадром. Убран чёрный экран в недавних. Отчёт о лагах называет плагин-виновник.",
-      "uk": "Менше підлагів: мод більше не обходить екран перед кожним кадром. Прибрано чорний екран у недавніх. Звіт про лаги називає плагін-винуватець.",
-      "en": "Less stutter: the mod no longer goes over the screen before every frame. No more blacked-out window in recents. A lag report names the plugin that is holding the app up."
+      "ru": "Счётчики на пути записи: лайки, избранное, комментарии и репосты сокращаются везде. Плюс строка в дневнике с точной формулировкой, если ничего не подошло.",
+      "uk": "Лічильники на шляху запису: лайки, обране, коментарі та репости скорочуються всюди. Плюс рядок у щоденнику з точним формулюванням, якщо нічого не підійшло.",
+      "en": "Counts on the write path: likes, favourites, comments and reposts shorten everywhere. Plus a diary line showing the exact wording when nothing matches."
      }
     }
    ]
