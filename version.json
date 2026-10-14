@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "3.0.3",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.0.3/tiktokolite.apk",
-  "notes": "Counts that work (100.8K everywhere), comments on cards with no dislike, and the update offer retried past a cold start. Short counts, Material 3 comments, keep-the-bar switch, owner badge and gradient.",
-  "notes_ru": "Работающие счётчики (100,8K везде), комментарии на карточках без дизлайка, повтор предложения обновления после холодного старта. Короткие счётчики, комментарии в Material 3, тумблер панели, значок и градиент владельца.",
-  "notes_uk": "Лічильники, що працюють (100,8K усюди), коментарі на картках без дизлайка, повтор пропозиції оновлення після холодного старту. Короткі лічильники, коментарі у Material 3, перемикач панелі, значок і градієнт власника."
+  "version": "3.1",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk",
+  "notes": "Less stutter: the mod no longer goes over the screen before every frame. No more blacked-out window in recents. A lag report names the plugin that is holding the app up.",
+  "notes_ru": "Меньше подлагиваний: мод больше не обходит экран перед каждым кадром. Убран чёрный экран в недавних. Отчёт о лагах называет плагин-виновник.",
+  "notes_uk": "Менше підлагів: мод більше не обходить екран перед кожним кадром. Прибрано чорний екран у недавніх. Звіт про лаги називає плагін-винуватець."
 }
