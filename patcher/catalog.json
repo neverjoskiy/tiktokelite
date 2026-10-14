@@ -23,13 +23,28 @@
     "uk": "Мод TikTok: оформлення, завантаження без водяного знака, підміна регіону, значки та багато іншого.",
     "en": "A TikTok mod: looks, downloads without a watermark, a region of your choice, badges and a lot more."
    },
-   "releases": [],
-   "apks": [
+   "releases": [
     {
      "version": "3.1",
      "beta": false,
-     "apk": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk",
+     "base": {
+      "name": "TikTok 47.2.41",
+      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+      "size": 346017026,
+      "sources": [
+       {
+        "name": "margy.narez.xyz",
+        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "direct": true
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/elite.mpatch",
+      "sha256": "102b0e0b0b713691f9c586f9305387a7a1f684e21841d2a5620153225152425c",
+      "size": 72653532
+     },
+     "result": {
       "sha256": "3a3e9c2acda82efe87e060c609a1f0f2ac511288798d90cc35ee0c40d6d7c794",
       "size": 396546905
      },
@@ -51,13 +66,28 @@
     "uk": "Легкий мод на TikTok Lite: підміна регіону, тема й акцент, значки.",
     "en": "A light mod of TikTok Lite: a region of your choice, theme and accent, badges."
    },
-   "releases": [],
-   "apks": [
+   "releases": [
     {
      "version": "0.1",
      "beta": false,
-     "apk": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.apk",
+     "base": {
+      "name": "TikTok Lite 47.1.4",
+      "sha256": "634c596e9f2c54b4e77600d4d1bdd96f1d0adad8bb661476a9df7cd21d3c6057",
+      "size": 90464759,
+      "sources": [
+       {
+        "name": "margy.narez.xyz",
+        "url": "https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk",
+        "direct": true
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.mpatch",
+      "sha256": "60b0b428082d170bb3bc962c71409800336e391d734b96e835f98f9ef100ce70",
+      "size": 33869815
+     },
+     "result": {
       "sha256": "17547e46446b833e0d8f2e2e654d566ad0ed04a2bc31396e6deda16721e82891",
       "size": 122988831
      },
