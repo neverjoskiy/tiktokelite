@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "3.1",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk",
-  "notes": "Less stutter: the mod no longer goes over the screen before every frame. No more blacked-out window in recents. A lag report names the plugin that is holding the app up.",
-  "notes_ru": "Меньше подлагиваний: мод больше не обходит экран перед каждым кадром. Убран чёрный экран в недавних. Отчёт о лагах называет плагин-виновник.",
-  "notes_uk": "Менше підлагів: мод більше не обходить екран перед кожним кадром. Прибрано чорний екран у недавніх. Звіт про лаги називає плагін-винуватець."
+  "version": "3.2",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.2/tiktokolite.apk",
+  "notes": "Counts on the write path: likes, favourites, comments and reposts shorten everywhere. Plus a diary line showing the exact wording when nothing matches.",
+  "notes_ru": "Счётчики на пути записи: лайки, избранное, комментарии и репосты сокращаются везде. Плюс строка в дневнике с точной формулировкой, если ничего не подошло.",
+  "notes_uk": "Лічильники на шляху запису: лайки, обране, коментарі та репости скорочуються всюди. Плюс рядок у щоденнику з точним формулюванням, якщо нічого не підійшло."
 }
