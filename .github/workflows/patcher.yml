@@ -44,7 +44,7 @@ jobs:
           BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)
           "$BUILD_TOOLS/zipalign" -f 4 "$APK" aligned.apk
           "$BUILD_TOOLS/apksigner" sign --ks /tmp/elite-patcher.jks \
-            --ks-pass:env KS_PASS --key-pass:env KEY_PASS --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KS_PASS --key-pass env:KEY_PASS --ks-key-alias "$KEY_ALIAS" \
             --out "$OUT" aligned.apk
           "$BUILD_TOOLS/apksigner" verify --print-certs "$OUT" | head -3
           echo "size=$(stat -c%s "$OUT")"
