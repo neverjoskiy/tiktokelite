@@ -178,8 +178,13 @@ public final class Lag {
             if (seen < took / (LOOK * 4)) return;
             String where = where(stack);
             if (where.length() == 0) return;
+            // A plugin's code first: it is called from the app's own machinery
+            // as often as from the mod's, and whoever reads the report wants
+            // to know the stall was a plugin's before knowing where in it.
+            String plugin = plugin(stack);
             String mine = mine(stack);
-            TALLY.stall(mine != null ? mine : brief(where), where, took);
+            TALLY.stall(plugin != null ? "plugin " + plugin : mine != null ? mine : brief(where), where, took);
+            if (plugin != null) charge(plugin, took);
             if (took > worst) worst = took;
             if (took >= BAD && told < ENOUGH) {
                 told++;
@@ -240,7 +245,56 @@ public final class Lag {
 
     /** What has been counted this run, for the full report. */
     static String report() {
-        return TALLY.report() + (Probe.ON ? profile() : "");
+        // How long this covers is the first thing to know about it: a report
+        // copied a minute after the app was opened is a report on the app
+        // being opened, whatever its numbers say.
+        long watched = (SystemClock.elapsedRealtime() - BEGAN) / 1000L;
+        return "since the app started: " + watched / 60L + " min " + watched % 60L + " s\n"
+                + TALLY.report() + (Probe.ON ? profile() : "");
+    }
+
+    private static final long BEGAN = SystemClock.elapsedRealtime();
+
+    /** The plugin whose code is nearest the top of a stack, or null when no plugin's is in it. */
+    static String plugin(StackTraceElement[] stack) {
+        if (stack == null) return null;
+        for (StackTraceElement frame : stack) {
+            String owner = Plugins.owner(frame.getClassName());
+            if (owner != null) return owner;
+        }
+        return null;
+    }
+
+    private static final java.util.HashMap<String, long[]> PLUGIN_COST = new java.util.HashMap<String, long[]>();
+    /** Past this much stalling in one run a plugin is named in the diary. */
+    private static final long TOO_MUCH = 3000L;
+
+    private static void charge(String plugin, long took) {
+        boolean say = false;
+        synchronized (PLUGIN_COST) {
+            long[] cost = PLUGIN_COST.get(plugin);
+            if (cost == null) {
+                cost = new long[2];
+                PLUGIN_COST.put(plugin, cost);
+            }
+            say = cost[0] < TOO_MUCH && cost[0] + took >= TOO_MUCH;
+            cost[0] += took;
+            cost[1]++;
+        }
+        if (say) Diary.note("lag: plugin " + plugin + " has stalled the app for " + TOO_MUCH / 1000 + " s this run");
+    }
+
+    /** How long a plugin has kept the app from drawing this run, in milliseconds. */
+    static long cost(String plugin) {
+        synchronized (PLUGIN_COST) {
+            for (java.util.Map.Entry<String, long[]> one : PLUGIN_COST.entrySet()) {
+                // two plugins that share a package are charged together
+                if (one.getKey().equals(plugin) || one.getKey().contains(plugin + " / ") || one.getKey().endsWith(" / " + plugin)) {
+                    return one.getValue()[0];
+                }
+            }
+            return 0L;
+        }
     }
 
     /** The mod's own first frame in a stack, or null when it has none. */

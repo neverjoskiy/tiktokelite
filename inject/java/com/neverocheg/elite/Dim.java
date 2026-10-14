@@ -422,6 +422,7 @@ public final class Dim {
         // can display a newly recycled post at its original brightness.
         final boolean[] dirty = {false};
         final int[] shape={layoutFingerprint(root,0)};
+        final long[] printed={0L};
         final int[] misses={0};
         root.getViewTreeObserver().addOnGlobalLayoutListener(
                 new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
@@ -433,8 +434,13 @@ public final class Dim {
                 new android.view.ViewTreeObserver.OnPreDrawListener() {
             @Override public boolean onPreDraw() {
                 if(!isConfigured()){dirty[0]=false;return true;}
-                if (dirty[0] && root.hasWindowFocus()) {
-                    Activity current = held.get();
+                // A video lays something out on nearly every frame, and reading
+                // the whole screen over each time was a millisecond or two of
+                // every one of them. Twenty times a second is still sooner
+                // than the eye catches a new video's buttons at full strength.
+                long at=android.os.SystemClock.uptimeMillis();
+                if (dirty[0] && at-printed[0]>=48L && root.hasWindowFocus()) {
+                    Activity current = held.get();printed[0]=at;
                     dirty[0]=false;long probe=Probe.start();int next=layoutFingerprint(root,0);Probe.stop(Probe.DIM_PRINT,probe);
                     if(current!=null && root.isAttachedToWindow() && next!=shape[0]){shape[0]=next;applyNow(current);}
                 }
@@ -887,8 +893,32 @@ public final class Dim {
             if(previous==null)faded.put(view,new Dimmed(view,original,applied));
             else {previous.original=original;previous.applied=applied;}
             if (Math.abs(current - applied) > 0.001f) view.setAlpha(applied);
+            flat(view, applied);
         } catch (Throwable ignored) {
         }
+    }
+
+    /** Views already told to be drawn flat, so each is told once. */
+    private static final java.util.Map<View,Boolean> flattened=new java.util.WeakHashMap<>();
+
+    /**
+     * A dimmed view drawn straight onto the screen, each thing in it faint by
+     * itself, in place of being drawn full into a picture of its own that is
+     * then laid on faintly.
+     *
+     * The second is what Android does for a group that is not fully there,
+     * so that things lying over one another inside it do not show through
+     * each other. It is also a picture the size of the group made again for
+     * every frame, and with the whole of TikTok's overlay dimmed that was
+     * most of the screen, a hundred and twenty times a second: reports from
+     * phones with the dimming on had their slow frames spent drawing, where
+     * every other report had them spent waiting. Icons and words over a
+     * video do not lie over one another enough for the difference to be seen.
+     */
+    private static void flat(View view, float applied) {
+        if (android.os.Build.VERSION.SDK_INT < 24 || applied >= 0.999f || flattened.containsKey(view)) return;
+        flattened.put(view, Boolean.TRUE);
+        view.forceHasOverlappingRendering(false);
     }
 
     /** A subtree gets exactly one composite alpha. */

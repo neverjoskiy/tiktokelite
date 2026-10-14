@@ -68,6 +68,7 @@ final class Md3 {
     }
 
     private static boolean on(int which) {
+        if (Version.LITE) return false;
         Boolean known = ON[which];
         if (known != null) return known;
         Context context = Margy.context();
@@ -111,6 +112,7 @@ final class Md3 {
 
         /** What it is for, which is what decides its colour. */
         int role = SHELL;
+        boolean dressed;
 
         void tint(int colour) {
             if (paint.getColor() == colour) return;
@@ -121,6 +123,7 @@ final class Md3 {
         /** Coloured for what it is and where it is, and kept on the list of what is coloured again. */
         void dress(View view, int as) {
             role = as;
+            dressed = true;
             synchronized (WORN) {
                 WORN.put(view, this);
             }
@@ -947,7 +950,9 @@ final class Md3 {
         card.left = card.right = 8f * unit;
         card.top = card.bottom = unit;
         card.ends(head ? 22f * unit : 5f * unit, tail ? 22f * unit : 5f * unit);
-        card.dress(view, SHELL);
+        // this is asked of every row before every frame; the colour is worked
+        // out once, and after that by what looks at every shape twice a second
+        if (!card.dressed || card.role != SHELL) card.dress(view, SHELL);
     }
 
     private static final ViewOutlineProvider ROUNDED = new ViewOutlineProvider() {

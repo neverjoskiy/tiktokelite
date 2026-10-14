@@ -32,6 +32,11 @@ SIGNER_JAR = (
 )
 
 
+# The deflate the patcher app repeats on a phone: the same code, so the same
+# bytes. See margyt/java/Deflate.java.
+JZLIB_JAR = "https://repo1.maven.org/maven2/com/jcraft/jzlib/1.1.3/jzlib-1.1.3.jar"
+
+
 class Toolchain:
     def __init__(self, directory: str, quiet: bool = False):
         self.directory = directory
@@ -76,6 +81,35 @@ class Toolchain:
             shutil.copyfileobj(zf.open(PLATFORM_MEMBER), out)
         os.remove(archive)
         return path
+
+    @property
+    def jzlib(self) -> str:
+        return self._fetch(JZLIB_JAR, "jzlib.jar")
+
+    def deflate_many(self, blobs: list) -> list:
+        """Deflate each of `blobs` the way the patcher app will, in one go.
+
+        One start of a JVM for all of them: there are a couple of hundred, and
+        a start each would be most of a minute.
+        """
+        if not blobs:
+            return []
+        helper = os.path.join(self.directory, "deflate")
+        source = os.path.join(os.path.dirname(os.path.abspath(__file__)), "java", "Deflate.java")
+        stamp = os.path.join(helper, "Deflate.class")
+        if not os.path.exists(stamp) or os.path.getmtime(stamp) < os.path.getmtime(source):
+            os.makedirs(helper, exist_ok=True)
+            _run(["javac", "-nowarn", "-cp", self.jzlib, "-d", helper, source])
+        with tempfile.TemporaryDirectory(prefix="margyt-deflate-") as room:
+            for at, blob in enumerate(blobs):
+                with open(os.path.join(room, "%d.in" % at), "wb") as handle:
+                    handle.write(blob)
+            _run([_java(), "-Xmx2g", "-cp", helper + os.pathsep + self.jzlib, "Deflate", room])
+            out = []
+            for at in range(len(blobs)):
+                with open(os.path.join(room, "%d.out" % at), "rb") as handle:
+                    out.append(handle.read())
+            return out
 
     # ------------------------------------------------------------ using them
 

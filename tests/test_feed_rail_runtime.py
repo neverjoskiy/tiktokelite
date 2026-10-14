@@ -9,14 +9,14 @@ class FeedRailTest(unittest.TestCase):
   sources={k:STUBS[k] for k in ['android/content/Context.java','android/content/SharedPreferences.java']}
   sources.update({
    'com/neverocheg/elite/VideoActions.java':'package com.neverocheg.elite;class VideoActions{static void accountChanged(){} static void bindNative(Object c){} static void selected(Object c,Object p){}}',
-   'com/neverocheg/elite/Repost.java':'package com.neverocheg.elite;class Repost{static void reload(){} static void anchor(Object c){} static boolean visibility(android.view.View v,int value){return false;}static boolean replacing(android.view.View v){return false;}}',
+   'com/neverocheg/elite/Repost.java':'package com.neverocheg.elite;class Repost{static final int TAG=2;static void reload(){} static void anchor(Object c){} static boolean visibility(android.view.View v,int value){return false;}static boolean replacing(android.view.View v){return false;}}',
 
-   'android/view/View.java':'package android.view;public class View{public static int VISIBLE=0,INVISIBLE=4,GONE=8;int visibility;public int writes;public boolean isAttachedToWindow(){return true;}public int getVisibility(){return visibility;}public void setVisibility(int v){visibility=v;writes++;}public void post(Runnable r){r.run();}}',
+   'android/view/View.java':'package android.view;public class View{public static int VISIBLE=0,INVISIBLE=4,GONE=8;int visibility;java.util.Map<Integer,Object> tags=new java.util.HashMap<>();public Object getTag(int k){return tags.get(k);}public void setTag(int k,Object v){tags.put(k,v);}public int writes;public boolean isAttachedToWindow(){return true;}public int getVisibility(){return visibility;}public void setVisibility(int v){visibility=v;writes++;}public void post(Runnable r){r.run();}}',
    'com/neverocheg/elite/Margy.java':'package com.neverocheg.elite;class Margy{static android.content.Context context=new android.content.Context();static android.content.Context context(){return context;}}',
    'com/neverocheg/elite/AccountAppearance.java':'package com.neverocheg.elite;class AccountAppearance{static String uid="111";static android.content.SharedPreferences prefs(android.content.Context c){return c.getSharedPreferences(uid,0);}}',
    'com/neverocheg/elite/Diary.java':'package com.neverocheg.elite;class Diary{static void note(String s){}}',
    'android/os/SystemClock.java':'package android.os;public class SystemClock{public static long uptimeMillis(){return 100000;}}',
-   'com/neverocheg/elite/Md3.java':'package com.neverocheg.elite;class Md3{static void rail(android.view.View v,int kind){}static void icons(android.view.View v,int kind){}}',
+   'com/neverocheg/elite/Md3.java':'package com.neverocheg.elite;class Md3{static final String KEY_ICONS="md3_icons";static boolean isOn(String key){return true;}static void rail(android.view.View v,int kind){}static void icons(android.view.View v,int kind){}}',
    'com/neverocheg/elite/FeedRail.java':(ROOT/'inject/java/com/neverocheg/elite/FeedRail.java').read_text(encoding='utf-8'),
    'com/neverocheg/elite/Test.java':'''package com.neverocheg.elite;import android.view.View;public class Test{
 static void check(boolean b,String s){if(!b)throw new AssertionError(s);}public static void main(String[] a){

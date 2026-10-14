@@ -215,6 +215,18 @@ def add_provider(axml: Axml, class_name: str, authority: str) -> None:
     axml.insert_into(application(axml), [provider, axml.close_element(provider)])
 
 
+def add_meta_data(axml: Axml, name: str, value: str) -> None:
+    """A named word about the app that another app may read.
+
+    The patcher app reads the mod's version this way: an installed app says
+    nothing else about itself that a stranger can ask for.
+    """
+    data = axml.make_element("meta-data")
+    axml.set_attr_string(data, "name", name)
+    axml.set_attr_string(data, "value", value)
+    axml.insert_into(application(axml), [data, axml.close_element(data)])
+
+
 LAUNCH_SINGLE_TASK = 2
 
 

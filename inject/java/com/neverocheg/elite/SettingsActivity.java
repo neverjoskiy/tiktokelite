@@ -223,7 +223,7 @@ public class SettingsActivity extends Activity {
         disclosureBodies.clear();disclosureArrows.clear();renderDisclosureKey=null;
         column.removeAllViews();
         column.addView(backArrow());
-        column.addView(title(settingsGroup == 0 ? "TikTokElite" : groupName(settingsGroup)));
+        column.addView(title(settingsGroup == 0 ? (Version.LITE ? "TikeLite" : "TikTokElite") : groupName(settingsGroup)));
         if(settingsGroup==0 || searchQuery.length()>0)column.addView(searchBox());
         if (settingsGroup != 0) column.addView(wrap(actionRow("info","Подсказки",null,this::showSectionHelp)));
         if (searchQuery.length() > 0) {
@@ -2228,7 +2228,8 @@ public class SettingsActivity extends Activity {
      */
     private View versions() {
         TextView view = new TextView(this);
-        view.setText("TikTokElite " + Version.MOD + "  ·  TikTok " + Version.TIKTOK
+        view.setText((Version.LITE ? "TikeLite " : "TikTokElite ") + Version.MOD
+                + (Version.LITE ? "  ·  TikTok Lite " : "  ·  TikTok ") + Version.TIKTOK
                 + "\nTikTokElite by @neverocheg"
                 + "\n" + Text.MADE_BY);
         view.setTextColor(skin.muted());
@@ -2391,6 +2392,12 @@ public class SettingsActivity extends Activity {
         if (!info.description.isEmpty()) by = by + "  ·  " + info.description;
         text.addView(detail(by));
         if (info.trouble != null) text.addView(detail(info.trouble));
+        long stalled = Lag.cost(info.id);
+        if (stalled >= 1000L) {
+            TextView slow = detail(Text.PLUGIN_SLOW + " " + (stalled + 500L) / 1000L + " " + Text.PLUGIN_SLOW_S);
+            slow.setTextColor(0xFFE57373);
+            text.addView(slow);
+        }
         if(info.safety!=null&&!info.safety.isEmpty())text.addView(detail("Статическая проверка · удерживайте для действий"));
         row.addView(text, grow());
 

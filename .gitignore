@@ -25,3 +25,5 @@ vendor/
 __pycache__/
 *.pyc
 tools/jadx/
+
+.opencode/

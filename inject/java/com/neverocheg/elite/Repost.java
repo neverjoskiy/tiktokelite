@@ -2,7 +2,7 @@ package com.neverocheg.elite;
 import android.view.*;import android.graphics.*;import java.lang.ref.WeakReference;import java.util.*;
 /** A native repost listener, with local placement. No fabricated upvote request. */
 public final class Repost {
- static final String KEY="repost_btn",POS="repost_pos";private static final int TAG=0x7e0c0334;
+ static final String KEY="repost_btn",POS="repost_pos";static final int TAG=0x7e0c0334;
  private static final Map<View,WeakReference<State>> nativeSlots=new WeakHashMap<>();
  private static final Map<View,WeakReference<Object>> anchors=new WeakHashMap<>();
  private static final class State {WeakReference<Object> component;final WeakReference<View> source;WeakReference<Button> button=new WeakReference<>(null);WeakReference<View> fav=new WeakReference<>(null);int wanted;State(Object c,View v){component=new WeakReference<>(c);source=new WeakReference<>(v);wanted=v.getVisibility();}}

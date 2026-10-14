@@ -51,13 +51,27 @@ final class DateOverlay {
             view=(View)parent;
         }return null;
     }
+    /**
+     * Whether the comments are open over the video, asked four times a second.
+     *
+     * With the screen saver off nobody keeps the answer, and finding it out is
+     * a walk over every view on the screen. This is called before every frame,
+     * so that walk was being taken a hundred and twenty times a second for as
+     * long as a video with a date on it was showing.
+     */
+    private static long panelAsked;private static boolean panelWas;private static java.lang.ref.WeakReference<View> panelRoot=new java.lang.ref.WeakReference<>(null);
+    private static boolean panelOpen(View root){
+        long now=android.os.SystemClock.uptimeMillis();
+        if(panelRoot.get()==root&&now-panelAsked<250L)return panelWas;
+        panelAsked=now;panelRoot=new java.lang.ref.WeakReference<>(root);panelWas=Dim.panelOpen(root);return panelWas;
+    }
     static void update(){
         if(!Dates.isEnabled()){TextView old=label.get();if(old!=null)restore(old);if(fallback.get()!=null){removeFallback();label=new WeakReference<>(null);}return;}
         chooseVisible();View cell=source.get();if(cell==null || date==null)return;
         TextView row=label.get();if(row!=null && (!row.isAttachedToWindow() || row.getRootView()!=cell.getRootView())){restore(row);label=new WeakReference<>(null);row=null;searched=0;}if(row==null){long now=android.os.SystemClock.uptimeMillis();if(now-searched<250)return;searched=now;row=find(cell);if(row==null)row=fallback(cell);if(row==null)return;
             label=new WeakReference<>(row);original=row.getText();alpha=row.getAlpha();visibility=row.getVisibility();wasClickable=row.isClickable();Fonts.apply(row);}
         Object parent=row.getParent();View anchor=parent instanceof View?(View)parent:cell;
-        boolean enabled=Dates.isEnabled();boolean show=enabled && anchor.isShown() && anchor.isAttachedToWindow() && !Dim.panelOpen(cell.getRootView());
+        boolean enabled=Dates.isEnabled();boolean show=enabled && anchor.isShown() && anchor.isAttachedToWindow() && !panelOpen(cell.getRootView());
         if(!enabled){restore(row);return;}
         CharSequence current=row.getText();if(applied && current!=null && !date.contentEquals(current))original=current;
         if(row.getText()==null||!date.contentEquals(row.getText()))row.setText(date);

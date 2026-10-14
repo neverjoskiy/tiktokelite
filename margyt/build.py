@@ -146,6 +146,7 @@ class Build:
         self.keystore_password = keystore_password
         self.key_password = key_password
         self.test = test
+        self.lite = False
         self.accent = dexpatch.TIKTOK_PINK if accent is None else accent
         self.started = time.time()
         self.patched_dex_count = 0
@@ -172,6 +173,13 @@ class Build:
         manifest = Axml.parse(apk.read("AndroidManifest.xml"))
         package = manifest_module.package_name(manifest)
         self.detail("package %s, staying as it is" % package)
+        # TikTok Lite is another app with another code base under the same
+        # roof. What does not depend on TikTok's own classes -- the region,
+        # the mod's settings, the things that hook Android itself -- is built
+        # into it; the rest is left out rather than required.
+        self.lite = package.endswith(".go")
+        if self.lite:
+            self.detail("this is TikTok Lite: the small build")
         self.detail("application class %s" % manifest_module.application_class(manifest))
 
         # everything built here has to be loadable as far back as the apk goes,
@@ -224,16 +232,23 @@ class Build:
 
         self.say("Name and icon")
         theme = self.tools.framework_constant(SETTINGS_THEME)
-        for where in manifest_module.set_label(manifest, LABEL):
+        lite_label = "TikeLite"
+        for where in manifest_module.set_label(manifest, lite_label if self.lite else LABEL):
             self.detail("label on %s" % where)
         self.tools.check_attribute_ids(axml_module.ATTR_IDS)
-        manifest_module.add_activity(manifest, SETTINGS_ACTIVITY, SETTINGS_LABEL, theme)
-        self.detail("%s declared, reached from TikTok's own settings" % SETTINGS_ACTIVITY)
+        if self.lite:
+            # Lite's settings are a web page, so the mod's are reached from the
+            # sheet behind the three lines of the profile
+            manifest_module.add_activity(manifest, SETTINGS_ACTIVITY, lite_label, theme)
+            self.detail("%s declared, reached from Lite's own menu" % SETTINGS_ACTIVITY)
+        else:
+            manifest_module.add_activity(manifest, SETTINGS_ACTIVITY, SETTINGS_LABEL, theme)
+            self.detail("%s declared, reached from TikTok's own settings" % SETTINGS_ACTIVITY)
         manifest_module.add_activity(manifest, STORE_ACTIVITY, SETTINGS_LABEL, theme)
         manifest_module.add_activity(manifest, PACKAGE + ".PluginEditorActivity", SETTINGS_LABEL, theme)
         self.detail("%s declared, the plugin store" % STORE_ACTIVITY)
 
-        if not manifest_module.has_activity(manifest, TIKTOK_SETTINGS):
+        if not self.lite and not manifest_module.has_activity(manifest, TIKTOK_SETTINGS):
             raise RuntimeError(
                 "%s is not in this apk -- TikTok's settings screen has been "
                 "renamed, and the TikTokElite row would never appear in it"
@@ -247,10 +262,15 @@ class Build:
             manifest_module.add_permission(manifest, permission)
         manifest_module.add_receiver(manifest, ALARM_RECEIVER, ALARM_ACTIONS)
         self.detail("%s declared: streak sends wake on the system clock" % ALARM_RECEIVER)
+        # what the patcher app asks an installed mod: which mod, which version
+        manifest_module.add_meta_data(manifest, "com.neverocheg.elite.mod",
+                                      "tikelite" if self.lite else "elite")
+        manifest_module.add_meta_data(manifest, "com.neverocheg.elite.version", self.mod_version())
         manifest_module.add_provider(
             manifest, STARTUP_PROVIDER, "%s.margyt" % package)
         self.detail("%s declared: the mod starts with the app" % STARTUP_PROVIDER)
-        self.detail("the TikTokElite row goes on top of %s" % TIKTOK_SETTINGS.rsplit(".", 1)[-1])
+        if not self.lite:
+            self.detail("the TikTokElite row goes on top of %s" % TIKTOK_SETTINGS.rsplit(".", 1)[-1])
 
         self.say("Provider authorities")
         shared = manifest_module.shared_authorities(manifest, package)
@@ -299,6 +319,9 @@ class Build:
         self.say("Writing the apk")
         for gone in apk.drop_signature():
             self.detail("dropped %s" % gone)
+        # deflated by the compressor the patcher app carries, so that the app
+        # can make this very file out of TikTok's own apk and a patch
+        apk.deflater = self.tools.deflate_many
         apk.write(self.out_path)
         apk.close()
         self.detail("%.0f MB" % (os.path.getsize(self.out_path) / 1e6))
@@ -424,11 +447,15 @@ class Build:
             )
         self.detail("%d icons in the code" % len(names))
 
+    def mod_version(self) -> str:
+        # Lite is a mod of its own with releases of its own, and says so
+        path = os.path.join(self.root, "VERSION-LITE" if self.lite else "VERSION")
+        with open(path, encoding="utf-8") as handle:
+            return handle.read().strip()
+
     def write_version(self, tiktok: str, test: bool = False) -> None:
         """Both versions, so the app can say what it is and what it patched."""
-        path = os.path.join(self.root, "VERSION")
-        with open(path, encoding="utf-8") as handle:
-            mod = handle.read().strip()
+        mod = self.mod_version()
 
         out = os.path.join(self.root, "inject", "java", "com", "neverocheg", "elite",
                            "Version.java")
@@ -453,10 +480,12 @@ class Build:
                 "    static final String MOD = \"%s\";\n"
                 "    static final String TIKTOK = \"%s\";\n"
                 "    static final boolean TEST = %s;\n"
-                "}\n" % (mod, tiktok, "true" if test else "false")
+                "    /** Built into TikTok Lite: only what does not need TikTok's own classes runs. */\n"
+                "    static final boolean LITE = %s;\n"
+                "}\n" % (mod, tiktok, "true" if test else "false", "true" if self.lite else "false")
             )
-        self.detail("TikTokElite %s on TikTok %s%s"
-                    % (mod, tiktok, ", a test build" if test else ""))
+        self.detail("TikTokElite %s%s on TikTok %s%s"
+                    % ("Lite " if self.lite else "", mod, tiktok, ", a test build" if test else ""))
 
     def write_theme(self, arsc: Arsc) -> None:
         """The colours TikTok repaints when its own theme changes."""
@@ -701,11 +730,12 @@ class Build:
             found = dexpatch.FOUND.get(label)
             if found is None:
                 self.detail("%s: not found in this release" % label)
+                lines.append((label, "", ""))
                 continue
             owner, name = found
             self.detail("%s: %s->%s" % (label, owner, name))
             lines.append((label, owner, name))
-        self.static_target_count = len(lines)
+        self.static_target_count = len([line for line in lines if line[1]])
 
         out = os.path.join(self.root, "inject", "java", "com", "neverocheg", "elite",
                            "Anchors.java")
@@ -728,7 +758,7 @@ class Build:
                     "\n    /** %s */\n"
                     "    static final String %s = \"%s\";\n"
                     "    static final String %s_METHOD = \"%s\";\n"
-                    % (label, _constant(label), _java_name(owner),
+                    % (label, _constant(label), _java_name(owner) if owner else "",
                        _constant(label), name)
                 )
             handle.write("}\n")
@@ -779,6 +809,8 @@ class Build:
         feature_hits["native missing string"]=0
         feature_hits[dexpatch.SETTINGS_LABEL]=0
         feature_hits["native window brightness"]=0
+        menu_rows=0
+        kept_requests=0
         feature_hits["native right-area slots"]=0
         feature_hits["native player resume"]=0
         feature_hits["native offline choices"]=0
@@ -816,6 +848,8 @@ class Build:
             feature_hits[dexpatch.START_LABEL] += counts.get(dexpatch.START_LABEL,0)
             feature_hits["native missing string"] += sum(v for key,v in counts.items() if "getString" in key and ("0TFu" in key or "0TVv" in key))
             feature_hits[dexpatch.SETTINGS_LABEL] += counts.get(dexpatch.SETTINGS_LABEL,0)
+            menu_rows += counts.get(dexpatch.LITE_MENU_LABEL,0)
+            kept_requests += counts.get(dexpatch.LITE_NET_LABEL,0)
             feature_hits["native window brightness"] += sum(v for key,v in counts.items() if key.startswith(dexpatch.WINDOW_LABEL))
             feature_hits["native avatar ring"] += sum(v for key,v in counts.items() if key.startswith("Canvas->drawArc") and any(ring in key for ring in dexpatch.STORY_RINGS))
             feature_hits["native avatar shape"] += sum(v for key,v in counts.items() if key.startswith("Path->addCircle"))
@@ -848,6 +882,18 @@ class Build:
                     "down, %d rewrites in all" % (calls, pink, total))
         self.patched_dex_count = patched_dex_count
         self.rewrite_count = total
+        if self.lite:
+            # none of these are in Lite, and none are promised in it
+            self.detail("Feature hooks found in Lite: "+(", ".join("%s x%d"%item for item in feature_hits.items() if item[1]) or "none"))
+            if not calls:
+                raise RuntimeError("not one call about the SIM card matched: the region could not be changed")
+            if not menu_rows:
+                raise RuntimeError("the sheet behind the profile's three lines was not found: "
+                                   "the mod's settings would have no way in")
+            self.detail("The mod's row is in Lite's menu")
+            self.detail("Requests the server says to drop: %s" % ("asked about, %d place(s)" % kept_requests
+                                                                    if kept_requests else "NOT hooked"))
+            return
         missing=[feature for feature,hits in feature_hits.items() if not hits]
         if feature_hits["native offline comments response"] < 4:
             missing.append("native offline comments response (need all four)")

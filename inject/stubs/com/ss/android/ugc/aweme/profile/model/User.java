@@ -3,6 +3,8 @@ package com.ss.android.ugc.aweme.profile.model;
 /** An account: who it is, and what it allows. */
 public class User {
 
+    public String nickname;
+
     public String getUniqueId(){throw new UnsupportedOperationException("stub");}
 
     public String getUid() {

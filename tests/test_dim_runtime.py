@@ -50,7 +50,7 @@ STUBS = {
         public boolean selected=false,activated=false;public CharSequence description;public int alphaWrites=0;
         public boolean isSelected(){return selected;}public boolean isActivated(){return activated;}public CharSequence getContentDescription(){return description;}
         public float alpha=1,x=0,y=0; public int left=0,top=0,width=100,height=100;
-        public float getAlpha(){return alpha;} public void setAlpha(float a){alpha=a;alphaWrites++;}
+        public float getAlpha(){return alpha;} public void setAlpha(float a){alpha=a;alphaWrites++;} public int flat; public void forceHasOverlappingRendering(boolean overlapping){if(!overlapping)flat++;}
         public float getTranslationX(){return x;} public void setTranslationX(float a){x=a;}
         public float getTranslationY(){return y;} public void setTranslationY(float a){y=a;}
         public java.util.Map<Integer,Object> tags=new java.util.HashMap<>();
@@ -109,6 +109,7 @@ STUBS = {
 }
 
 STUBS['com/neverocheg/elite/ProfileLayout.java']='package com.neverocheg.elite;class ProfileLayout {static boolean profile;static boolean visible(android.view.View root){return profile;}}'
+STUBS['android/os/Build.java']='package android.os;public class Build{public static class VERSION{public static int SDK_INT=34;}}'
 STUBS['com/neverocheg/elite/NavBar.java']='package com.neverocheg.elite;class NavBar{static boolean wears(android.view.View v){return false;}}'
 STUBS['android/view/View.java']=STUBS['android/view/View.java'].replace('public boolean isAttachedToWindow(){return true;}', 'public boolean isAttachedToWindow(){return true;}public boolean hasWindowFocus(){return true;}')
 
@@ -299,6 +300,7 @@ public class DimHarness {
         // Recycling hundreds of nested comment widgets must not alter the
         // feed fingerprint or force full theme/anti-burn passes while scrolling.
         for(int row=0;row<100;row++){ViewGroup cell=new ViewGroup();cell.setTag(0x5454434D,true);sheet.addView(cell);for(int n=0;n<12;n++)cell.addView(new View());}
+        android.os.SystemClock.now+=100;
         Dim.applyNow(activity);root.observer.layout.onGlobalLayout();root.observer.draw.onPreDraw();
         int readStart=ViewGroup.childReads;Dim.layoutFingerprint(sheet,0);
         if(ViewGroup.childReads!=readStart)throw new AssertionError("A known comments sheet must be opaque to layout observers");

@@ -27,7 +27,7 @@ public class DateHarness {
   TextView nativeDate=new TextView(new android.content.Context());nativeDate.setText("Yesterday");nativeDate.alpha=.8f;root.addView(nativeDate,new FrameLayout.LayoutParams(80,24));root.nativeDate=nativeDate;
   DateOverlay.bind(caption,"01.01.2021","Author");TextView date=nativeDate;
   check(root.getChildCount()==3 && date.text.equals("01.01.2021") && date.alpha==.6f,"native date reused without an overlay");
-  Dim.panel=true;DateOverlay.update();check(date.visibility==8,"no date in comments");Dim.panel=false;DateOverlay.update();check(date.visibility==0,"date returns after comments");
+  android.os.SystemClock.now+=300;Dim.panel=true;DateOverlay.update();check(date.visibility==8,"no date in comments");android.os.SystemClock.now+=300;Dim.panel=false;DateOverlay.update();check(date.visibility==0,"date returns after comments");
   Dates.enabled=false;DateOverlay.update();check(date.text.equals("Yesterday")&&date.alpha==.8f,"native content and alpha restored when disabled");Dates.enabled=true;DateOverlay.update();check(date.text.equals("01.01.2021"),"enabled without reload");
   caption.visibility=8;root.observer.draw.onPreDraw();check(date.visibility==0,"empty/hidden caption does not hide author date");root.visibility=8;DateOverlay.update();check(date.visibility==8,"hidden author container hides date");root.visibility=0;caption.visibility=0;
   DateOverlay.bind(caption,"02.01.2021");check(root.getChildCount()==3 && date.text.equals("02.01.2021"),"next post reuses native element");

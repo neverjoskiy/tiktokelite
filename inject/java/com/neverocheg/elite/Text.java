@@ -101,6 +101,10 @@ final class Text {
             "Копіювати діагностику", "Copy diagnostics");
     static final String PROFILE_STYLE = pick("Оформление профиля",
             "Оформлення профілю", "Profile style");
+    static final String LITE_GOOGLE = pick(
+            "Вход через Google в TikeLite не работает. Войди по почте или номеру телефона.",
+            "Вхід через Google у TikeLite не працює. Увійди за поштою або номером телефону.",
+            "Signing in with Google does not work in TikeLite. Use your e-mail or phone number.");
     static final String APPEARANCE = pick("Внешний вид", "Зовнішній вигляд", "Appearance");
     static final String PROFILE_PREVIEW = pick("Так значок будет выглядеть у ника",
             "Так значок виглядатиме біля імені", "Badge preview beside nickname");
@@ -984,6 +988,13 @@ final class Text {
             "Долгое нажатие — удалить",
             "Довге натискання — видалити",
             "Hold to remove");
+
+    static final String PLUGIN_SLOW = pick(
+            "Тормозит приложение: подвисаний за этот запуск",
+            "Гальмує застосунок: підвисань за цей запуск",
+            "Slows the app down: stalled this run for");
+
+    static final String PLUGIN_SLOW_S = pick("с", "с", "s");
 
     // ----------------------------------------------------------- the links
 

@@ -9,6 +9,34 @@ final class Diagnostics {
      * hooks did, every plugin, and the whole diary. Never the account id, a
      * token or any session data.
      */
+    /**
+     * What the phone is told to say about where it is, and what it would say
+     * by itself: countries only, which is as much as the choice in the mod's
+     * own settings gives away. A profile or a search that will not load for
+     * some people and loads for others may come down to these two disagreeing.
+     */
+    private static String region(android.content.Context context) {
+        StringBuilder out = new StringBuilder();
+        try {
+            out.append("told to TikTok: ").append(Margy.isEnabled() ? Margy.current()[Margy.ISO] + " (" + Margy.current()[Margy.CARRIER] + ")" : "nothing, the mod's region is off").append('\n');
+            android.telephony.TelephonyManager phone = context == null ? null
+                    : (android.telephony.TelephonyManager) context.getSystemService(android.content.Context.TELEPHONY_SERVICE);
+            if (phone == null) return out.append("the phone itself: unknown\n").toString();
+            boolean card = false;
+            try { card = phone.getSimState() == android.telephony.TelephonyManager.SIM_STATE_READY; } catch (Throwable ignored) { }
+            out.append("the phone itself: ").append(card ? "a card from " + said(phone.getSimCountryIso()) : "no card")
+                    .append(", on a network in ").append(said(phone.getNetworkCountryIso())).append('\n');
+            out.append("system language and country: ").append(java.util.Locale.getDefault()).append('\n');
+        } catch (Throwable error) {
+            out.append("could not be read: ").append(error.getClass().getSimpleName()).append('\n');
+        }
+        return out.toString();
+    }
+
+    private static String said(String iso) {
+        return iso == null || iso.isEmpty() ? "nowhere it will name" : iso;
+    }
+
     static String fullReport() {
         StringBuilder out = new StringBuilder();
         out.append("== TikTokElite full report ==\n");
@@ -45,6 +73,8 @@ final class Diagnostics {
                 .append(" version-specific targets\n");
 
         out.append("\n== lag ==\n").append(Lag.report());
+
+        out.append("\n== region ==\n").append(region(context));
 
         out.append("\n== appearance ==\n");
         out.append("accent: #").append(String.format(java.util.Locale.US, "%06X",

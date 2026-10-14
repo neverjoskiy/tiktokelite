@@ -65,6 +65,36 @@ public final class Plugins {
     private static final String PREFS = "elite_plugins";
 
     /** What a manifest says, and what the loader made of it. */
+    /** The package each running plugin's own classes are in, and whose it is. */
+    private static final java.util.concurrent.ConcurrentHashMap<String, String> PACKAGES =
+            new java.util.concurrent.ConcurrentHashMap<String, String>();
+
+    /** A plugin's classes are taken to be those in the package of the class it starts with. */
+    private static void claim(Info info) {
+        int dot = info.entry.lastIndexOf('.');
+        if (dot <= 0) return;
+        String prefix = info.entry.substring(0, dot + 1);
+        // not a package the app, Android or the mod itself has classes in
+        for (String taken : new String[] {"cat.narezany.margyt.", "com.neverocheg.elite.", "android.", "androidx.", "java.", "kotlin.", "com.ss.", "com.bytedance.", "X."}) {
+            if (prefix.startsWith(taken)) return;
+        }
+        String before = PACKAGES.put(prefix, info.id);
+        // two plugins in one package cannot be told apart by a class name
+        if (before != null && !before.equals(info.id)) PACKAGES.put(prefix, before + " / " + info.id);
+    }
+
+    /**
+     * Which plugin a class belongs to, or null when it is nobody's. Asked
+     * when the app has stalled, about the classes that were running.
+     */
+    static String owner(String className) {
+        if (className == null || PACKAGES.isEmpty()) return null;
+        for (java.util.Map.Entry<String, String> one : PACKAGES.entrySet()) {
+            if (className.startsWith(one.getKey())) return one.getValue();
+        }
+        return null;
+    }
+
     public static final class Info {
         public final String id;
         public final String name;
@@ -361,6 +391,7 @@ public final class Plugins {
                 }
             }));
             plugin.onStart(context);
+            claim(info);
             live.instance = plugin;
             live.settings = plugin;
             info.trouble = null;

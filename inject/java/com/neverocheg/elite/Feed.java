@@ -145,7 +145,13 @@ public final class Feed {
         return kept==null?items:kept;
     }
     public static List searchItems(com.ss.android.ugc.aweme.search.pages.result.topsearch.core.model.SearchMixFeedList page){
-        return page==null?null:withoutAds(page.mItems);
+        if(page==null)return null;
+        List given=page.mItems,kept=withoutAds(given);
+        // Some people search and are told at once that nothing was found. Whether TikTok
+        // had nothing to show or the mod took it all away is the first thing to know.
+        int had=given==null?-1:given.size(),left=kept==null?-1:kept.size();
+        if(had<=0||left!=had)Diary.note("search: a page of "+(had<0?"nothing at all":had+" from TikTok")+(left!=had?", "+left+" after the mod":""));
+        return kept;
     }
     public static List rawItems(FeedItemList page){return page==null?null:withoutAds(page.items);}
 

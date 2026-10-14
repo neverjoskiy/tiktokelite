@@ -121,6 +121,7 @@ final class NavBar {
     // -------------------------------------------------------------- the switch
 
     static boolean isEnabled() {
+        if (Version.LITE) return false;
         SharedPreferences prefs = prefs();
         return prefs == null || prefs.getBoolean(KEY, true);
     }
@@ -422,11 +423,20 @@ final class NavBar {
         }
 
         /** Before every frame: what TikTok's bar says now, and whether that is what is drawn. */
+        private long readAt;
+        private boolean animates = true;
+        private static final long READ_EVERY = 250L;
+
         void settle(ViewGroup bar) {
             long now = SystemClock.uptimeMillis();
             boolean changed = gather(bar);
             boolean moving = false;
-            boolean animated = Motion.enabled(bar.getContext());
+            boolean read = changed || now - readAt >= READ_EVERY;
+            if (read) {
+                readAt = now;
+                animates = Motion.enabled(bar.getContext());
+            }
+            boolean animated = animates;
             for (Tab tab : tabs) {
                 float target = tab.view.isSelected() ? 1f : 0f;
                 if (target != tab.to) {
@@ -440,6 +450,18 @@ final class NavBar {
                             : tab.from + (tab.to - tab.from) * ease.getInterpolation(Math.max(0f, passed));
                     changed = true;
                     if (tab.open != tab.to) moving = true;
+                }
+                // What a tab says is read four times a second rather than on
+                // every frame: each reading walks the tab and makes a string or
+                // two, and at 120 frames a second that was thousands of them a
+                // second for words that change a few times a day.
+                if (!read) {
+                    float shown = Math.max(0f, Math.min(1f, tab.view.getAlpha()));
+                    if (Math.abs(shown - tab.shown) > 0.004f) {
+                        tab.shown = shown;
+                        changed = true;
+                    }
+                    continue;
                 }
                 String name = name(tab.view);
                 if (name == null && tab.kind != CREATE) {

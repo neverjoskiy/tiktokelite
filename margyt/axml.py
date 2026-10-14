@@ -54,6 +54,7 @@ ATTR_IDS = {
     "taskAffinity": 0x01010012,
     "minSdkVersion": 0x0101020C,
     "versionCode": 0x0101021B,
+    "value": 0x01010024,
 }
 
 NO_ENTRY = 0xFFFFFFFF

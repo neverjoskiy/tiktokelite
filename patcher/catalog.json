@@ -1,0 +1,73 @@
+{
+ "_comment": "What Elite Patcher reads to know which mods there are, what each is made from and where the patch is.",
+ "patcher": {
+  "version": "1.0",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/patcher-v1.0/elite-patcher.apk",
+  "sha256": "pending-first-patcher-build",
+  "size": 0,
+  "notes": {
+   "ru": "Первая версия.",
+   "uk": "Перша версія.",
+   "en": "The first version."
+  }
+ },
+ "channel": "https://t.me/tiktelite",
+ "mods": [
+  {
+   "id": "elite",
+   "name": "TikTokElite",
+   "icon": "elite",
+   "package": "com.zhiliaoapp.musically",
+   "about": {
+    "ru": "Мод TikTok: оформление, скачивание без водяного знака, подмена региона, значки и многое другое.",
+    "uk": "Мод TikTok: оформлення, завантаження без водяного знака, підміна регіону, значки та багато іншого.",
+    "en": "A TikTok mod: looks, downloads without a watermark, a region of your choice, badges and a lot more."
+   },
+   "releases": [],
+   "apks": [
+    {
+     "version": "3.1",
+     "beta": false,
+     "apk": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk",
+      "sha256": "3a3e9c2acda82efe87e060c609a1f0f2ac511288798d90cc35ee0c40d6d7c794",
+      "size": 396546905
+     },
+     "notes": {
+      "ru": "Меньше подлагиваний: мод больше не обходит экран перед каждым кадром. Убран чёрный экран в недавних. Отчёт о лагах называет плагин-виновник.",
+      "uk": "Менше підлагів: мод більше не обходить екран перед кожним кадром. Прибрано чорний екран у недавніх. Звіт про лаги називає плагін-винуватець.",
+      "en": "Less stutter: the mod no longer goes over the screen before every frame. No more blacked-out window in recents. A lag report names the plugin that is holding the app up."
+     }
+    }
+   ]
+  },
+  {
+   "id": "tikelite",
+   "name": "TikeLite",
+   "icon": "tikelite",
+   "package": "com.zhiliaoapp.musically.go",
+   "about": {
+    "ru": "Лёгкий мод на TikTok Lite: подмена региона, тема и акцент, значки.",
+    "uk": "Легкий мод на TikTok Lite: підміна регіону, тема й акцент, значки.",
+    "en": "A light mod of TikTok Lite: a region of your choice, theme and accent, badges."
+   },
+   "releases": [],
+   "apks": [
+    {
+     "version": "0.1",
+     "beta": false,
+     "apk": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.apk",
+      "sha256": "17547e46446b833e0d8f2e2e654d566ad0ed04a2bc31396e6deda16721e82891",
+      "size": 122988831
+     },
+     "notes": {
+      "ru": "Первая версия. Подмена региона, тема, акцент, значки.",
+      "uk": "Перша версія. Підміна регіону, тема, акцент, значки.",
+      "en": "The first version. A region of your choice, theme, accent, badges."
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -59,6 +59,9 @@ class Apk:
 
     # ----------------------------------------------------------------- read
 
+    #: Deflates a list of byte strings, each to a raw stream. None: zlib does it.
+    deflater = None
+
     def _read_central_directory(self) -> None:
         size = os.path.getsize(self.path)
         tail = min(size, 66000)
@@ -158,10 +161,21 @@ class Apk:
         return gone
 
     def write(self, out_path: str) -> None:
+        # What is new in this apk is deflated all at once and by the one
+        # compressor the patcher app has too, when the build has given it:
+        # an apk the app can make again has to be deflated the way it would.
+        ready = {}
+        if self.deflater is not None:
+            fresh = [entry for entry in self.entries
+                     if entry.data is not None and entry.method == DEFLATED]
+            for entry, raw in zip(fresh, self.deflater([entry.data for entry in fresh])):
+                ready[id(entry)] = raw
         with open(out_path, "wb") as out:
             offsets = []
             for entry in self.entries:
-                raw = self._raw(entry)
+                raw = ready.get(id(entry))
+                if raw is None:
+                    raw = self._raw(entry)
                 if entry.data is not None:
                     entry.csize = len(raw)
                 name = entry.name.encode("utf-8")

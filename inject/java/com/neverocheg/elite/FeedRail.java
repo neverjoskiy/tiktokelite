@@ -44,14 +44,22 @@ public final class FeedRail {
             if(!(content instanceof View))return;
             View v=(View)content;
             synchronized(slots){if(!slots.containsKey(v))slots.put(v,new State(kind,v.getVisibility()));}
+            v.setTag(KNOWN,Boolean.TRUE);
             apply(v);
             if(kind==3)VideoActions.bindNative(component);
             if(kind==2)Repost.anchor(component);
         }catch(Throwable error){Diary.note("feed rail binding: "+error);}
     }
     /** Preserve TikTok's latest intended state, including server-hidden actions. */
+    /** On the few views the mod has anything to say about. */
+    private static final int KNOWN=0x7e0c0399;
     public static void setVisibility(View view,int visibility){
         if(view==null)return;
+        // Every show and hide in TikTok comes through here, thousands a second
+        // while a list is filled, and all but a handful are none of the mod's
+        // business. Those go straight on: two tags asked for, where there used
+        // to be two locks taken and two tables searched for each.
+        if(view.getTag(KNOWN)==null&&view.getTag(Repost.TAG)==null){view.setVisibility(visibility);return;}
         long probe=Probe.start();
         boolean taken=Repost.visibility(view,visibility);
         State state=null;
@@ -70,8 +78,12 @@ public final class FeedRail {
     }
     /** The icons of the buttons on screen, looked at before each frame: a tap changes one without anything being laid out. */
     private static View[] seen=new View[0];private static int[] kinds=new int[0];private static long listed;
+    private static long idled;
     static void icons(){
         long now=android.os.SystemClock.uptimeMillis();
+        // with the round icons off there is nothing to swap; it is looked at
+        // twice a second all the same, so that turning them off puts TikTok's back
+        if(!Md3.isOn(Md3.KEY_ICONS)){if(now-idled<500L)return;idled=now;}
         if(now-listed>500L){
             listed=now;
             synchronized(slots){
