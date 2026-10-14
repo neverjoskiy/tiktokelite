@@ -1,0 +1,51 @@
+name: Elite patches
+
+# Makes the small .mpatch files the patcher builds a mod from.
+# Needs Python 3.11: bsdiff4 has no wheels for newer ones.
+# Verifies each patch by applying it and comparing hashes.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install bsdiff4
+
+      - name: Fetch base and release apks
+        run: |
+          curl -L --fail -o base-full.apk https://margy.narez.xyz/original/tiktok-47-2-41.apk
+          curl -L --fail -o base-lite.apk https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk
+          curl -L --fail -o elite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk
+          curl -L --fail -o tikelite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.apk
+          echo "base-full=$(sha256sum base-full.apk | cut -d' ' -f1)"
+          echo "base-lite=$(sha256sum base-lite.apk | cut -d' ' -f1)"
+
+      - name: Make patches
+        run: |
+          python -m margyt.delta make base-full.apk elite.apk -o elite.mpatch
+          python -m margyt.delta make base-lite.apk tikelite.apk -o tikelite.mpatch
+          ls -la *.mpatch
+          echo "elite-mpatch-sha256=$(sha256sum elite.mpatch | cut -d' ' -f1)"
+          echo "tikelite-mpatch-sha256=$(sha256sum tikelite.mpatch | cut -d' ' -f1)"
+
+      - name: Verify patches
+        run: |
+          python -m margyt.delta apply base-full.apk elite.mpatch rebuilt-elite.apk
+          python -m margyt.delta apply base-lite.apk tikelite.mpatch rebuilt-tikelite.apk
+          echo "rebuilt-elite=$(sha256sum rebuilt-elite.apk | cut -d' ' -f1)"
+          echo "rebuilt-tikelite=$(sha256sum rebuilt-tikelite.apk | cut -d' ' -f1)"
+          echo "expect-elite=$(sha256sum elite.apk | cut -d' ' -f1)"
+          echo "expect-tikelite=$(sha256sum tikelite.apk | cut -d' ' -f1)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: elite-patches
+          path: "*.mpatch"
