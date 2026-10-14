@@ -108,6 +108,64 @@ final class Counts {
         Diary.detail("counts: " + line);
     }
 
+    private static volatile boolean toldMiss;
+
+    /** One sample of digit-bearing text no compact word matched, for the diary. */
+    private static void miss(String text) {
+        if (toldMiss || !hasDigit(text) || !hasBlank(text)) return;
+        toldMiss = true;
+        try {
+            String sample = text.length() > 28 ? text.substring(0, 28) + "..." : text;
+            Diary.detail("counts: digits seen, no compact word: [" + sample + "]");
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static boolean hasDigit(CharSequence text) {
+        for (int i = 0, n = text.length(); i < n; i++) {
+            char c = text.charAt(i);
+            if (c >= '0' && c <= '9') return true;
+        }
+        return false;
+    }
+
+    private static boolean hasBlank(CharSequence text) {
+        for (int i = 0, n = text.length(); i < n; i++) {
+            int c = text.charAt(i);
+            if (c == 0x20 || c == 0x09 || c == 0xA0 || c == 0x202F || c == 0x205F || c == 0x3000
+                    || (c >= 0x2000 && c <= 0x200A)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Shorten a text on its way into a view, for every setText in the app.
+     *
+     * The tree walk only sees what is on screen when it passes; a count that
+     * arrives between passes, on a screen that never lays out again, or past
+     * the walk's budget stays long. This sees the text itself being written,
+     * wherever it is written: likes, favourites, comments, reposts and all.
+     * Pure apart from the tag and the diary line, so it is unit-tested.
+     */
+    static CharSequence shortenText(TextView view, CharSequence text) {
+        if (text == null || !isEnabled()) return text;
+        int n = text.length();
+        if (n < 5 || n > 32 || !hasDigit(text)) return text;
+        String plain = text.toString();
+        String shorted = format(plain);
+        if (shorted == null) {
+            miss(plain);
+            return text;
+        }
+        if (shorted.equals(plain)) return text;
+        try {
+            if (view != null) view.setTag(WAS, plain);
+        } catch (Throwable ignored) {
+        }
+        tell(plain + " -> " + shorted);
+        return shorted;
+    }
+
     /** The shortened form of a compact count, or null when it is short already. */
     static String format(String text) {        if (text == null) return null;
         Matcher match = COMPACT.matcher(text.trim());
@@ -138,7 +196,9 @@ final class Counts {
                 // TikTok wrote something new: look at it below
             }
             String shorted = format(text);
-            if (shorted != null && !shorted.equals(text)) {
+            if (shorted == null) {
+                miss(text);
+            } else if (!shorted.equals(text)) {
                 view.setTag(WAS, text);
                 view.setText(shorted);
                 tell(text + " -> " + shorted);

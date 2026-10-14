@@ -314,6 +314,7 @@ public final class Badge {
             return;
         }
         CharSequence out = marked(view, text);
+        if (out == text) out = Counts.shortenText(view, out);
         Probe.stop(Probe.TEXT, probe);
         // asking for it to be kept spannable, because a TextView told to store
         // plain text copies the spans into an immutable SpannedString and the
@@ -334,6 +335,7 @@ public final class Badge {
             return;
         }
         CharSequence out = marked(view, text);
+        if (out == text) out = Counts.shortenText(view, out);
         Probe.stop(Probe.TEXT, probe);
         view.setText(out, out != text ? TextView.BufferType.SPANNABLE : type);
     }

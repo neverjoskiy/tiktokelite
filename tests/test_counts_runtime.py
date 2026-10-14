@@ -38,6 +38,12 @@ check("45,2K".equals(v.text),"shortened");
 Counts.shorten(v);check("45,2K".equals(v.text),"left alone");
 v.text="45,2 тыс.";Counts.shorten(v);check("45,2K".equals(v.text),"written again shortened again");
 v.text="7 млн";Counts.shorten(v);check("7M".equals(v.text),"new count shortened");
+TextView w=new TextView();CharSequence r=Counts.shortenText(w,"45,2 тыс.");
+check("45,2K".contentEquals(r),"write-path shortened");
+check("45,2 тыс.".equals(w.getTag(0x436E7431)),"original remembered for the switch");
+check("hello".contentEquals(Counts.shortenText(w,"hello")),"plain untouched");
+check(Counts.shortenText(w,null)==null,"null untouched");
+check("12:30".contentEquals(Counts.shortenText(w,"12:30")),"time untouched");
 }}'''
   })
   with tempfile.TemporaryDirectory() as folder:

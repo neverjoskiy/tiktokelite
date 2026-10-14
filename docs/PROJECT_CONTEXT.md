@@ -56,7 +56,9 @@ Ported: Sliced incremental screen walks, Dim chat detection fix, plugin restart 
 
 ## 3. История версий (git log, новое сверху)
 
-- `7383d5c` Release 3.0.3: version.json (запушено в `origin/main`, live)
+- `3.2` (в работе): счётчики на пути записи (`Badge.setText` → `Counts.shortenText`) + диагностика `no compact word` в дневнике
+- `ef3a0c4` Release 3.1: version.json (live); `b495bfd` TikTokElite 3.1: порт 2.0.5, TikeLite, Elite Patcher
+- `7383d5c` Release 3.0.3: version.json
 - `3041dae` TikTokElite 3.0.3: counts that work, comment cards, no dislike, update retry
 - `d783fb1` Release 3.0.2: version.json
 - `ba42516` TikTokElite 3.0.2: short counts (Counts.java), Material 3 comments (CommentSheets.java)
