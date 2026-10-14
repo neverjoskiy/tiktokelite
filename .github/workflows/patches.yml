@@ -6,6 +6,13 @@ name: Elite patches
 
 on:
   workflow_dispatch:
+    inputs:
+      full_tag:
+        description: Full mod release tag
+        default: v3.2
+      lite_tag:
+        description: Lite release tag
+        default: lite-v0.1
 
 jobs:
   make:
@@ -23,8 +30,8 @@ jobs:
         run: |
           curl -L --fail -o base-full.apk https://margy.narez.xyz/original/tiktok-47-2-41.apk
           curl -L --fail -o base-lite.apk https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk
-          curl -L --fail -o elite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/v3.1/tiktokolite.apk
-          curl -L --fail -o tikelite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.apk
+          curl -L --fail -o elite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.full_tag }}/tiktokolite.apk
+          curl -L --fail -o tikelite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.lite_tag }}/tikelite.apk
           echo "base-full=$(sha256sum base-full.apk | cut -d' ' -f1)"
           echo "base-lite=$(sha256sum base-lite.apk | cut -d' ' -f1)"
 
