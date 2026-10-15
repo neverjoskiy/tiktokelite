@@ -14,7 +14,7 @@ class ArchivePlayerTest(unittest.TestCase):
  'android/os/Handler.java':'package android.os;public class Handler{public static java.util.List<Runnable> queue=new java.util.ArrayList<>();public Handler(Looper l){}public void post(Runnable r){r.run();}public void postDelayed(Runnable r,long d){queue.add(r);}public void removeCallbacks(Runnable r){queue.remove(r);}public static void tick(long now){SystemClock.now=now;java.util.List<Runnable> old=new java.util.ArrayList<>(queue);queue.clear();for(Runnable r:old)r.run();}}',
  'android/text/InputType.java':'package android.text;public class InputType{public static int TYPE_CLASS_NUMBER=2,TYPE_NUMBER_FLAG_DECIMAL=8192;}',
  'android/widget/EditText.java':'package android.widget;public class EditText{String text="";public void setText(String s){text=s;}public CharSequence getText(){return text;}public void setInputType(int i){}}',
- 'com/neverocheg/elite/Margy.java':'package com.neverocheg.elite;class Margy{static android.content.Context c=new android.content.Context();static android.content.Context context(){return c;}}',
+ 'com/neverocheg/elite/Margy.java':'package com.neverocheg.elite;class Margy{static final String PREFS="p";static android.content.Context c=new android.content.Context();static android.content.Context context(){return c;}}',
  'com/neverocheg/elite/AccountAppearance.java':'package com.neverocheg.elite;class AccountAppearance{static String account="111";static android.content.SharedPreferences prefs(android.content.Context c){return c.getSharedPreferences(account,0);}}',
  'com/neverocheg/elite/Diary.java':'package com.neverocheg.elite;class Diary{static void note(String s){}}',
  'com/neverocheg/elite/Screen.java':'package com.neverocheg.elite;class Screen{static int errors;static void say(String s){errors++;}}',
@@ -23,7 +23,7 @@ class ArchivePlayerTest(unittest.TestCase):
  'com/neverocheg/elite/ModDialog.java':'package com.neverocheg.elite;class ModDialog{interface Choice{void on(Object d,int i);}static class Builder{Builder(android.content.Context c){}Builder setItems(String[] s,Choice ch){return this;}void show(){}}}',
  'com/neverocheg/elite/Panel.java':'package com.neverocheg.elite;class Panel{static Panel with(android.content.Context c,Skin s,String t){return new Panel();}android.widget.EditText field(String s){return new android.widget.EditText();}Panel primaryKeepOpen(String s,Runnable r){return this;}Panel quiet(String s,Runnable r){return this;}void show(){}void close(){}}'
   })
-  for name in ['NativeRead','PlayerTools']:sources['com/neverocheg/elite/'+name+'.java']=(ROOT/'inject/java/com/neverocheg/elite'/(name+'.java')).read_text(encoding='utf-8')
+  for name in ['NativeRead','PlayerTools','Watched']:sources['com/neverocheg/elite/'+name+'.java']=(ROOT/'inject/java/com/neverocheg/elite'/(name+'.java')).read_text(encoding='utf-8')
   sources['com/neverocheg/elite/Test.java']=HARNESS
   with tempfile.TemporaryDirectory() as folder:
    root=pathlib.Path(folder)

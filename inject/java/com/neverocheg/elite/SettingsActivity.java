@@ -393,6 +393,8 @@ public class SettingsActivity extends Activity {
         feed.addView(line());
         feed.addView(liveToggleRow("visibility_off",Text.HIDE_STORIES,Feed.hides(Feed.KEY_STORIES),on->Feed.setHides(Feed.KEY_STORIES,on)));
         feed.addView(liveToggleRow("visibility_off",Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS),on->Feed.setHides(Feed.KEY_SUGGESTIONS,on)));
+        feed.addView(line());
+        feed.addView(toggleRow("history", Text.HIDE_WATCHED, Watched.hides(), Watched::setHidden));
         column.addView(wrap(feed));
 
         column.addView(section(Text.TAGS));
@@ -514,6 +516,15 @@ public class SettingsActivity extends Activity {
         downloads.addView(toggleRow("star", Text.SAVE_STICKERS_ON, Stickers.isEnabled(),
                 Stickers::setEnabled));
         column.addView(wrap(downloads));
+
+        column.addView(section(Text.PRIVACY));
+        LinearLayout privacy = card();
+        privacy.addView(toggleRow("person_off", Text.BLOCK_APPS, Packages.blocks(),
+                Packages::setBlocked));
+        privacy.addView(line());
+        privacy.addView(toggleRow("history", Text.NO_HISTORY, Watched.historyOff(),
+                Watched::setHistoryOff));
+        column.addView(wrap(privacy));
 
         column.addView(section(Text.BACKUP));
         LinearLayout backup = card();
@@ -3074,6 +3085,9 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.FEED,Text.HIDE_PHOTOS,Feed.hides(Feed.KEY_PHOTOS));
         found+=searchControl(results,Text.FEED,Text.HIDE_STORIES,Feed.hides(Feed.KEY_STORIES));
         found+=searchControl(results,Text.FEED,Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS));
+        found+=searchControl(results,Text.FEED,Text.HIDE_WATCHED,Watched.hides());
+        found+=searchControl(results,Text.PRIVACY,Text.BLOCK_APPS,Packages.blocks());
+        found+=searchControl(results,Text.PRIVACY,Text.NO_HISTORY,Watched.historyOff());
         found+=searchHit(results,Text.PINNED_FRIENDS,Text.PINNED_FRIENDS+" "+Text.MESSAGE_TIMES,()->{});
         found+=searchControl(results,Text.DM,Text.HIDE_TYPING,Typing.hides());
         found+=searchHit(results,Text.NOTIFICATIONS,Text.NOTIFY_MESSAGES+" "+Text.NOTIFY_PROMOS+" "+Text.NOTIFY_OTHER+" "+Text.NOTIFY_NO_PROMPTS+" "+Text.NOTIFY_SETTINGS,()->{});

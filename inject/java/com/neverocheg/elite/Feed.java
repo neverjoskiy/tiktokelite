@@ -167,6 +167,14 @@ public final class Feed {
 
     /** A social repost card is not a suggested-account card. Preserve its native data. */
     static boolean socialRepost(Object post){return NativeRead.get(post,"getUpvoteReason")!=null || NativeRead.get(post,"getUpvoteInfo")!=null || NativeRead.get(post,"getUpvotePreload")!=null;}
+    static String aidOf(Object item){
+        try {
+            Object post=item instanceof Aweme?item:NativeRead.get(item,"getAweme");
+            return NativeRead.aid(post);
+        } catch (Throwable ignored) {
+            return "";
+        }
+    }
     static boolean suggestion(Object post){
         if(NativeRead.number(NativeRead.get(post,"getRecommendCardType"))<=0)return false;
         if(socialRepost(post))return false;
@@ -206,7 +214,8 @@ public final class Feed {
         boolean authors=!FeedBlacklist.items().isEmpty() || !FeedBlacklist.cards().isEmpty();
         // a hashtag somebody blocked is a reason to look at the page too
         boolean others=!Tags.all().isEmpty();
-        if (!ads && !live && !photos && !stories && !suggestions && !authors && !others) {
+        boolean watched=Watched.hides();
+        if (!ads && !live && !photos && !stories && !suggestions && !authors && !others && !watched) {
             return Plugins.feed(items);
         }
         try {
@@ -216,6 +225,7 @@ public final class Feed {
                 boolean extra=item instanceof Aweme && ((stories && !socialRepost(item) && Boolean.TRUE.equals(NativeRead.get(item,"getIsTikTokStory")))
                         || (suggestions && suggestion(item))
                         || (authors && FeedBlacklist.hides(item)));
+                if(!extra && watched && Watched.seen(aidOf(item)))extra=true;
                 if(extra || unwanted(item,ads,live,photos)) {
                     if(kept==null){kept=new ArrayList(items.size());kept.addAll(items.subList(0,index));}
                     out++;

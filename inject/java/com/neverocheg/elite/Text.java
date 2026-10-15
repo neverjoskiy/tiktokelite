@@ -387,6 +387,13 @@ final class Text {
     static final String DM = pick("Сообщения", "Повідомлення", "Direct messages");
     static final String HIDE_TYPING = pick("Скрывать набор текста", "Ховати набір тексту",
             "Hide typing status");
+    static final String PRIVACY = pick("Конфиденциальность", "Конфіденційність", "Privacy");
+    static final String BLOCK_APPS = pick("Скрывать список приложений", "Ховати список застосунків",
+            "Hide installed apps");
+    static final String HIDE_WATCHED = pick("Скрывать просмотренные", "Ховати переглянуті",
+            "Hide watched videos");
+    static final String NO_HISTORY = pick("Не вести историю просмотров", "Не вести історію переглядів",
+            "Don't keep watch history");
     static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");
     static final String TAB_READ_ALL_NOTE = pick(
             "Число на кнопке пропадёт и вернётся, когда придёт что-то новое.",

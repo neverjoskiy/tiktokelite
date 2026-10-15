@@ -15,7 +15,7 @@ public final class PlayerTools {
    Object manager=NativeRead.get(controller,"getPlayerManager");if(manager==null)return;
    current=new WeakReference<Object>(manager);
    if(next.equals(aid))return;
-   aid=next;cancelSmooth();
+   aid=next;Watched.saw(next);cancelSmooth();
   }catch(Throwable error){Diary.note("default speed: "+error);}
  }
  static void accountChanged(){aid="";current=new WeakReference<Object>(null);cancelSmooth();}

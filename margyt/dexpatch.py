@@ -67,6 +67,7 @@ COMMENT_STICKER = "Lcom/ss/android/ugc/aweme/comment/model/CommentStickerStruct;
 WATERMARK = "Lcom/neverocheg/elite/Watermark;"
 FLAGS = "Lcom/neverocheg/elite/Flags;"
 SOUND = "Lcom/neverocheg/elite/Sound;"
+PACKAGES = "Lcom/neverocheg/elite/Packages;"
 BADGE = "Lcom/neverocheg/elite/Badge;"
 AVATARS = "Lcom/neverocheg/elite/Avatars;"
 STICKERS = "Lcom/neverocheg/elite/Stickers;"
@@ -744,6 +745,8 @@ MODEL_SOURCES += [
     (FRIENDS_RESPONSE,"getUserList","()Ljava/util/List;","(Ljava/lang/Object;)Ljava/util/List;","Lcom/neverocheg/elite/PinnedFriends;"),
     ("Landroid/app/NotificationManager;","notify","(ILandroid/app/Notification;)V","(Landroid/app/NotificationManager;ILandroid/app/Notification;)V","Lcom/neverocheg/elite/ModNotifications;"),
     ("Landroid/app/NotificationManager;","notify","(Ljava/lang/String;ILandroid/app/Notification;)V","(Landroid/app/NotificationManager;Ljava/lang/String;ILandroid/app/Notification;)V","Lcom/neverocheg/elite/ModNotifications;"),
+    ("Landroid/content/pm/PackageManager;",("getInstalledPackages","installedPackages"),"(I)Ljava/util/List;","(Landroid/content/pm/PackageManager;I)Ljava/util/List;","Lcom/neverocheg/elite/Packages;"),
+    ("Landroid/content/pm/PackageManager;",("getInstalledApplications","installedApplications"),"(I)Ljava/util/List;","(Landroid/content/pm/PackageManager;I)Ljava/util/List;","Lcom/neverocheg/elite/Packages;"),
 ]
 
 def model_rules() -> List[Tuple[str, "re.Pattern[str]", str]]:
