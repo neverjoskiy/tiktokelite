@@ -1043,16 +1043,13 @@ public class SettingsActivity extends Activity {
 
     private View switchRow() {
         LinearLayout row = row();
-        final View lead = icon("language", true, 40);
-        if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(Margy.isEnabled(), false);
-        row.addView(lead);
+        row.addView(glyph("language"));
         row.addView(label(Text.CHANGE_REGION), grow());
 
         final M3Switch toggle = new M3Switch(this);
         toggle.colours(Accent.colour(), skin.muted(), skin.card);
         toggle.setChecked(Margy.isEnabled());
         toggle.setOnChanged(checked -> {
-            if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(checked, true);
             Margy.setEnabled(checked);
             markChanged();
             rebuildAfterSwitchAnimation();
@@ -1988,7 +1985,7 @@ public class SettingsActivity extends Activity {
      * tap, and decoding a dozen pngs each time would be felt.
      */
     private View icon(String name) {
-        return icon(name, false, 40);
+        return glyph(name);
     }
 
     /** A plain monochrome outline glyph for section rows: 24dp, muted. */
@@ -2082,9 +2079,7 @@ public class SettingsActivity extends Activity {
     private View toggleRow(String picture, String title, boolean on, final Setting setting,
                            final boolean requiresRestart) {
         LinearLayout row = row();
-        final View lead = icon(picture, true, 40);
-        if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(on, false);
-        row.addView(lead);
+        row.addView(glyph(picture));
         row.addView(label(title), grow());
 
         settingTargets.put(title,row);
@@ -2093,7 +2088,6 @@ public class SettingsActivity extends Activity {
         toggle.setContentDescription(title);
         toggle.setChecked(on);
         toggle.setOnChanged(checked -> {
-            if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(checked, true);
             setting.set(checked);
             if (requiresRestart) markChanged();
         });
@@ -2120,9 +2114,7 @@ public class SettingsActivity extends Activity {
      */
     private View betaRow(String picture, String title, boolean on, final Setting setting) {
         LinearLayout row = row();
-        final View lead = icon(picture, true, 40);
-        if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(on, false);
-        row.addView(lead);
+        row.addView(glyph(picture));
         row.addView(label(title), grow());
 
         TextView beta = new TextView(this);
@@ -2144,7 +2136,6 @@ public class SettingsActivity extends Activity {
         toggle.colours(Accent.colour(), skin.muted(), skin.card);
         toggle.setChecked(on);
         toggle.setOnChanged(checked -> {
-            if (lead instanceof Expressive.Badge) ((Expressive.Badge) lead).set(checked, true);
             setting.set(checked);
             markChanged();
         });
@@ -3161,11 +3152,7 @@ public class SettingsActivity extends Activity {
     private View section(String text) {
         renderDisclosureKey=null;
         TextView view = new TextView(this);
-        try {
-            view.setText(text.toLowerCase(java.util.Locale.ROOT));
-        } catch (Throwable ignored) {
-            view.setText(text);
-        }
+        view.setText(text);
         view.setTag(text);
         view.setTextColor(skin.muted());
         view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
