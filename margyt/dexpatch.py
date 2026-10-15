@@ -1388,6 +1388,64 @@ def rewrite_typing_send(root: str, dex: Optional[bytes] = None) -> Dict[str, int
     return counts
 
 
+READ = "Lcom/neverocheg/elite/Read;"
+READ_SEND = "LX/0RcG;"
+READ_SEND_LABEL = "native read receipt"
+READ_QUESTION = "%s->sends()Z" % READ
+READ_BODY = ("ILcom/bytedance/im/core/proto/MarkConversationReadRequestBody;"
+             "Ljava/lang/String;I)V")
+
+
+def rewrite_read_receipt(root: str, dex: Optional[bytes] = None) -> Dict[str, int]:
+    """Have TikTok's read-state sender ask the mod before it posts.
+
+    `LX/0RcG;.LJIIJJI` is the one place the built `MarkConversationRead`
+    request body goes to the network; everything local (unread counters,
+    badges) happens earlier, in `X/0RcB` and `ReadStateMarkDelegate`, and is
+    left working. The mod is asked first and the posting is swallowed when
+    receipts are hidden. `v0` is written by the very first instruction the
+    gate lands in front of, so borrowing it for the answer is safe; anything
+    else about the shape and the hook stays off so the build fails loudly
+    instead of half-hooking.
+    """
+    counts: Dict[str, int] = {}
+    if dex is not None and not defines(dex, READ_SEND):
+        return counts
+    for folder, _folders, files in os.walk(root):
+        for name in files:
+            if not name.endswith(".smali"):
+                continue
+            path = os.path.join(folder, name)
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            if READ_SEND not in text:
+                continue
+            owner = re.search(r"(?m)^\.class .* (L[^;]+;)$", text)
+            if owner is None or owner.group(1) != READ_SEND:
+                continue
+            match = re.search(
+                r"(?ms)^\.method public final LJIIJJI\(%s\n"
+                r"    \.registers (\d+)\n(.*?)^\.end method" % re.escape(READ_BODY), text)
+            if match is None or "Lcom/bytedance/im/core/proto/MarkConversationReadRequestBody;" not in match.group(2):
+                continue
+            if READ_QUESTION in match.group(2):
+                counts[READ_SEND_LABEL] = counts.get(READ_SEND_LABEL, 0) + 1
+                continue
+            if int(match.group(1)) < 9:
+                continue
+            rows = match.group(2).split("\n")
+            at = next(i for i, row in enumerate(rows)
+                      if "new-instance v0, LX/0SNi;" in row)
+            rows[at:at] = ["    invoke-static {}, %s\n\n    move-result v0\n\n"
+                           "    if-nez v0, :elite_read\n\n    return-void\n\n"
+                           "    :elite_read\n" % READ_QUESTION]
+            text = text[:match.start(2)] + "\n".join(rows) + text[match.end(2):]
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(text)
+            counts[READ_SEND_LABEL] = counts.get(READ_SEND_LABEL, 0) + 1
+    return counts
+
+
 # When a message arrives while the app is open, the code that shows the banner
 # for it asks for a string an apk installed by hand does not have, and the app
 # closes: nine crash reports in ten, in every version. In those two classes
@@ -2304,6 +2362,7 @@ def rewrite_everything(root: str, literals: Optional[Dict[str, str]] = None,
     counts.update(rewrite_settings_row(root, dex))
     counts.update(rewrite_starts(root, dex))
     counts.update(rewrite_typing_send(root, dex))
+    counts.update(rewrite_read_receipt(root, dex))
     counts.update(rewrite_lite_menu(root, dex))
     counts.update(rewrite_lite_drops(root, dex))
     # Class-specific heart hooks must claim the feed heart's Tux tint calls

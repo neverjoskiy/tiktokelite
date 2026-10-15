@@ -387,6 +387,8 @@ final class Text {
     static final String DM = pick("Сообщения", "Повідомлення", "Direct messages");
     static final String HIDE_TYPING = pick("Скрывать набор текста", "Ховати набір тексту",
             "Hide typing status");
+    static final String HIDE_READ = pick("Скрывать «прочитано»", "Ховати «прочитано»",
+            "Hide read receipts");
     static final String PRIVACY = pick("Конфиденциальность", "Конфіденційність", "Privacy");
     static final String BLOCK_APPS = pick("Скрывать список приложений", "Ховати список застосунків",
             "Hide installed apps");

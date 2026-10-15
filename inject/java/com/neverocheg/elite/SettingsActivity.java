@@ -599,6 +599,7 @@ public class SettingsActivity extends Activity {
         column.addView(section(Text.DM));
         LinearLayout messages=card();
         messages.addView(toggleRow("chat",Text.HIDE_TYPING,Typing.hides(),on->Typing.setHidden(on),false));
+        messages.addView(toggleRow("done_all",Text.HIDE_READ,Read.hides(),on->Read.setHidden(on),false));
         column.addView(wrap(messages));
 
         column.addView(section(Text.CHANNEL));
@@ -3090,6 +3091,7 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.PRIVACY,Text.NO_HISTORY,Watched.historyOff());
         found+=searchHit(results,Text.PINNED_FRIENDS,Text.PINNED_FRIENDS+" "+Text.MESSAGE_TIMES,()->{});
         found+=searchControl(results,Text.DM,Text.HIDE_TYPING,Typing.hides());
+        found+=searchControl(results,Text.DM,Text.HIDE_READ,Read.hides());
         found+=searchHit(results,Text.NOTIFICATIONS,Text.NOTIFY_MESSAGES+" "+Text.NOTIFY_PROMOS+" "+Text.NOTIFY_OTHER+" "+Text.NOTIFY_NO_PROMPTS+" "+Text.NOTIFY_SETTINGS,()->{});
         found+=searchHit(results,Text.VIDEO,Text.PLAYER_SPEED,()->{});
         found+=searchHit(results,Text.DOWNLOADS,Text.DL_QUALITY+" "+Text.FRAME_QUALITY,()->{});
