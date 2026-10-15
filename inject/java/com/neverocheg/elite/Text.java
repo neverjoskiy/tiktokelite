@@ -384,6 +384,9 @@ final class Text {
     static final String KEEP_BAR = pick("Не прятать нижнюю панель", "Не ховати нижню панель",
             "Keep the bottom bar in sight");
 
+    static final String DM = pick("Сообщения", "Повідомлення", "Direct messages");
+    static final String HIDE_TYPING = pick("Скрывать набор текста", "Ховати набір тексту",
+            "Hide typing status");
     static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");
     static final String TAB_READ_ALL_NOTE = pick(
             "Число на кнопке пропадёт и вернётся, когда придёт что-то новое.",

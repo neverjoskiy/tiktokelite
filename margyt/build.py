@@ -817,6 +817,7 @@ class Build:
         feature_hits["native offline row"]=0
         feature_hits["native offline count accepted"]=0
         feature_hits["native offline comments response"]=0
+        feature_hits["native typing send"]=0
         for feature in ("native repost","native repost avatar","native profile layout","native message timestamps","native notification guide","native friends order","native notification filters","native author date slot"):feature_hits[feature]=0
         total = 0
         patched_dex_count = 0
@@ -859,6 +860,7 @@ class Build:
             feature_hits["native offline row"] += counts.get("native offline row",0)
             feature_hits["native offline count accepted"] += counts.get("native offline count accepted",0)
             feature_hits["native offline comments response"] += counts.get("native offline comments response",0)
+            feature_hits["native typing send"] += counts.get(dexpatch.TYPING_SEND_LABEL,0)
             for feature in ("native repost","native repost avatar","native profile layout","native message timestamps","native notification guide"):feature_hits[feature]+=counts.get(feature,0)
             feature_hits["native author date slot"]+=counts.get("native author date slot",0)
             feature_hits["native friends order"]+=sum(v for key,v in counts.items() if "FriendsListResponse" in key and "getUserList" in key)

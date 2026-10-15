@@ -585,6 +585,11 @@ public class SettingsActivity extends Activity {
         notifications.addView(actionRow("settings",Text.NOTIFY_SETTINGS,null,()->ModNotifications.settings(this)));
         column.addView(wrap(notifications));
 
+        column.addView(section(Text.DM));
+        LinearLayout messages=card();
+        messages.addView(toggleRow("chat",Text.HIDE_TYPING,Typing.hides(),on->Typing.setHidden(on),false));
+        column.addView(wrap(messages));
+
         column.addView(section(Text.CHANNEL));
         column.addView(channelBanner());
 
@@ -3070,6 +3075,7 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.FEED,Text.HIDE_STORIES,Feed.hides(Feed.KEY_STORIES));
         found+=searchControl(results,Text.FEED,Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS));
         found+=searchHit(results,Text.PINNED_FRIENDS,Text.PINNED_FRIENDS+" "+Text.MESSAGE_TIMES,()->{});
+        found+=searchControl(results,Text.DM,Text.HIDE_TYPING,Typing.hides());
         found+=searchHit(results,Text.NOTIFICATIONS,Text.NOTIFY_MESSAGES+" "+Text.NOTIFY_PROMOS+" "+Text.NOTIFY_OTHER+" "+Text.NOTIFY_NO_PROMPTS+" "+Text.NOTIFY_SETTINGS,()->{});
         found+=searchHit(results,Text.VIDEO,Text.PLAYER_SPEED,()->{});
         found+=searchHit(results,Text.DOWNLOADS,Text.DL_QUALITY+" "+Text.FRAME_QUALITY,()->{});
@@ -3251,7 +3257,7 @@ public class SettingsActivity extends Activity {
                 || section.equals(Text.TIKTOK_FEATURES)
                 || section.equals(BURN)) return 3;
         if (section.equals(Text.PINNED_FRIENDS) || section.equals(Text.STREAKS)
-                || section.equals(Text.NOTIFICATIONS)) return 7;
+                || section.equals(Text.NOTIFICATIONS) || section.equals(Text.DM)) return 7;
         if (section.equals(Text.THANKS) || section.equals(Text.UPDATE) || section.equals(Text.CHANNEL)
                 || section.equals(Text.LINKS)) return 5;
         return 4; // downloads, backup, diagnostics, diary

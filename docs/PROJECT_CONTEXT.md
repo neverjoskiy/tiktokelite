@@ -56,9 +56,10 @@ Ported: Sliced incremental screen walks, Dim chat detection fix, plugin restart 
 
 ## 3. История версий (git log, новое сверху)
 
-- `3.3.1` (в работе): иконки везде монохром-контур, заголовкам возвращён обычный регистр
-- `3.3`: настройки в стиле iOS-карточек: секции + разделители, строки с иконкой/галкой, свитч-пилюля, липкая шапка с поиском, дом — список разделов
-- `3.2` (в работе): счётчики на пути записи (`Badge.setText` → `Counts.shortenText`) + диагностика `no compact word` в дневнике
+- `3.4` (в работе): скрытие набора текста в личке (`Typing` + пролог в `LX/0S4d;.LIZ`); остальное из списка 3.4 в разведке
+- `3.3.1`: иконки везде монохром-контур, заголовкам возвращён обычный регистр (заливка APK и version.json — уточнить у пользователя)
+- `3.3`: настройки-карточки; патчер раздаёт 3.3, НО version.json=3.2 (полный апдейтер предлагает 3.2 — несогласовано, поднять)
+- `3.2`: счётчики на пути записи + `no compact word` (version.json 3.2 live)
 - `ef3a0c4` Release 3.1: version.json (live); `b495bfd` TikTokElite 3.1: порт 2.0.5, TikeLite, Elite Patcher
 - `7383d5c` Release 3.0.3: version.json
 - `3041dae` TikTokElite 3.0.3: counts that work, comment cards, no dislike, update retry
