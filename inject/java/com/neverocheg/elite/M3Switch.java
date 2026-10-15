@@ -16,8 +16,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
  * The platform's own Switch is the one from 2014 and looks it. Material's is a
  * library this build cannot add -- adding one means adding resources, and
  * adding resources means rewriting a 25 MB resource table -- so the shape is
- * drawn instead: a 52 by 32 track, a small thumb that grows as it slides, and a
- * plain thumb without extra symbols.
+ * drawn instead: a 52 by 32 track, a thumb that slides and grows, and a
+ * check drawn inside the thumb when it is on.
  */
 public final class M3Switch extends View {
 
@@ -172,7 +172,7 @@ public final class M3Switch extends View {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        setMeasuredDimension(dp(28), dp(28));
+        setMeasuredDimension(dp(TRACK_WIDTH), dp(TRACK_HEIGHT));
     }
 
     private final android.graphics.Path tick = new android.graphics.Path();
@@ -200,34 +200,44 @@ public final class M3Switch extends View {
         blob.close();
     }
 
-    /** A round indicator: an empty ring when off, a turning accent cookie with a drawn check when on. */
+    /** A pill track with a sliding thumb; a check grows in the thumb when on. */
     @Override
     protected void onDraw(Canvas canvas) {
-        float cx = getWidth() / 2f, cy = getHeight() / 2f, r = dp(12f);
-        int accent = Accent.colour();
-        int ink = (Color.red(accent) * 299 + Color.green(accent) * 587 + Color.blue(accent) * 114) / 1000 > 150 ? 0xFF111111 : 0xFFFFFFFF;
         float eased = position * position * (3f - 2f * position);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(dp(2f));
-        paint.setColor(withAlpha(outlineOff, Math.round(190 * (1f - eased))));
-        canvas.drawCircle(cx, cy, r - dp(1f), paint);
-        if (position > 0f) {
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(withAlpha(accent, Math.round(255 * eased)));
-            cookie(cx, cy, r * (0.82f + 0.18f * eased), eased, 45f * eased);
-            canvas.drawPath(blob, paint);
+        float w = dp(TRACK_WIDTH), h = dp(TRACK_HEIGHT), r = h / 2f;
+        box.set(0f, 0f, w, h);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(blend(trackOff, trackOn, eased));
+        canvas.drawRoundRect(box, r, r, paint);
+        if (eased < 1f) {
+            float half = dp(2f) / 2f;
+            box.set(half, half, w - half, h - half);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(dp(2f));
+            paint.setColor(withAlpha(outlineOff, Math.round(190 * (1f - eased))));
+            canvas.drawRoundRect(box, r - half, r - half, paint);
+        }
+        float thumbR = dp(8f + 4f * eased);
+        float cx = dp(16f) + dp(20f) * eased;
+        float cy = h / 2f;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(blend(thumbOff, thumbOn, eased));
+        canvas.drawCircle(cx, cy, thumbR, paint);
+        if (position > 0.02f) {
+            float t = Math.max(0f, Math.min(1f, (position - 0.25f) / 0.75f));
+            float s = thumbR / dp(12f);
             tick.reset();
-            tick.moveTo(cx - dp(5.2f), cy + dp(0.6f));
-            tick.lineTo(cx - dp(1.7f), cy + dp(4f));
-            tick.lineTo(cx + dp(5.2f), cy - dp(3.4f));
+            tick.moveTo(cx - dp(5.2f) * s, cy + dp(0.6f) * s);
+            tick.lineTo(cx - dp(1.7f) * s, cy + dp(4f) * s);
+            tick.lineTo(cx + dp(5.2f) * s, cy - dp(3.4f) * s);
             measure.setPath(tick, false);
             tickPart.reset();
-            measure.getSegment(0f, measure.getLength() * Math.max(0f, Math.min(1f, (position - 0.25f) / 0.75f)), tickPart, true);
+            measure.getSegment(0f, measure.getLength() * t, tickPart, true);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(dp(2.2f));
+            paint.setStrokeWidth(dp(2f));
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeJoin(Paint.Join.ROUND);
-            paint.setColor(ink);
+            paint.setColor(withAlpha(trackOn, Math.round(255 * t)));
             canvas.drawPath(tickPart, paint);
             paint.setStrokeCap(Paint.Cap.BUTT);
         }

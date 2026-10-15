@@ -114,6 +114,7 @@ public class SettingsActivity extends Activity {
     private boolean fontOpen;
     private boolean iconOpen;
     private ScrollView page;
+    private LinearLayout header;
     private boolean thanksOpen;
     private int settingsGroup;
     private boolean mineOpen;
@@ -160,7 +161,7 @@ public class SettingsActivity extends Activity {
 
         column = new LinearLayout(this);
         column.setOrientation(LinearLayout.VERTICAL);
-        column.setPadding(0, statusBar(), 0, dp(32));
+        column.setPadding(0, 0, 0, dp(32));
         scroll.addView(column, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -168,6 +169,15 @@ public class SettingsActivity extends Activity {
         root.setBackgroundColor(skin.page);
         root.addView(scroll, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setBackgroundColor(skin.page);
+        FrameLayout.LayoutParams headerPlace = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+        headerPlace.topMargin = statusBar();
+        root.addView(header, headerPlace);
 
         setContentView(root);
         rebuild();
@@ -222,9 +232,17 @@ public class SettingsActivity extends Activity {
         sectionTargets.clear();settingTargets.clear();
         disclosureBodies.clear();disclosureArrows.clear();renderDisclosureKey=null;
         column.removeAllViews();
-        column.addView(backArrow());
+        header.removeAllViews();
+        header.addView(backArrow());
+        header.addView(searchBox(), new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        root.post(() -> {
+            try {
+                if (page != null && header != null) page.setPadding(0, header.getHeight(), 0, 0);
+            } catch (Throwable ignored) {
+            }
+        });
         column.addView(title(settingsGroup == 0 ? (Version.LITE ? "TikeLite" : "TikTokElite") : groupName(settingsGroup)));
-        if(settingsGroup==0 || searchQuery.length()>0)column.addView(searchBox());
         if (settingsGroup != 0) column.addView(wrap(actionRow("info","Подсказки",null,this::showSectionHelp)));
         if (searchQuery.length() > 0) {
             searchResults();
@@ -234,6 +252,7 @@ public class SettingsActivity extends Activity {
 
         if (settingsGroup == 0) {
             if (Badges.freeStillOpen() && !Mine.hasFree()) column.addView(freeBanner());
+            column.addView(section("Разделы"));
             column.addView(groupNavigation());
             column.addView(wrap(actionRow("info","Обучение",null,() -> Tutorial.show(this))));
             column.addView(versions());
@@ -1401,6 +1420,11 @@ public class SettingsActivity extends Activity {
         boolean animated=!revealAnimationUsed && Motion.enabled(this);
         if(animated)revealAnimationUsed=true;
         DisclosureBody body=new DisclosureBody(this,view,animated);
+        try {
+            if (Boolean.TRUE.equals(view.getTag(Expressive.ROW_TAG)))
+                body.setTag(Expressive.ROW_TAG, Boolean.TRUE);
+        } catch (Throwable ignored) {
+        }
         if(renderDisclosureKey!=null) {
             java.util.List<DisclosureBody> list=disclosureBodies.get(renderDisclosureKey);
             if(list==null){list=new java.util.ArrayList<>();disclosureBodies.put(renderDisclosureKey,list);}
@@ -1967,6 +1991,19 @@ public class SettingsActivity extends Activity {
         return icon(name, false, 40);
     }
 
+    /** A plain monochrome outline glyph for section rows: 24dp, muted. */
+    private View glyph(String name) {
+        ImageView view = new ImageView(this);
+        try {
+            view.setImageDrawable(SettingsGlyph.make(name, skin.muted()));
+        } catch (Throwable ignored) {
+        }
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(24), dp(24));
+        size.rightMargin = dp(12);
+        view.setLayoutParams(size);
+        return view;
+    }
+
     /** The shapes the first icons of the main list get; the rest are picked by name. */
     private static final java.util.Map<String, Integer> SHAPES = new java.util.HashMap<String, Integer>();
     static {
@@ -2197,7 +2234,7 @@ public class SettingsActivity extends Activity {
     /** A row that does something at once, rather than setting anything. */
     private View actionRow(String picture, String title, String detail, final Runnable action) {
         LinearLayout row = row();
-        row.addView(icon(picture));
+        row.addView(glyph(picture));
         boolean value = detail != null && detail.length() <= 14;
 
         LinearLayout text = new LinearLayout(this);
@@ -2891,19 +2928,12 @@ public class SettingsActivity extends Activity {
         LinearLayout bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER_VERTICAL);
-        bar.setPadding(dp(12), dp(8), dp(16), dp(4));
+        bar.setPadding(dp(4), dp(8), dp(4), dp(4));
         // a round tonal button that turns into a rounded square under the finger
         View button = Expressive.roundButton(this, SettingsGlyph.make("arrow_forward", skin.text),
                 skin.card, (Accent.colour() & 0xFFFFFF) | 0x33000000, skin.text, 48);
         ((ViewGroup) button).getChildAt(0).setScaleX(-1f);
         bar.addView(button);
-        TextView name = new TextView(this);
-        name.setText(settingsGroup == 0 ? "TikTok" : "Настройки");
-        name.setTextColor(skin.muted());
-        name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        name.setPadding(dp(12), 0, 0, 0);
-        bar.addView(name);
         bar.setContentDescription(settingsGroup == 0 ? "TikTok" : "Настройки");
         bar.setOnClickListener(v -> goBack());
         return bar;
@@ -2913,8 +2943,8 @@ public class SettingsActivity extends Activity {
         final TextView view = new TextView(this);
         view.setText(text);
         view.setTextColor(skin.text);
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, settingsGroup == 0 ? 44 : 34);
-        view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, settingsGroup == 0 ? 34 : 28);
+        view.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
         view.setPadding(dp(28), dp(8), dp(24), dp(16));
         // five taps in a row and a cat turns up; one by accident does nothing
         view.setOnClickListener(v -> {
@@ -3131,12 +3161,16 @@ public class SettingsActivity extends Activity {
     private View section(String text) {
         renderDisclosureKey=null;
         TextView view = new TextView(this);
-        view.setText(text);
-        view.setTextColor(accentInk());
+        try {
+            view.setText(text.toLowerCase(java.util.Locale.ROOT));
+        } catch (Throwable ignored) {
+            view.setText(text);
+        }
+        view.setTag(text);
+        view.setTextColor(skin.muted());
         view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        view.setLetterSpacing(0.04f);
-        view.setPadding(dp(28), dp(24), dp(16), dp(8));
+        view.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        view.setPadding(dp(8), dp(12), dp(16), dp(8));
         sectionTargets.put(text, view);
         return view;
     }
@@ -3165,7 +3199,7 @@ public class SettingsActivity extends Activity {
                 .quiet("Обучение",() -> Tutorial.show(this)).primary("Понятно",null).show();
     }
 
-    /** The shelves as a grid of rounded tiles instead of a list of rows. */
+    /** The shelves as one section list instead of a grid of tiles. */
     private View groupNavigation() {
         String[] icons = {"palette", "group", "play_circle", "tune", "info", "extension", "chat"};
         String[] notes = {"Акцент, тема и шрифты",
@@ -3176,45 +3210,24 @@ public class SettingsActivity extends Activity {
                 "Друзья, серии и уведомления"};
         // Shelf order on screen: what people touch daily first, the project itself last.
         int[] shelf = {1, 2, 3, 7, 4, 6, 5};
-        LinearLayout grid = new LinearLayout(this);
-        grid.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout line = null;
+        LinearLayout list = card();
         for (int n = 0; n < shelf.length; n++) {
-            if (n % 2 == 0) {
-                line = new LinearLayout(this);
-                line.setOrientation(LinearLayout.HORIZONTAL);
-                grid.addView(line, new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
             final int chosen = shelf[n];
-            LinearLayout tile = new LinearLayout(this);
-            tile.setOrientation(LinearLayout.VERTICAL);
-            tile.setGravity(Gravity.CENTER_HORIZONTAL);
-            tile.setPadding(dp(12), dp(18), dp(12), dp(16));
-            tile.setBackground(Expressive.tile(this, skin.card,
-                    (Accent.colour() & 0xFFFFFF) | 0x33000000, dp(22), dp(22), dp(10)));
-            tile.setContentDescription(groupName(chosen) + ". " + notes[chosen - 1]);
-            tile.setFocusable(true);
-
-            View badge = icon(icons[chosen - 1], false, 52);
-            LinearLayout.LayoutParams badgeSize =
-                    new LinearLayout.LayoutParams(dp(52), dp(52));
-            badgeSize.gravity = Gravity.CENTER_HORIZONTAL;
-            badge.setLayoutParams(badgeSize);
-            tile.addView(badge);
-
+            LinearLayout row = row();
+            row.addView(glyph(icons[chosen - 1]));
+            LinearLayout text = new LinearLayout(this);
+            text.setOrientation(LinearLayout.VERTICAL);
             TextView head = label(groupName(chosen));
-            head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            head.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            head.setGravity(Gravity.CENTER);
-            head.setMaxLines(2);
-            head.setPadding(0, dp(10), 0, 0);
-            tile.addView(head, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            tile.setMinimumHeight(dp(148));
-            Motion.touch(tile);
-            tile.setOnClickListener(v -> {
+            head.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            text.addView(head);
+            TextView sub = detail(notes[chosen - 1]);
+            text.addView(sub);
+            row.addView(text, grow());
+            ImageView chevron = new ImageView(this);
+            chevron.setImageDrawable(SettingsGlyph.make("chevron_right", skin.muted()));
+            row.addView(chevron, new LinearLayout.LayoutParams(dp(24), dp(24)));
+            row.setContentDescription(groupName(chosen) + ". " + notes[chosen - 1]);
+            row.setOnClickListener(v -> {
                 if (navigating) return;
                 navigating = true;
                 Motion.navigate(column, 1f, () -> {
@@ -3224,25 +3237,12 @@ public class SettingsActivity extends Activity {
                     navigating = false;
                 });
             });
-            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(
-                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-            int gap = dp(6);
-            place.setMargins(gap, gap, gap, gap);
-            line.addView(tile, place);
-        }
-        // an odd shelf leaves the last row half empty: hold its width
-        if (shelf.length % 2 != 0 && line != null) {
-            View spacer = new View(this);
-            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(
-                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-            int gap = dp(6);
-            place.setMargins(gap, gap, gap, gap);
-            line.addView(spacer, place);
+            list.addView(row);
         }
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(12), dp(6), dp(12), dp(6));
-        box.addView(grid, new LinearLayout.LayoutParams(
+        box.setPadding(dp(16), 0, dp(16), dp(12));
+        box.addView(list, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return box;
     }
@@ -3252,6 +3252,7 @@ public class SettingsActivity extends Activity {
      * 1 look, 2 profile, 3 feed and video, 4 tools, 5 about, 6 plugins, 7 friends and chats.
      */
     private int groupOf(String section) {
+        if (section.equals("Разделы")) return 0;
         if (section.equals(Text.PLUGINS)) return 6;
         if (section.equals(Text.GRADIENT) || section.equals(Text.BADGES) || section.equals(Text.ACCOUNT)) return 2;
         if (section.equals(Text.APPEARANCE) || section.equals(Text.ACCENT)
@@ -3271,10 +3272,12 @@ public class SettingsActivity extends Activity {
 
     private void filterGroup() {
         int current = 0;
-        for (int i = 3; i < column.getChildCount(); i++) {
+        for (int i = 1; i < column.getChildCount(); i++) {
             View item = column.getChildAt(i);
-            if (item instanceof TextView && sectionTargets.containsValue(item))
-                current = groupOf(((TextView) item).getText().toString());
+            if (item instanceof TextView && sectionTargets.containsValue(item)) {
+                Object key = item.getTag();
+                current = groupOf(key instanceof String ? (String) key : ((TextView) item).getText().toString());
+            }
             item.setVisibility(current == settingsGroup ? View.VISIBLE : View.GONE);
         }
     }
@@ -3316,14 +3319,15 @@ public class SettingsActivity extends Activity {
      * with large outer corners, small inner ones and a thin gap between them.
      */
     private LinearLayout card() {
-        return new Expressive.Group(this, skin.card, (Accent.colour() & 0xFFFFFF) | 0x33000000);
+        return new Expressive.Group(this, skin.card, (Accent.colour() & 0xFFFFFF) | 0x33000000,
+                (skin.muted() & 0xFFFFFF) | 0x1F000000);
     }
 
     /** A lone row is a one-tile list, so it looks like every other group. */
     private View wrap(View card) {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(12), 0, dp(12), dp(6));
+        box.setPadding(dp(16), 0, dp(16), dp(12));
         if (!(card instanceof Expressive.Group)) {
             LinearLayout single = card();
             single.addView(card);
@@ -3354,8 +3358,9 @@ public class SettingsActivity extends Activity {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(16), dp(4), dp(20), dp(4));
+        row.setPadding(dp(16), dp(12), dp(16), dp(12));
         row.setMinimumHeight(dp(56));
+        row.setTag(Expressive.ROW_TAG, Boolean.TRUE);
         Motion.press(row);
         return row;
     }

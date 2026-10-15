@@ -13,6 +13,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -20,6 +21,7 @@ import android.graphics.drawable.RippleDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
@@ -225,26 +227,54 @@ final class Expressive {
     // -------------------------------------------------------------- group
 
     /**
-     * A segmented list: every child becomes a tile of its own.
+     * Rows that belong to a section card, for the divider between them.
      *
-     * The first tile has large top corners, the last large bottom ones, and
-     * between them the corners are small, with a thin gap -- the grouped list
-     * of M3 Expressive. A child that already paints its own background (a
-     * preview, a banner) is left as it is.
+     * Set by the settings screen on every row container; the card draws a
+     * thin line between two neighbouring rows and none after the last one.
+     * Anything without the tag (captions, previews, banners) breaks the run.
+     */
+    static final int ROW_TAG = 0x52776F77;
+
+    /**
+     * One section card: a single rounded container with dividers between rows.
+     *
+     * The card itself carries the background, clipped to 16dp corners; rows
+     * stay transparent (keeping their ripple) and a hairline is drawn between
+     * two neighbouring rows, never after the last one. A child that already
+     * paints its own background (a preview, a banner) is left as it is and
+     * breaks the divider run.
      */
     static final class Group extends LinearLayout {
-        private final int fill, ripple;
-        private final float outer, inner, gap, pressed;
+        private final int ripple;
+        private final Paint divider = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float radius, inset;
 
-        Group(Context context, int fill, int ripple) {
+        Group(Context context, int fill, int ripple, int dividerColor) {
             super(context);
             setOrientation(VERTICAL);
-            this.fill = fill;
             this.ripple = ripple;
-            this.outer = dp(context, 26);
-            this.inner = dp(context, 6);
-            this.gap = dp(context, 2);
-            this.pressed = dp(context, 28);
+            this.radius = dp(context, 16);
+            this.inset = dp(context, 52);
+            divider.setColor(dividerColor);
+            divider.setStrokeWidth(1f);
+            GradientDrawable background = new GradientDrawable();
+            background.setColor(fill);
+            background.setCornerRadius(radius);
+            setBackground(background);
+            try {
+                setClipToOutline(true);
+                setOutlineProvider(new ViewOutlineProvider() {
+                    @Override public void getOutline(View view, android.graphics.Outline outline) {
+                        outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+                    }
+                });
+            } catch (Throwable ignored) {
+            }
+            setWillNotDraw(false);
+        }
+
+        Group(Context context, int fill, int ripple) {
+            this(context, fill, ripple, 0x1F000000);
         }
 
         @Override
@@ -268,13 +298,7 @@ final class Expressive {
         }
 
         private void restyle() {
-            int count = getChildCount(), first = -1, last = -1;
-            for (int i = 0; i < count; i++) {
-                if (getChildAt(i).getVisibility() == GONE) continue;
-                if (first < 0) first = i;
-                last = i;
-            }
-            for (int i = 0; i < count; i++) {
+            for (int i = 0, count = getChildCount(); i < count; i++) {
                 View view = getChildAt(i);
                 if (view.getVisibility() == GONE) continue;
                 ViewGroup.LayoutParams given = view.getLayoutParams();
@@ -282,14 +306,42 @@ final class Expressive {
                         ? (LinearLayout.LayoutParams) given
                         : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT);
-                int want = i == first ? 0 : Math.round(gap);
-                if (params.topMargin != want || params != given) {
-                    params.topMargin = want;
+                if (params.topMargin != 0 || params != given) {
+                    params.topMargin = 0;
                     view.setLayoutParams(params);
                 }
                 if (!ours(view)) continue;
-                view.setBackground(tile(getContext(), fill, ripple,
-                        i == first ? outer : inner, i == last ? outer : inner, pressed));
+                // transparent, keeping the press ripple bounded by the view itself
+                view.setBackground(new RippleDrawable(ColorStateList.valueOf(ripple), null,
+                        new ColorDrawable(Color.WHITE)));
+            }
+            invalidate();
+        }
+
+        private static boolean tagged(View view) {
+            try {
+                return Boolean.TRUE.equals(view.getTag(ROW_TAG));
+            } catch (Throwable ignored) {
+                return false;
+            }
+        }
+
+        protected void dispatchDraw(Canvas canvas) {
+            super.dispatchDraw(canvas);
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                View view = getChildAt(i);
+                if (view.getVisibility() == GONE || !tagged(view)) continue;
+                boolean more = false;
+                for (int j = i + 1; j < count; j++) {
+                    View next = getChildAt(j);
+                    if (next.getVisibility() == GONE) continue;
+                    more = tagged(next);
+                    break;
+                }
+                if (!more) continue;
+                float y = view.getBottom() + 0.5f;
+                canvas.drawLine(inset, y, getWidth(), y, divider);
             }
         }
     }

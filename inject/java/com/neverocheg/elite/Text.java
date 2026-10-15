@@ -893,7 +893,7 @@ final class Text {
 
     static final String SEARCH = pick("Найти", "Знайти", "Search");
     static final String SEARCH_CLEAR = pick("Очистить", "Очистити", "Clear");
-    static final String SEARCH_HINT = pick("Поиск по настройкам", "Пошук у налаштуваннях", "Search settings");
+    static final String SEARCH_HINT = pick("Поиск настроек", "Пошук у налаштуваннях", "Search settings");
     static final String SEARCH_RESULTS = pick("Результаты поиска", "Результати пошуку", "Search results");
     static final String SEARCH_NONE = pick("Ничего не найдено", "Нічого не знайдено", "Nothing found");
     static final String SEARCH_REGION = pick("Страна и регион", "Країна та регіон", "Country and region");
