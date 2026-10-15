@@ -56,7 +56,7 @@ Ported: Sliced incremental screen walks, Dim chat detection fix, plugin restart 
 
 ## 3. История версий (git log, новое сверху)
 
-- `3.4` (в работе): скрытие набора текста (`Typing` + пролог в `LX/0S4d;.LIZ`, проверочная сборка прошла гейт); скрытие просмотренных (`Watched`, фильтр в `Feed.without`, метка в `PlayerTools.resumed`); блок списка приложений (`Packages` + 2 перехвата); скрытие «прочитано» в DM (`Read` + пролог-гейт в `LX/0RcG;.LJIIJJI(ILcom/bytedance/im/core/proto/MarkConversationReadRequestBody;Ljava/lang/String;I)V` — глушится только отправка на сервер, локальные счётчики в `X/0RcB`/`ReadStateMarkDelegate` не тронуты; тумблер `Text.HIDE_READ` в секции `Text.DM`, гейт `native read receipt`); тумблеры в меню, всё default OFF; остальное из списков 3.4/3.5 в разведке
+- `3.4` (в работе): скрытие набора текста + скрытие «прочитано» в личке; скрытие просмотренных; блок списка приложений
 - `3.3.1`: иконки везде монохром-контур, заголовкам возвращён обычный регистр (заливка APK и version.json — уточнить у пользователя)
 - `3.3`: настройки-карточки; патчер раздаёт 3.3, НО version.json=3.2 (полный апдейтер предлагает 3.2 — несогласовано, поднять)
 - `3.2`: счётчики на пути записи + `no compact word` (version.json 3.2 live)
