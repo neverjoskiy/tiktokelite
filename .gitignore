@@ -8,6 +8,7 @@ build/
 
 # Local build log
 build-elite.log
+build-*.log
 
 # Downloaded tooling
 tools/

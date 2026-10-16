@@ -519,9 +519,6 @@ public class SettingsActivity extends Activity {
 
         column.addView(section(Text.PRIVACY));
         LinearLayout privacy = card();
-        privacy.addView(toggleRow("person_off", Text.BLOCK_APPS, Packages.blocks(),
-                Packages::setBlocked));
-        privacy.addView(line());
         privacy.addView(toggleRow("history", Text.NO_HISTORY, Watched.historyOff(),
                 Watched::setHistoryOff));
         column.addView(wrap(privacy));
@@ -3087,7 +3084,6 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.FEED,Text.HIDE_STORIES,Feed.hides(Feed.KEY_STORIES));
         found+=searchControl(results,Text.FEED,Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS));
         found+=searchControl(results,Text.FEED,Text.HIDE_WATCHED,Watched.hides());
-        found+=searchControl(results,Text.PRIVACY,Text.BLOCK_APPS,Packages.blocks());
         found+=searchControl(results,Text.PRIVACY,Text.NO_HISTORY,Watched.historyOff());
         found+=searchHit(results,Text.PINNED_FRIENDS,Text.PINNED_FRIENDS+" "+Text.MESSAGE_TIMES,()->{});
         found+=searchControl(results,Text.DM,Text.HIDE_TYPING,Typing.hides());

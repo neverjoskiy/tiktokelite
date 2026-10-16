@@ -390,8 +390,6 @@ final class Text {
     static final String HIDE_READ = pick("Скрывать «прочитано»", "Ховати «прочитано»",
             "Hide read receipts");
     static final String PRIVACY = pick("Конфиденциальность", "Конфіденційність", "Privacy");
-    static final String BLOCK_APPS = pick("Скрывать список приложений", "Ховати список застосунків",
-            "Hide installed apps");
     static final String HIDE_WATCHED = pick("Скрывать просмотренные", "Ховати переглянуті",
             "Hide watched videos");
     static final String NO_HISTORY = pick("Не вести историю просмотров", "Не вести історію переглядів",
