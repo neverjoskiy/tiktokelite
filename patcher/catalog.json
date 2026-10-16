@@ -25,7 +25,7 @@
    },
    "releases": [
     {
-     "version": "3.3",
+     "version": "3.4",
      "beta": false,
      "base": {
       "name": "TikTok 47.2.41",
@@ -40,18 +40,18 @@
       ]
      },
      "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.3/elite.mpatch",
-      "sha256": "f7d279b7e297df4e3ccb8b0b375941b72a4869416de7bcc6021c6f168d682d06",
-      "size": 72653844
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.4/elite.mpatch",
+      "sha256": "5add4477487722b2a27252143fc1640b399609d5dabe5dc20bca8df61b31810b",
+      "size": 72650588
      },
      "result": {
-      "sha256": "8dbd089e4dd388587ad6e59d30ab1268e47435203bd415b211b19d68a0bac52a",
-      "size": 396546905
+      "sha256": "f6e0b31859706fa4eee69a9270a945956fb3a7b35671ed51a5458c5c636ca7aa",
+      "size": 396551001
      },
      "notes": {
-      "ru": "Настройки в новом виде: разделы-карточки, поиск всегда под рукой.",
-      "uk": "Налаштування у новому вигляді: розділи-картки, пошук завжди під рукою.",
-      "en": "Settings with a new look: section cards, search always at hand."
+      "ru": "Приватность и порядок: скрытие набора текста и «прочитано» в личке, скрытие просмотренных.",
+      "uk": "Приватність і порядок: ховати набір тексту й «прочитано» в особистих, ховати переглянуті.",
+      "en": "Privacy and order: hide typing status and read receipts in DMs, hide watched videos."
      }
     }
    ]
