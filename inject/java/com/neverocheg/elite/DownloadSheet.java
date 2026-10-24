@@ -4,13 +4,15 @@ import android.content.Context;import android.graphics.Typeface;import android.u
  * Download chooser, kept short so it does not fill the screen.
  * A video post: the tallest size stands alone, filled with the accent and marked as the best; the other
  * sizes follow as one segmented group, the shortest marked as the worst -- both read from what this post
- * really offers. A photo post: one "all photos" button and a grid of numbered chips, one per photo.
+ * really offers. A photo post: a grid of the photos themselves, each with a tick; the button below saves
+ * the ticked ones, or every photo while none is ticked.
  * The soundtrack is always the last row.
  */
 final class DownloadSheet {
  interface Pick {void on(DownloadQuality.Choice choice);}
+ interface Picks {void on(List<DownloadQuality.Choice> choices);}
  private DownloadSheet(){}
- static void show(Context c,List<DownloadQuality.Choice> videos,List<DownloadQuality.Choice> photos,boolean nativeOnly,final Panel.Click nativeSave,final Pick video,final Pick photo,final Panel.Click audio,final Panel.Click allPhotos){
+ static void show(Context c,List<DownloadQuality.Choice> videos,List<DownloadQuality.Choice> photos,boolean nativeOnly,final Panel.Click nativeSave,final Pick video,final Picks photo,final Panel.Click audio){
   final Skin skin=Skin.remembered(c);
   final boolean photoPost=photos!=null&&!photos.isEmpty();
   final Panel panel=Panel.with(c,skin,photoPost?Text.SHEET_POST_TITLE:Text.SHEET_PICK_QUALITY).compact();
@@ -20,12 +22,10 @@ final class DownloadSheet {
   java.util.ArrayList<DownloadQuality.Choice> list=new java.util.ArrayList<>();
   if(best!=null)list.add(best);
   for(DownloadQuality.Choice v:rest){boolean same=best!=null&&best.height>0&&v.height==best.height;if(!same)list.add(v);}
+  final TextView[] save={null};final java.util.TreeSet<Integer> picked=new java.util.TreeSet<>();
   if(photoPost){
-   if(photos.size()==1){final DownloadQuality.Choice only=photos.get(0);panel.hero("image",Text.SAVE_IMAGE,null,"download",()->photo.on(only));}
-   else{
-    panel.hero("image",Text.allPhotos(photos.size()),null,"download",()->allPhotos.on());
-    panel.view(chips(c,skin,panel,photos,photo));
-   }
+   if(photos.size()==1){panel.hero("image",Text.SAVE_IMAGE,null,"download",()->photo.on(photos));}
+   else panel.view(PhotoGrid.make(c,skin,photos,picked,()->{if(save[0]!=null)save[0].setText(picked.isEmpty()?Text.allPhotos(photos.size()):Text.pickedPhotos(picked.size()));}));
   }else if(!list.isEmpty()){
    for(int i=0;i<list.size();i++){
     final DownloadQuality.Choice item=list.get(i);
@@ -41,36 +41,16 @@ final class DownloadSheet {
   // no heading: the row says what it is, and a heading only costs another line of height
   panel.section(null);
   panel.item("music_note",Text.DL_AUDIO,null,"download",()->audio.on());
+  if(photoPost&&photos.size()>1){
+   // the button stays put below the grid however far the photos scroll
+   save[0]=panel.action(Text.allPhotos(photos.size()),true);
+   save[0].setOnClickListener(v->{
+    java.util.ArrayList<DownloadQuality.Choice> chosen=new java.util.ArrayList<>();
+    if(picked.isEmpty())chosen.addAll(photos);else for(int i:picked)chosen.add(photos.get(i));
+    panel.close();photo.on(chosen);
+   });
+  }
   panel.quiet(Text.CLOSE,null).show();
- }
- /** Numbered chips, six to a line, each saving one photo. */
- private static View chips(final Context c,Skin skin,final Panel panel,List<DownloadQuality.Choice> photos,final Pick pick){
-  final int perLine=6;
-  LinearLayout box=new LinearLayout(c);box.setOrientation(LinearLayout.VERTICAL);
-  LinearLayout line=null;
-  for(int i=0;i<photos.size();i++){
-   if(i%perLine==0){
-    line=new LinearLayout(c);line.setOrientation(LinearLayout.HORIZONTAL);
-    LinearLayout.LayoutParams where=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-    where.topMargin=i==0?0:dp(c,6);box.addView(line,where);
-   }
-   final DownloadQuality.Choice item=photos.get(i);
-   TextView chip=new TextView(c);chip.setText(String.valueOf(i+1));chip.setGravity(Gravity.CENTER);
-   chip.setTextColor(skin.text);chip.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
-   chip.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
-   chip.setBackground(Expressive.tile(c,(skin.text&0xFFFFFF)|0x14000000,(Accent.colour()&0xFFFFFF)|0x33000000,dp(c,16),dp(c,16),dp(c,8)));
-   chip.setClickable(true);chip.setFocusable(true);chip.setContentDescription(item.label);
-   Motion.touch(chip);
-   chip.setOnClickListener(v->{panel.close();pick.on(item);});
-   LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,dp(c,44),1f);
-   size.leftMargin=i%perLine==0?0:dp(c,6);line.addView(chip,size);
-  }
-  // fill the last line so its chips keep the width of the others
-  int left=photos.size()%perLine;
-  if(left!=0&&line!=null)for(int k=left;k<perLine;k++){
-   View gap=new View(c);LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,dp(c,44),1f);size.leftMargin=dp(c,6);line.addView(gap,size);
-  }
-  return box;
  }
  private static int dp(Context c,int v){return Math.round(v*c.getResources().getDisplayMetrics().density);}
 }

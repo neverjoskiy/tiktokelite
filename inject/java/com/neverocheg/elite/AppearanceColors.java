@@ -184,6 +184,9 @@ public final class AppearanceColors {
     // selected is part of what it is here, because a tab's role depends on it.
     private static final int LOOKED = 0x4D617273;
 
+    /** On a text whose colour this changed, and only then. */
+    private static final int RECOLOURED = 0x4D417443;  // "MAtC"
+
     private static int wearing(View view) {
         int all = Accent.epoch * 31 + (view.isSelected() ? 1 : 0);
         all = 31 * all + System.identityHashCode(view.getBackground());
@@ -230,27 +233,42 @@ public final class AppearanceColors {
                 if (role != null && (!LIKE.equals(role) || view instanceof ImageView)
                         && !(CONTROL.equals(role) && countBadgeName(textName))) {
                     TextView text = (TextView) view;
-                    ColorStateList original;
                     int mode = Themes.isDark() ? 1 : 0;
-                    synchronized (originalText) {
-                        ColorStateList[] saved = originalText.get(view);
-                        if (saved == null) {
-                            saved = new ColorStateList[2];
-                            originalText.put(view, saved);
-                        }
-                        original = saved[mode];
-                        if (original == null) {
-                            original = text.getTextColors();
-                            saved[mode] = original;
-                        }
-                    }
                     int chosen = get(role);
                     if (COMMENT_LIKE.equals(role)
                             && !activeLikeColour(text.getCurrentTextColor())) chosen = 0;
                     if (chosen == 0 && accentElement(textName, role)) chosen = Accent.colour();
-                    if (chosen != 0) text.setTextColor(chosen);
-                    else if (!COMMENT_LIKE.equals(role) && original != null)
-                        text.setTextColor(original);
+                    // A colour is only ever put back on a view this changed, and
+                    // what is put back is what TikTok gave it last, not the first
+                    // time it was seen: lists hand one view from row to row, and
+                    // TikTok colours a name grey in one row and white in the next.
+                    // Putting back the first one is what left names grey, white,
+                    // or both at once where a span covered part of them.
+                    boolean ours = view.getTag(RECOLOURED) != null;
+                    int now = text.getCurrentTextColor();
+                    if (chosen != 0) {
+                        if (!ours || now != chosen) {
+                            synchronized (originalText) {
+                                ColorStateList[] saved = originalText.get(view);
+                                if (saved == null) {
+                                    saved = new ColorStateList[2];
+                                    originalText.put(view, saved);
+                                }
+                                saved[mode] = text.getTextColors();
+                            }
+                        }
+                        if (now != chosen) text.setTextColor(chosen);
+                        view.setTag(RECOLOURED, Boolean.TRUE);
+                    } else if (ours) {
+                        view.setTag(RECOLOURED, null);
+                        ColorStateList original;
+                        synchronized (originalText) {
+                            ColorStateList[] saved = originalText.get(view);
+                            original = saved == null ? null : saved[mode];
+                        }
+                        // a like TikTok has just turned grey again has its own colour already
+                        if (!COMMENT_LIKE.equals(role) && original != null) text.setTextColor(original);
+                    }
                 }
             }
         }

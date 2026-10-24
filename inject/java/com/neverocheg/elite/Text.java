@@ -947,6 +947,13 @@ final class Text {
     static final String DOWNLOAD_ALWAYS = pick(
             "Сохранять можно всё", "Зберігати можна все", "Save anything");
 
+    static final String DOWNLOAD_WINDOW = pick(
+            "Окно скачивания мода", "Вікно завантаження мода", "Mod download window");
+    static final String DOWNLOAD_WINDOW_NOTE = pick(
+            "Показывает варианты качества, когда мод сам перехватывает скачивание.",
+            "Показує варіанти якості, коли мод сам перехоплює завантаження.",
+            "Shows quality choices when the mod intercepts a download.");
+
     static final String FEED = pick("Лента", "Стрічка", "Feed");
 
     static final String HIDE_ADS = pick(
@@ -1256,6 +1263,33 @@ final class Text {
     static final String SHEET_POST_TITLE = pick("Скачать публикацию", "Завантажити публікацію", "Download post");
     static String allPhotos(int count) {
         return pick("Скачать все фото (" + count + ")", "Завантажити всі фото (" + count + ")", "Download all photos (" + count + ")");
+    }
+    static String pickedPhotos(int count) {
+        return pick("Скачать выбранные (" + count + ")", "Завантажити вибрані (" + count + ")", "Download selected (" + count + ")");
+    }
+
+    static final String DATE_FILTER_OFF = pick("Выключен", "Вимкнено", "Off");
+
+    static String dateFilterRecent(int n, int unit) {
+        return pick("Не старше: ", "Не старші за: ", "No older than ") + n + " " + dateUnit(unit, n);
+    }
+
+    static String dateUnit(int unit, int n) {
+        switch (unit) {
+            case 0: return pick(word(n, "час", "часа", "часов"), word(n, "година", "години", "годин"), n == 1 ? "hour" : "hours");
+            case 2: return pick(word(n, "неделя", "недели", "недель"), word(n, "тиждень", "тижні", "тижнів"), n == 1 ? "week" : "weeks");
+            case 3: return pick(word(n, "месяц", "месяца", "месяцев"), word(n, "місяць", "місяці", "місяців"), n == 1 ? "month" : "months");
+            case 4: return pick(word(n, "год", "года", "лет"), word(n, "рік", "роки", "років"), n == 1 ? "year" : "years");
+            default: return pick(word(n, "день", "дня", "дней"), word(n, "день", "дні", "днів"), n == 1 ? "day" : "days");
+        }
+    }
+
+    static String word(int n, String one, String few, String many) {
+        int mod10 = n % 10;
+        int mod100 = n % 100;
+        if (mod10 == 1 && mod100 != 11) return one;
+        if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+        return many;
     }
     static String photosSaved(int saved, int total) {
         return pick("Сохранено " + saved + " из " + total + " фото", "Збережено " + saved + " із " + total + " фото", "Saved " + saved + " of " + total + " photos");

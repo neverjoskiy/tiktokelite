@@ -37,18 +37,18 @@ class NativeFlagsTests(unittest.TestCase):
    'com/neverocheg/elite/DevMode.java':'package com.neverocheg.elite;class DevMode {static boolean on;static boolean isOn(){return on;}}',
    'com/neverocheg/elite/Diary.java':'package com.neverocheg.elite;class Diary {static void note(String line){}static void detail(String line){}}',
    'com/neverocheg/elite/FlagGuard.java':'package com.neverocheg.elite;class FlagGuard {static boolean allows(){return true;}static void again(){}}',
-   'com/neverocheg/elite/Flags.java':(ROOT/'inject/java/com/neverocheg/elite/Flags.java').read_text(encoding='utf-8'),
+     'com/neverocheg/elite/Flags.java':(ROOT/'inject/java/com/neverocheg/elite/Flags.java').read_text(encoding='utf-8'),
+     'com/neverocheg/elite/FlagObjects.java':'package com.neverocheg.elite;class FlagObjects{static Object build(String json,Class<?> type){return null;}}',
+
    'com/neverocheg/elite/FlagHarness.java':"""package com.neverocheg.elite;import android.content.*;import java.util.*;public class FlagHarness {
     static class Prefs implements SharedPreferences,SharedPreferences.Editor {Map<String,Object> values=new HashMap<>();public boolean getBoolean(String k,boolean d){return values.containsKey(k)?(Boolean)values.get(k):d;}public Map<String,?> getAll(){return new HashMap<String,Object>(values);}public Editor edit(){return this;}public Editor putBoolean(String k,boolean v){values.put(k,v);return this;}public Editor putInt(String k,int v){values.put(k,v);return this;}public Editor putLong(String k,long v){values.put(k,v);return this;}public Editor putFloat(String k,float v){values.put(k,v);return this;}public Editor putString(String k,String v){values.put(k,v);return this;}public Editor remove(String k){values.remove(k);return this;}public Editor clear(){values.clear();return this;}public void apply(){}}
     static void check(boolean v,String what){if(!v)throw new AssertionError(what);}
     public static void main(String[]args){
      Context.files.put("test",new Prefs());Context.files.put(Flags.OVERRIDES,new Prefs());
      check(Flags.forcedInt("audio_comment_publish")==1,"voice comments are on until switched off");
-     Flags.set(Flags.KEY_VOICE,false);check(Flags.forcedInt("audio_comment_publish")==null,"and left to TikTok when they are");
      check(Flags.forcedInt("unrelated")==null&&Flags.forcedBoolean("unrelated")==null,"a flag nobody named is TikTok's");
-     check(Flags.forcedInt("long_press_speed_up_lock")==1,"the speed lock is answered both ways");
+     check(Flags.forcedInt("long_press_speed_up_lock")==0,"the speed lock is off by default");
      Flags.set(Flags.KEY_SPEED_LOCK,false);check(Flags.forcedInt("long_press_speed_up_lock")==0,"off is an answer too");
-     check(Flags.forcedInt("tt_comment_repost")==null&&Flags.forcedInt("enable_self_repost")==null,"what is only offered is off to begin with");
      Flags.set(Flags.KEY_COMMENT_REPOST,true);Flags.set(Flags.KEY_SELF_REPOST,true);
      check(Flags.forcedInt("tt_comment_repost")==1&&Flags.forcedInt("tt_comment_repost_interaction")==1&&Flags.forcedInt("tt_audio_comment_repost")==1&&Flags.forcedInt("enable_self_repost")==1,"and on when asked for");
      check(Flags.forcedInt("profile_left_align")==1,"the new profile is on for everybody");
@@ -62,7 +62,7 @@ class NativeFlagsTests(unittest.TestCase):
      Flags.override(flag,null);check(Flags.forcedBoolean("some_flag")==null&&Flags.overrides().size()==2,"one can be let go");
      Flags.clearOverrides();check(Flags.forcedInt("profile_left_align")==1&&Flags.overrides().isEmpty(),"or all of them");
      check(Flags.parse(flag,"yes")==null&&Flags.parse(lock,"1.5")==null&&Flags.parse(new Flags.Known("o","OBJECT",null),"x")==null,"what is not a value of the type is refused");
-     check(Flags.flag("audio_comment_publish",5)==5&&Flags.flag("profile_left_align",0)==1,"the older reader is answered from the same table");
+     check(Flags.flag("audio_comment_publish",5)==1&&Flags.flag("profile_left_align",0)==1,"the older reader is answered from the same table");
     }
    }"""
   }

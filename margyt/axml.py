@@ -38,6 +38,10 @@ ANDROID_NS = "http://schemas.android.com/apk/res/android"
 # every one of them against android.jar rather than trusting this table.
 ATTR_IDS = {
     "theme": 0x01010000,
+    "mimeType": 0x01010026,
+    "scheme": 0x01010027,
+    "host": 0x01010028,
+    "pathPattern": 0x0101002C,
     "label": 0x01010001,
     "icon": 0x01010002,
     "name": 0x01010003,

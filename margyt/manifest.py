@@ -353,6 +353,54 @@ def add_activity(axml: Axml, class_name: str, label: str, theme: int,
     axml.insert_into(application(axml), subtree)
 
 
+VIEW_ACTION = "android.intent.action.VIEW"
+DEFAULT_CATEGORY = "android.intent.category.DEFAULT"
+
+
+def add_file_opener(axml: Axml, class_name: str, label: str, theme: int,
+                    extension: str, mimes: List[str]) -> None:
+    activity = axml.make_element("activity")
+    axml.set_attr(activity, "theme", TYPE_REFERENCE, theme)
+    axml.set_attr_string(activity, "label", label)
+    axml.set_attr_string(activity, "name", class_name)
+    axml.set_attr_bool(activity, "exported", True)
+
+    def element(tag, **attrs):
+        node = axml.make_element(tag)
+        for key, value in attrs.items():
+            axml.set_attr_string(node, key, value)
+        return [node, axml.close_element(node)]
+
+    by_type = axml.make_element("intent-filter")
+    subtree = [activity, by_type] + element("action", name=VIEW_ACTION) + element("category", name=DEFAULT_CATEGORY)
+    subtree += element("data", scheme="content") + element("data", scheme="file")
+    for mime in mimes:
+        subtree += element("data", mimeType=mime)
+    subtree.append(axml.close_element(by_type))
+
+    by_name = axml.make_element("intent-filter")
+    subtree += [by_name] + element("action", name=VIEW_ACTION) + element("category", name=DEFAULT_CATEGORY)
+    subtree += element("data", scheme="content") + element("data", scheme="file")
+    subtree += element("data", host="*") + element("data", mimeType="*/*")
+    dots = "\\." + extension
+    for pattern in (".*" + dots, ".*\\..*" + dots, ".*\\..*\\..*" + dots):
+        subtree += element("data", pathPattern=pattern)
+    subtree.append(axml.close_element(by_name))
+    subtree.append(axml.close_element(activity))
+    axml.insert_into(application(axml), subtree)
+
+
+def add_queries(axml: Axml, packages: List[str]) -> None:
+    queries = axml.make_element("queries")
+    subtree = [queries]
+    for name in packages:
+        node = axml.make_element("package")
+        axml.set_attr_string(node, "name", name)
+        subtree += [node, axml.close_element(node)]
+    subtree.append(axml.close_element(queries))
+    axml.insert_into(axml.elements("manifest")[0], subtree)
+
+
 def add_receiver(axml: Axml, class_name: str, actions: List[str]) -> None:
     """Declare a receiver that only the system (and the app itself) can reach.
 

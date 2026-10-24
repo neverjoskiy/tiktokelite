@@ -294,7 +294,7 @@ final class BurnEye {
         void replaceAnchor(View next){
             if(anchor.get()==next && replaced)return;
             restoreAnchor();anchor=new java.lang.ref.WeakReference<View>(next);
-            nativeAlpha=next.getAlpha();nativeClickable=next.isClickable();
+            nativeAlpha=Dim.undimmed(next);nativeClickable=next.isClickable();
             nativeAccessibility=next.getImportantForAccessibility();replaced=true;replacedAnchors.put(next,true);revet();
         }
         void restoreAnchor(){
@@ -350,9 +350,11 @@ final class BurnEye {
                 }else{
                     show=present && root.isShown() && root.getWindowVisibility()==View.VISIBLE;
                     if(show){
-                        for(View view=anchored;view!=null && view!=root;){alpha*=view==anchored && replaced?nativeAlpha:view.getAlpha();Object parent=view.getParent();view=parent instanceof View?(View)parent:null;}
+                         for(View view=anchored;view!=null && view!=root;){alpha*=view==anchored && replaced?nativeAlpha:Dim.undimmed(view);Object parent=view.getParent();view=parent instanceof View?(View)parent:null;}
+
                         show=alpha>0f;
-                        alpha=Math.max(alpha,MIN_ALPHA);
+                         alpha=Math.max(Math.min(alpha,dimmed()),MIN_ALPHA);
+
                     }
                 }
             }

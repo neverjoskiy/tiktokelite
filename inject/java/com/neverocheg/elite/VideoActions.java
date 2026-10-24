@@ -1,8 +1,23 @@
 package com.neverocheg.elite;
 import android.content.Context;import android.view.View;import java.lang.ref.WeakReference;
 /** Extra actions on a long press of the native Share slot. Native tap stays intact. */
-public final class VideoActions {
- private static volatile Object selected;
+ public final class VideoActions {
+  static final String WINDOW_KEY = "download_window";
+  private static volatile Object selected;
+  static boolean windowOn() {
+    try {
+      return Margy.context().getSharedPreferences(Margy.PREFS, android.content.Context.MODE_PRIVATE).getBoolean(WINDOW_KEY, true);
+    } catch (Throwable ignored) {
+      return true;
+    }
+  }
+  static void setWindow(boolean on) {
+    try {
+      Margy.context().getSharedPreferences(Margy.PREFS, android.content.Context.MODE_PRIVATE).edit().putBoolean(WINDOW_KEY, on).apply();
+    } catch (Throwable ignored) {
+    }
+  }
+
  private static volatile WeakReference<View> selectedView=new WeakReference<View>(null);
  static void accountChanged(){selected=null;selectedView=new WeakReference<View>(null);}
  static void selected(Object holder,Object post){
@@ -57,7 +72,8 @@ public final class VideoActions {
    try{Diary.note("download sizes offered: "+qualities.size());}catch(Throwable ignored){}
   }
   final java.util.List<DownloadQuality.Choice> every=photos;
-  DownloadSheet.show(c,qualities,photos,video!=null&&qualities.isEmpty(),()->save(post,0),choice->saveAddress(post,choice),choice->savePhoto(post,choice),()->save(post,3),()->saveAllPhotos(post,every));
+   DownloadSheet.show(c,qualities,photos,video!=null&&qualities.isEmpty(),()->save(post,0),choice->saveAddress(post,choice),chosen->{if(chosen.size()==1)savePhoto(post,chosen.get(0));else saveAllPhotos(post,chosen);},()->save(post,3));
+
  }
  static void save(Object post,boolean forceAudio){
   save(post,forceAudio?3:0);

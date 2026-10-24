@@ -25,6 +25,36 @@
    },
    "releases": [
     {
+     "version": "4.0",
+     "beta": false,
+     "base": {
+      "name": "TikTok 47.2.41",
+      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+      "size": 346017026,
+      "sources": [
+       {
+        "name": "TikTok",
+        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "direct": true
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.0/elite.mpatch",
+      "sha256": "0be432b5da68ea648c6d06ca44ebbd9a1989963710362ae809a3e4cb0460f923",
+      "size": 72713460
+     },
+     "result": {
+      "sha256": "105de535bd36a72b443cbabdf6f23c4b713589b61ef70f383ba9b38dea1de212",
+      "size": 396551001
+     },
+     "notes": {
+      "ru": "Порт 2.1.0/2.1.1: новый профиль, несколько фото, фильтр по дате, телесуфлёр и вспышка, окно скачивания, анти-выгорание, перф, флаги.",
+      "uk": "Порт 2.1.0/2.1.1: новий профіль, кілька фото, фільтр за датою, телесуфлер і спалах, вікно завантаження, анти-вигорання, перф, прапорці.",
+      "en": "Port of 2.1.0/2.1.1: new profile, multiple photos, date filter, teleprompter and flash, download window, anti-burn, perf, flags."
+     }
+    },
+    {
      "version": "3.4",
      "beta": false,
      "base": {

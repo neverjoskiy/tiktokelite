@@ -3,8 +3,8 @@ import android.app.Dialog;import android.view.View;import android.view.ViewGroup
 /** One bounded pass when the native share sheet opens, without polling the feed. */
 public final class DownloadChoice {
  
- public static void show(Dialog dialog){dialog.show();if(dialog.getClass().getName().startsWith("com.neverocheg.elite.")||dialog.getWindow()==null)return;
-  Object post=VideoActions.downloadPost();if(post==null)return;guard(dialog,post);View root=dialog.getWindow().getDecorView();root.post(()->bind(root,dialog,post,0,new int[]{512}));for(int delay:new int[]{150,500})root.postDelayed(()->{if(dialog.isShowing())bind(root,dialog,post,0,new int[]{512});},delay);
+ public static void show(Dialog dialog){dialog.show();if(!VideoActions.windowOn()||dialog.getClass().getName().startsWith("com.neverocheg.elite.")||dialog.getWindow()==null)return;
+  Object found=VideoActions.downloadPost();if(found==null)found=SheetPost.of(dialog);if(found==null)return;final Object post=found;guard(dialog,post);View root=dialog.getWindow().getDecorView();root.post(()->bind(root,dialog,post,0,new int[]{512}));for(int delay:new int[]{150,500})root.postDelayed(()->{if(dialog.isShowing())bind(root,dialog,post,0,new int[]{512});},delay);
  }
  static boolean saveLabel(CharSequence value){if(value==null)return false;String text=value.toString().trim().toLowerCase(java.util.Locale.ROOT);return text.equals("скачать")||text.equals("download")||text.equals("завантажити")||text.equals("сохранить видео")||text.equals("save video")||text.equals("скачать видео")||text.equals("завантажити відео")||text.equals("зберегти відео")||text.equals("download video")||text.equals("скачать фото")||text.equals("сохранить фото")||text.equals("download photo")||text.equals("save photo")||text.equals("завантажити фото")||text.equals("зберегти фото");}
  private static void bind(View view,Dialog dialog,Object post,int depth,int[] budget){if(post==null||depth>20||budget[0]--<=0)return;
@@ -15,7 +15,9 @@ public final class DownloadChoice {
   if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)bind(group.getChildAt(i),dialog,post,depth+1,budget);}
  }
 
- private static final java.util.Map<android.view.Window,Boolean> guarded=new java.util.WeakHashMap<>();
+  private static final java.util.Map<android.view.Window,Boolean> guarded=new java.util.WeakHashMap<>();
+  private static final java.util.Map<android.view.Window,Object> posts=new java.util.WeakHashMap<>();
+
  /**
   * The tap itself is taken at the window, before TikTok's button can see it: a tap that ends on the
   * "save" button is turned into a CANCEL for the stock code (so its click never fires and nothing is
@@ -23,9 +25,11 @@ public final class DownloadChoice {
   * Rebinding the click (above) stays as a fallback for keyboard and accessibility clicks.
   */
  private static void guard(final Dialog dialog,final Object post){
-  final android.view.Window window=dialog.getWindow();if(window==null)return;
-  final android.view.Window.Callback base=window.getCallback();if(base==null)return;
-  synchronized(guarded){if(guarded.containsKey(window))return;guarded.put(window,Boolean.TRUE);}
+   final android.view.Window window=dialog.getWindow();if(window==null)return;
+   final android.view.Window.Callback base=window.getCallback();if(base==null)return;
+   synchronized(posts){posts.put(window,post);}
+   synchronized(guarded){if(guarded.containsKey(window))return;guarded.put(window,Boolean.TRUE);}
+
   final float[] down=new float[2];final long[] when={0L};final android.graphics.Rect[] zone={null};
   final int slop=android.view.ViewConfiguration.get(dialog.getContext()).getScaledTouchSlop();
   window.setCallback((android.view.Window.Callback)java.lang.reflect.Proxy.newProxyInstance(base.getClass().getClassLoader(),new Class<?>[]{android.view.Window.Callback.class},(proxy,method,args)->{
@@ -43,7 +47,9 @@ public final class DownloadChoice {
        if(hit){android.view.MotionEvent cancel=android.view.MotionEvent.obtain(e);cancel.setAction(android.view.MotionEvent.ACTION_CANCEL);
         try{method.invoke(base,cancel);}finally{cancel.recycle();}
         final android.content.Context context=dialog.getContext();
-        window.getDecorView().post(()->{try{dialog.dismiss();VideoActions.chooseDownload(context,post);}catch(Throwable error){Diary.note("download menu: "+error);}});
+         final Object now;synchronized(posts){Object latest=posts.get(window);now=latest!=null?latest:post;}
+         window.getDecorView().post(()->{try{dialog.dismiss();VideoActions.chooseDownload(context,now);}catch(Throwable error){Diary.note("download menu: "+error);}});
+
         take=true;
        }
       }

@@ -109,6 +109,7 @@ STUBS = {
 }
 
 STUBS['com/neverocheg/elite/ProfileLayout.java']='package com.neverocheg.elite;class ProfileLayout {static boolean profile;static boolean visible(android.view.View root){return profile;}}'
+STUBS['com/neverocheg/elite/RailPresence.java']='package com.neverocheg.elite;class RailPresence{static boolean onScreen(android.view.View v){return true;}}'
 STUBS['android/os/Build.java']='package android.os;public class Build{public static class VERSION{public static int SDK_INT=34;}}'
 STUBS['com/neverocheg/elite/NavBar.java']='package com.neverocheg.elite;class NavBar{static boolean wears(android.view.View v){return false;}}'
 STUBS['android/view/View.java']=STUBS['android/view/View.java'].replace('public boolean isAttachedToWindow(){return true;}', 'public boolean isAttachedToWindow(){return true;}public boolean hasWindowFocus(){return true;}')

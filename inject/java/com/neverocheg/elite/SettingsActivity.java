@@ -501,6 +501,9 @@ public class SettingsActivity extends Activity {
 
         column.addView(section(Text.DOWNLOADS));
         LinearLayout downloads = card();
+        downloads.addView(liveToggleRow("download", Text.DOWNLOAD_WINDOW, VideoActions.windowOn(), VideoActions::setWindow));
+        downloads.addView(quiet(Text.DOWNLOAD_WINDOW_NOTE));
+        downloads.addView(line());
         downloads.addView(actionRow("image",Text.FRAME_QUALITY,Integer.toString(FrameCapture.quality()),()->{
             new ModDialog.Builder(this).setItems(new String[]{"480","720","1080"},(dialog,index)->{AccountAppearance.prefs(this).edit().putInt(FrameCapture.KEY,new int[]{480,720,1080}[index]).apply();rebuild();}).show();
         }));
@@ -2005,8 +2008,10 @@ public class SettingsActivity extends Activity {
     /** A plain monochrome outline glyph for section rows: 24dp, muted. */
     private View glyph(String name) {
         ImageView view = new ImageView(this);
+        android.graphics.drawable.Drawable icon = SettingsGlyph.make(name, skin.muted());
+        if (icon == null) icon = SettingsGlyph.make("settings", skin.muted());
         try {
-            view.setImageDrawable(SettingsGlyph.make(name, skin.muted()));
+            view.setImageDrawable(icon);
         } catch (Throwable ignored) {
         }
         LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(24), dp(24));

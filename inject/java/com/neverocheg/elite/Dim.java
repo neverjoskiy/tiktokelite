@@ -74,12 +74,12 @@ public final class Dim {
         SharedPreferences prefs = prefs();
         if (prefs == null) return DEFAULT; // not remembered: the saved value is read once the context exists
         int value = prefs.getInt(KEY_HOW, DEFAULT);
-        how = Math.max(0, Math.min(90, value));
+        how = Math.max(0, Math.min(100, value));
         return how;
     }
 
     public static void setStrength(int percent) {
-        how = Math.max(0, Math.min(90, percent));
+        how = Math.max(0, Math.min(100, percent));
         SharedPreferences prefs = prefs();
         if (prefs != null) prefs.edit().putInt(KEY_HOW, how).apply();
         refresh();
@@ -123,6 +123,9 @@ public final class Dim {
             if(!activity.hasWindowFocus()){if(!isEnabled())restore();return;}
             if(!isConfigured()){retryEye=false;BurnEye.hide(root);restore();return;}
             if(ProfileLayout.visible(root)){retryEye=false;BurnEye.hide(root);restore();return;}
+            // No column of likes and comments, no anti burn-in: neither the eye nor the dimming.
+            // That column is only there while a post is on the screen, and it is the one sure sign.
+            if(!RailPresence.onScreen(root)){retryEye=false;BurnEye.hideSoon(root);restore();return;}
             inspection=passInspection;inspection.clear();commentSources.clear();commentZone=Integer.MAX_VALUE;
             int protection=protectedFlags(root,0,new int[]{10000});
             // A permanent comment composer below a search video is not an open sheet.
@@ -993,7 +996,16 @@ public final class Dim {
         }
     }
 
-    private static int childShape(View view){
+     /** A view's alpha as TikTok has it, with this pass's dimming taken back out. */
+     static float undimmed(View view) {
+         if (view == null) return 0f;
+         float now = view.getAlpha();
+         Dimmed dimmed = android.os.Looper.myLooper() == android.os.Looper.getMainLooper() ? faded.get(view) : null;
+         return dimmed != null && Math.abs(now - dimmed.applied) < 0.001f ? dimmed.original : now;
+     }
+
+     private static int childShape(View view){
+
         int hash=0;if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++){View child=group.getChildAt(i);hash=31*hash+child.getWidth()*17+child.getHeight();}}return hash;
     }
     /** The value TikTok had and the value the anti-burn pass applied. */
@@ -1047,13 +1059,13 @@ public final class Dim {
     }
     /** Animate only our alpha. Stop immediately if TikTok changes or detaches the view. */
     private static void restoreSmooth(View view,float original){
-        if(!view.isAttachedToWindow() || !view.isShown()){view.setAlpha(original);return;}
+        if(!view.isAttachedToWindow() || !view.isShown())return;
         Returning state=new Returning(view.getAlpha(),original);returns.put(view,state);
         java.lang.ref.WeakReference<View> ref=new java.lang.ref.WeakReference<>(view);
         state.animator.setDuration(160L);
         state.animator.addUpdateListener(animation->{View target=ref.get();
             if(target==null || returns.get(target)!=state || Math.abs(target.getAlpha()-state.last)>.001f){animation.cancel();return;}
-            if(!target.isAttachedToWindow() || !target.isShown()){target.setAlpha(state.original);animation.cancel();return;}
+            if(!target.isAttachedToWindow() || !target.isShown()){animation.cancel();return;}
             state.last=(Float)animation.getAnimatedValue();target.setAlpha(state.last);
         });
         state.animator.addListener(new android.animation.AnimatorListenerAdapter(){@Override public void onAnimationEnd(android.animation.Animator animation){View target=ref.get();if(target!=null && returns.get(target)==state)returns.remove(target);}});

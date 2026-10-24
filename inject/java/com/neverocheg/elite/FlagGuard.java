@@ -17,6 +17,11 @@ import android.os.Looper;
  *
  * Only the main process counts. TikTok starts several others beside it, and
  * each would add one to a count that only the main one ever gets to wipe.
+ *
+ * And only a start somebody saw counts, or one that crashed. The main process
+ * is also started in the background, for a push or a sync, and the system
+ * ends it again in seconds; three of those used to hold the answers back as
+ * if TikTok had fallen over three times ("flags: held back"), with no crash.
  */
 final class FlagGuard {
 
@@ -27,7 +32,11 @@ final class FlagGuard {
     private static final String FILE = "flagguard_margyt";
     private static final String STARTS = "starts";
     private static final int TOO_MANY = 3;
-    private static final long LASTED = 15000L;
+    private static final long LASTED = 8000L;
+
+    private static volatile SharedPreferences counting;
+    private static volatile int countedFrom;
+    private static volatile boolean counted;
 
     /** 0 not asked yet, 1 held back, 2 let through. One answer a process. */
     private static volatile int answer;
@@ -47,16 +56,37 @@ final class FlagGuard {
                 return false;
             }
             if (context.getPackageName().equals(processName())) {
-                // written at once: what this guards against is the process dying
-                prefs.edit().putInt(STARTS, starts + 1).commit();
-                new Handler(Looper.getMainLooper()).postDelayed(
-                        () -> prefs.edit().putInt(STARTS, 0).apply(), LASTED);
+                counting = prefs;
+                countedFrom = starts;
+                // a crash before any screen is up counts as well
+                final Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
+                Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+                    count();
+                    if (before != null) before.uncaughtException(thread, error);
+                });
             }
             answer = 2;
             return true;
         } catch (Throwable error) {
             return false;
         }
+    }
+
+    /** A TikTok screen came up: this start counts, and is wiped if the app stays up. */
+    static void shown() {
+        final SharedPreferences prefs = counting;
+        if (prefs == null || counted) return;
+        count();
+        new Handler(Looper.getMainLooper()).postDelayed(
+                () -> prefs.edit().putInt(STARTS, 0).apply(), LASTED);
+    }
+
+    private static synchronized void count() {
+        SharedPreferences prefs = counting;
+        if (prefs == null || counted) return;
+        counted = true;
+        // written at once: what this guards against is the process dying
+        try { prefs.edit().putInt(STARTS, countedFrom + 1).commit(); } catch (Throwable ignored) { }
     }
 
     static boolean heldBack() {

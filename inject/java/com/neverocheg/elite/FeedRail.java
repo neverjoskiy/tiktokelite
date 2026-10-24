@@ -95,6 +95,8 @@ public final class FeedRail {
         View[] views=seen;int[] which=kinds;
         for(int i=0;i<views.length&&i<which.length;i++)Md3.icons(views[i],which[i]);
     }
+    /** Every button the mod has been handed, in no order. */
+    static java.util.List<View> views(){synchronized(slots){return new java.util.ArrayList<View>(slots.keySet());}}
     /** Every button the mod has been handed, for what dresses them to look at again. */
     static void restyle(){
         java.util.List<View> views;

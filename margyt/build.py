@@ -246,6 +246,9 @@ class Build:
             self.detail("%s declared, reached from TikTok's own settings" % SETTINGS_ACTIVITY)
         manifest_module.add_activity(manifest, STORE_ACTIVITY, SETTINGS_LABEL, theme)
         manifest_module.add_activity(manifest, PACKAGE + ".PluginEditorActivity", SETTINGS_LABEL, theme)
+        manifest_module.add_file_opener(manifest, PACKAGE + ".PluginOpenActivity", "Плагин MargyT", 0x01030055, "mtp", ["application/octet-stream", "application/zip", "application/x-zip-compressed"])
+        manifest_module.add_file_opener(manifest, PACKAGE + ".StyleOpenActivity", "Стиль MargyT", 0x01030055, "mtui", ["application/octet-stream", "application/json", "text/plain"])
+        manifest_module.add_queries(manifest, ["cat.narezany.store", "cat.narezany.patcher"])
         self.detail("%s declared, the plugin store" % STORE_ACTIVITY)
 
         if not self.lite and not manifest_module.has_activity(manifest, TIKTOK_SETTINGS):
@@ -317,6 +320,10 @@ class Build:
         self.detail("the mod's classes go in as %s" % name)
 
         self.say("Writing the apk")
+        for profile in ("assets/dexopt/baseline.prof", "assets/dexopt/baseline.profm"):
+            if apk.has(profile):
+                apk.remove(profile)
+                self.detail("dropped stale %s" % profile)
         for gone in apk.drop_signature():
             self.detail("dropped %s" % gone)
         # deflated by the compressor the patcher app carries, so that the app
@@ -624,6 +631,11 @@ class Build:
         ("govno", "че за говно"),
         ("glamour", "Гламурная"),
         ("tilcayo", "Толстый тилкайо"),
+        # redrawn in 2.1.0. New ones go at the end: a launcher entry is named
+        # by its place here, and a place that changed would change the icon of
+        # whoever had picked it. The old two stay as they were, under Legacy
+        ("margyrialyou", "Margyrial You"),
+        ("margyrial3", "Margyrial 3"),
     ]
 
     ICON_PACKAGE = 0x30
@@ -819,7 +831,7 @@ class Build:
         feature_hits["native offline comments response"]=0
         feature_hits["native typing send"]=0
         feature_hits["native read receipt"]=0
-        for feature in ("native repost","native repost avatar","native profile layout","native message timestamps","native notification guide","native friends order","native notification filters","native author date slot"):feature_hits[feature]=0
+        for feature in ("native repost","native repost avatar","native profile layout","native message timestamps","native notification guide","native notification filters","native author date slot"):feature_hits[feature]=0
         total = 0
         patched_dex_count = 0
         # all of them at once, as many side by side as the machine has room
@@ -865,7 +877,6 @@ class Build:
             feature_hits["native read receipt"] += counts.get(dexpatch.READ_SEND_LABEL,0)
             for feature in ("native repost","native repost avatar","native profile layout","native message timestamps","native notification guide"):feature_hits[feature]+=counts.get(feature,0)
             feature_hits["native author date slot"]+=counts.get("native author date slot",0)
-            feature_hits["native friends order"]+=sum(v for key,v in counts.items() if "FriendsListResponse" in key and "getUserList" in key)
             feature_hits["native notification filters"]+=sum(v for key,v in counts.items() if "NotificationManager" in key and "notify" in key)
             feature_hits["visible publication date"] += counts.get("visible publication date",0)
             feature_hits["ads"] += sum(v for key,v in counts.items() if "FeedItemList" in key and "getItems" in key)

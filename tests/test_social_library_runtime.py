@@ -25,7 +25,8 @@ class SocialLibraryTest(unittest.TestCase):
    'com/neverocheg/elite/Diary.java':'package com.neverocheg.elite;class Diary{static void note(String s){}}',
    'com/neverocheg/elite/Net.java':'package com.neverocheg.elite;class Net{static void away(String s,Runnable r){r.run();}}',
    'com/neverocheg/elite/NativeRead.java':(ROOT/'inject/java/com/neverocheg/elite/NativeRead.java').read_text(encoding='utf8'),
-   'com/neverocheg/elite/Test.java':"""package com.neverocheg.elite;public class Test{public static void main(String[] a)throws Exception{SocialLibrary.load("1",null);if(mock.Api.calls!=2||PinnedFriends.all.size()!=2)throw new AssertionError("both immediate and suspended pages");PinnedFriends.all.clear();mock.Api.stale=true;SocialLibrary.load("1",null);if(!PinnedFriends.all.isEmpty())throw new AssertionError("stale account accepted");System.out.println("pagination and account guards passed");}}"""}
+      'com/neverocheg/elite/Test.java':"""package com.neverocheg.elite;public class Test{public static void main(String[] a)throws Exception{SocialLibrary.load("1",null);if(mock.Api.calls!=2||PinnedFriends.all.size()!=2)throw new AssertionError("both immediate and suspended pages");PinnedFriends.all.clear();mock.Api.stale=true;SocialLibrary.load("1",null);if(!PinnedFriends.all.isEmpty())throw new AssertionError("stale account accepted");System.out.println("pagination and account guards passed");}}"""
+}
   return files
  def run_with(self,files):
   with tempfile.TemporaryDirectory() as directory:

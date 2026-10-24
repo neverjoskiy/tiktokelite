@@ -495,6 +495,14 @@ FIELD_SOURCES: List[Tuple[str, str, str, str, str]] = [
     (PHOTO_IMAGE, "userWatermarkImage", URL_MODEL, "userWatermarkImage", DOWNLOAD),
 ]
 
+# Statics of TikTok's own whose every read the mod answers instead. 2.1.0 had
+# one here, TikTok's "is this the new profile", answered by the switch before
+# the server had its say, and with it the profile page moved into the new shape
+# (ProfileHeader): for accounts the server keeps on the old profile that left
+# other people's pages without a name or an avatar and one's own without the
+# edit button and the banner. Gone in 2.1.1; the profile is the server's again.
+STATIC_FIELD_SOURCES: List[Tuple[str, str, str, str, str]] = []
+
 # The pink TikTok is built around. Most of the places it is drawn hold it as a
 # plain constant in the bytecode, so each of those becomes a call into the mod
 # and the colour turns into something a person can change. The build counts
@@ -820,10 +828,24 @@ def model_rules() -> List[Tuple[str, "re.Pattern[str]", str]]:
             re.compile(r"^(\s*)%s ([vp]\d+), ([vp]\d+), %s->%s:%s$"
                        % (read, re.escape(owner), re.escape(field), re.escape(kind)),
                        re.MULTILINE),
-            r"\1invoke-static {\3}, %s->%s(%s)%s\n\n\1%s \2"
-            % (target, name, owner, kind, took),
+             r"\1invoke-static {\3}, %s->%s(%s)%s\n\n\1%s \2"
+             % (target, name, owner, kind, took),
+         ))
+    for owner, field, kind, name, target in STATIC_FIELD_SOURCES:
+        # sget-boolean vA, Owner->field:Z  ->  invoke-static {}, Ours->name()Z ; move-result vA
+        read = {"Z": "sget-boolean", "B": "sget-byte", "S": "sget-short", "C": "sget-char",
+                "I": "sget", "F": "sget", "J": "sget-wide", "D": "sget-wide"}.get(kind, "sget-object")
+        took = ("move-result-wide" if kind in ("J", "D")
+                else "move-result" if kind in ("Z", "B", "S", "C", "I", "F") else "move-result-object")
+        out.append((
+            "%s.%s" % (owner.rsplit("/", 1)[-1][:-1], field),
+            re.compile(r"^(\s*)%s ([vp]\d+), %s->%s:%s$"
+                       % (read, re.escape(owner), re.escape(field), re.escape(kind)),
+                       re.MULTILINE),
+            r"\1invoke-static {}, %s->%s()%s\n\n\1%s \2" % (target, name, kind, took),
         ))
     return out
+
 
 
 def rewrite_models(root: str) -> Dict[str, int]:
@@ -837,7 +859,9 @@ def rewrite_models(root: str) -> Dict[str, int]:
     needles = [_required(pattern) for _label, pattern, _target in prepared]
     owners = tuple(set([owner for owner, _n, _o, _r, _t in MODEL_SOURCES]
                        + [owner for owner, _n, _o, _r, _t in MODEL_STATICS]
-                       + [owner for owner, _f, _k, _n, _t in FIELD_SOURCES]
+                        + [owner for owner, _f, _k, _n, _t in FIELD_SOURCES]
+                        + [owner for owner, _f, _k, _n, _t in STATIC_FIELD_SOURCES]
+
                        # a rule with no owner of its own is recognised by the
                        # method it is looking for, or its file is never opened
                        + [name for name, _o, _r, _t in WILD_SOURCES]

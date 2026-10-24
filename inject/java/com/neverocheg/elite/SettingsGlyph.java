@@ -88,6 +88,10 @@ final class SettingsGlyph extends android.graphics.drawable.Drawable {
    if(command.equals("M"))path.moveTo(values[0],values[1]);
    else if(command.equals("L"))path.lineTo(values[0],values[1]);
    else path.cubicTo(values[0],values[1],values[2],values[3],values[4],values[5]);
+   paths.put("done_all","M 18 7 l -1.41 -1.41 l -6.34 6.34 l 1.41 1.41 L 18 7 z m 4.24 -1.41 L 11.66 16.17 L 7.48 12 l -1.41 1.41 L 11.66 19 l 12 -12 l -1.42 -1.41 z M .41 13.41 L 6 19 l 1.41 -1.41 L 1.83 12 L .41 13.41 z");
+   paths.put("history","M 13 3 a 9 9 0 0 0 -9 9 H 1 l 3.89 3.89 l .07 .14 L 9 12 H 6 c 0 -3.87 3.13 -7 7 -7 s 7 3.13 7 7 s -3.13 7 -7 7 c -1.93 0 -3.68 -.79 -4.94 -2.06 l -1.42 1.42 A 8.954 8.954 0 0 0 13 21 a 9 9 0 0 0 0 -18 z m -1 5 v 5 l 4.28 2.54 l .72 -1.21 l -3.5 -2.08 V 8 H 12 z");
+   paths.put("person","M 12 12 c 2.21 0 4 -1.79 4 -4 s -1.79 -4 -4 -4 s -4 1.79 -4 4 s 1.79 4 4 4 z m 0 2 c -2.67 0 -8 1.34 -8 4 v 2 h 16 v -2 c 0 -2.66 -5.33 -4 -8 -4 z");
+   paths.put("favorite","M 12 21.35 l -1.45 -1.32 C 5.4 15.36 2 12.28 2 8.5 C 2 5.42 4.42 3 7.5 3 c 1.74 0 3.41 .81 4.5 2.09 C 13.09 3.81 14.76 3 16.5 3 C 19.58 3 22 5.42 22 8.5 c 0 3.78 -3.4 6.86 -8.55 11.54 L 12 21.35 z");
   }
   parsed.put(d,path);
  }

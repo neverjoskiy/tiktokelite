@@ -54,6 +54,7 @@ public final class SettingsRow implements Application.ActivityLifecycleCallbacks
     public void onActivityResumed(Activity activity) {
         Plugins.onActivityResumed(activity);
         Plugins.screen(activity);
+        FlagGuard.shown();
         Screen.at(activity);
         if (!Version.LITE) {
             SocialLibrary.refresh(null);
