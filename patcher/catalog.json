@@ -25,6 +25,36 @@
    },
    "releases": [
     {
+     "version": "4.1",
+     "beta": false,
+     "base": {
+      "name": "TikTok 47.2.41",
+      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+      "size": 346017026,
+      "sources": [
+       {
+        "name": "TikTok",
+        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "direct": true
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.1/elite.mpatch",
+      "sha256": "a96fb1526f93a5d23692e4182a43e8e0e3ea78691519cfb0d3331268a9725ba2",
+      "size": 72713432
+     },
+     "result": {
+      "sha256": "37d2a70a344b7b423ac45f1c68fe768768722adc699726239569803e2ff7bbb1",
+      "size": 396403540
+     },
+     "notes": {
+      "ru": "Починка краша вкладки настроек 4.0: глифы переписаны под грамматику парсера, добавлены новые иконки; <queries> объявлен по схеме (видимость стора на Android 11+).",
+      "uk": "Виправлення крашу вкладки налаштувань 4.0: гліфи переписані під граматику парсера, додано нові іконки; <queries> оголошено за схемою (видимість стора на Android 11+).",
+      "en": "Fixes the 4.0 settings-tab crash: glyphs rewritten to the parser's grammar, new icons; <queries> declared where the schema puts it (store visibility on Android 11+)."
+     }
+    },
+    {
      "version": "4.0",
      "beta": false,
      "base": {

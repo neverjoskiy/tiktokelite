@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "3.2",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.2/tiktokolite.apk",
-  "notes": "Counts on the write path: likes, favourites, comments and reposts shorten everywhere. Plus a diary line showing the exact wording when nothing matches.",
-  "notes_ru": "Счётчики на пути записи: лайки, избранное, комментарии и репосты сокращаются везде. Плюс строка в дневнике с точной формулировкой, если ничего не подошло.",
-  "notes_uk": "Лічильники на шляху запису: лайки, обране, коментарі та репости скорочуються всюди. Плюс рядок у щоденнику з точним формулюванням, якщо нічого не підійшло."
+  "version": "4.1",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.1/tiktokolite.apk",
+  "notes": "Settings icon fix: glyphs the icon font writer could not parse no longer crash the settings tab, plus new icons and a schema-correct manifest. Update for 4.0 users whose settings tab crashed on open.",
+  "notes_ru": "Починка иконок настроек: глифы, которые не умел парсер, больше не роняют вкладку настроек; новые иконки и манифест по схеме. Обновление для тех, у кого 4.0 падала настройка.",
+  "notes_uk": "Виправлення іконок налаштувань: гліфи, які не вмів парсер, більше не роняють вкладку налаштувань; нові іконки та маніфест за схемою. Оновлення для тих, у кого 4.0 падало налаштування."
 }
