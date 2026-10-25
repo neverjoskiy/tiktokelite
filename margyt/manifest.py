@@ -391,6 +391,12 @@ def add_file_opener(axml: Axml, class_name: str, label: str, theme: int,
 
 
 def add_queries(axml: Axml, packages: List[str]) -> None:
+    """Declare the packages this app wants to see on Android 11 and later.
+
+    A package absent from <queries> is invisible to getPackageInfo and the
+    like, so a check for the patcher being installed silently answers no.
+    The element belongs before <application>, where the schema puts it.
+    """
     queries = axml.make_element("queries")
     subtree = [queries]
     for name in packages:
@@ -398,7 +404,7 @@ def add_queries(axml: Axml, packages: List[str]) -> None:
         axml.set_attr_string(node, "name", name)
         subtree += [node, axml.close_element(node)]
     subtree.append(axml.close_element(queries))
-    axml.insert_into(axml.elements("manifest")[0], subtree)
+    axml.insert_before(axml.elements("manifest")[0], application(axml), subtree)
 
 
 def add_receiver(axml: Axml, class_name: str, actions: List[str]) -> None:

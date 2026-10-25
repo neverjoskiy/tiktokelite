@@ -487,6 +487,22 @@ class Axml:
                 depth -= 1
         raise AxmlError("element has no end tag")
 
+    def insert_before(self, parent: Node, child: Node, subtree: List[Node]) -> None:
+        """Put a subtree in as a child of `parent`, directly before `child`.
+
+        The manifest schema orders <queries> before <application>, and a
+        subtree appended after it reads as the wrong place to every tool that
+        checks the file rather than merely parses it.
+        """
+        if parent not in self.nodes:
+            raise AxmlError("parent is not in the tree")
+        if child not in self.nodes:
+            raise AxmlError("child is not in the tree")
+        start, stop = self.nodes.index(parent), self.nodes.index(child)
+        if stop <= start:
+            raise AxmlError("child does not come after parent")
+        self.nodes[stop:stop] = subtree
+
 
 def _parse_node(data: bytes, pos: int, ctype: int, chdr: int, csize: int) -> Node:
     line, comment = struct.unpack_from("<II", data, pos + 8)
