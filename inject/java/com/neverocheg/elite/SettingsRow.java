@@ -64,6 +64,7 @@ public final class SettingsRow implements Application.ActivityLifecycleCallbacks
         PinkButtons.watch(activity);
         if (!Version.LITE) {
             Tutorial.maybeShow(activity);
+            WavySeek.attach(activity);
         }
 
         String name = activity.getClass().getName();

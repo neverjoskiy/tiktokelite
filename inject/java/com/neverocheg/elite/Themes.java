@@ -39,6 +39,8 @@ public final class Themes {
     public static final String KEY_TEXT = "theme_text";
     public static final String KEY_BACKGROUND = "theme_background";
     public static final String KEY_STRENGTH = "theme_strength";
+    /** Pure black for AMOLED screens, over TikTok's dark theme and over the mod's own. */
+    public static final String KEY_AMOLED = "theme_amoled";
 
     /** What the mod falls back to: pure black, not dark grey. */
     private static final int TEXT = 0xFFFFFFFF;
@@ -160,15 +162,19 @@ public final class Themes {
         /** The background at the depth asked for: asked for on every colour drawn. */
         final int ground;
 
+        /** Whether the pure-black pass is on: asked on every colour drawn. */
+        final boolean amoled;
+
         Settled(boolean on, boolean material, boolean dark,
-                int text, int background, int strength) {
-            this.ground = toned(background, strength, dark);
-            this.on = on;
+                int text, int background, int strength, boolean amoled) {
+            this.ground = amoled && dark ? 0xFF000000 : toned(background, strength, dark);
+            this.on = on || amoled;
             this.material = material;
             this.dark = dark;
             this.text = text;
             this.background = background;
             this.strength = strength;
+            this.amoled = amoled;
         }
     }
 
@@ -202,8 +208,12 @@ public final class Themes {
         if (strength < 0) strength = 0;
         if (strength > 100) strength = 100;
 
+        // AMOLED only means anything in the dark theme; in the light one it is simply off.
+        // With the mod's theme off, AMOLED keeps TikTok's own white for the words
+        boolean amoled = dark && flag(KEY_AMOLED, false);
+
         Settled fresh = new Settled(on, material, dark,
-                chosenText, chosenBackground, strength);
+                chosenText, chosenBackground, strength, amoled);
         // not kept until there is a context to have read the settings with:
         // an answer given too early would otherwise be the answer for good
         if (Margy.context() != null) settled = fresh;
@@ -228,7 +238,7 @@ public final class Themes {
                 .remove(KEY_TEXT).remove(KEY_BACKGROUND)
                 .remove(modeKey(KEY_TEXT, true)).remove(modeKey(KEY_TEXT, false))
                 .remove(modeKey(KEY_BACKGROUND, true)).remove(modeKey(KEY_BACKGROUND, false))
-                .remove(KEY_STRENGTH).apply();
+                .remove(KEY_STRENGTH).remove(KEY_AMOLED).apply();
         forget();
         AppearanceColors.reset();
     }
@@ -299,9 +309,32 @@ public final class Themes {
         // theme the background is the black end, in the light theme the white
         float level = brightness(colour);
         if (!isDark()) level = 1.0f - level;
+        // TikTok's dark theme is a set of greys, the darkest few of which are its
+        // pages and sheets: on an AMOLED screen those go to black, and everything
+        // lighter moves down with them so the steps between them stay
+        if (now.amoled) level = level <= AMOLED_FLOOR ? 0f : (level - AMOLED_FLOOR) / (1f - AMOLED_FLOOR);
 
         int mixed = mix(now.ground, now.text, level);
         return (colour & 0xFF000000) | (mixed & 0xFFFFFF);
+    }
+
+    /** The darkest greys of TikTok's dark theme, which are its pages and sheets. */
+    private static final float AMOLED_FLOOR = 0.16f;
+
+    /** Whether the pure-black pass is actually painting: dark and switched on. */
+    public static boolean isAmoled() {
+        return current().amoled;
+    }
+
+    /** Whether the switch is on, whatever the theme is now. */
+    public static boolean amoledChosen() {
+        return flag(KEY_AMOLED, false);
+    }
+
+    public static void setAmoled(boolean on) {
+        SharedPreferences prefs = prefs();
+        if (prefs != null) prefs.edit().putBoolean(KEY_AMOLED, on).apply();
+        forget();
     }
 
     /** How bright a colour reads, 0 for black and 1 for white. */

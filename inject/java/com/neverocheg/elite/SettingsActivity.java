@@ -324,6 +324,13 @@ public class SettingsActivity extends Activity {
             theme.addView(quiet(Text.THEME_OLD));
         }
         theme.addView(line());
+        theme.addView(toggleRow("contrast", Text.AMOLED, Themes.amoledChosen(), on -> {
+            Themes.setAmoled(on);
+            markChanged();
+            rebuildAfterSwitchAnimation();
+        }));
+        theme.addView(quiet(Themes.isDark() ? Text.AMOLED_NOTE : Text.AMOLED_LIGHT));
+        theme.addView(line());
         theme.addView(actionRow("palette", Text.THEME_PRESETS, Text.THEME_PRESETS_NOTE,
                 this::chooseThemePreset));
         theme.addView(line());
@@ -443,7 +450,17 @@ public class SettingsActivity extends Activity {
         video.addView(line());
         video.addView(liveToggleRow("timeline", Text.SEEKBAR, Seekbar.isEnabled(),
                 Seekbar::setEnabled));
-        video.addView(line());
+        if (!Version.LITE) {
+            video.addView(line());
+            video.addView(liveToggleRow("waves", Text.WAVY_SEEK, WavySeek.enabled(),
+                    on -> {
+                        WavySeek.setEnabled(on);
+                        WavySeek.reloadSettings();
+                        WavySeek.attach(Watch.here());
+                    }));
+            video.addView(caption(Text.WAVY_SEEK_NOTE));
+            video.addView(line());
+        }
         video.addView(liveToggleRow("info", Text.ALWAYS_DATE, Dates.isEnabled(),
                 Dates::setEnabled));
         video.addView(line());

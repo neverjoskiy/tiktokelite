@@ -301,6 +301,17 @@ final class Text {
             "Only what TikTok itself repaints when you switch between light and "
                     + "dark. The accent is its own thing.");
 
+    static final String AMOLED = pick("AMOLED", "AMOLED", "AMOLED");
+
+    static final String AMOLED_NOTE = pick(
+            "Чистый чёрный вместо тёмно-серого.", "Чистий чорний замість темно-сірого.",
+            "Pure black instead of dark grey.");
+
+    static final String AMOLED_LIGHT = pick(
+            "Работает только с тёмной темой TikTok.",
+            "Працює лише з темною темою TikTok.",
+            "Works with TikTok's dark theme only.");
+
     static final String BACKGROUND = pick(
             "Играть в фоне", "Грати у фоні", "Play in the background");
 
@@ -314,6 +325,15 @@ final class Text {
     static final String SEEKBAR = pick(
             "Перемотка на всех видео", "Перемотка на всіх відео",
             "The scrubbing bar everywhere");
+
+    static final String WAVY_SEEK = pick(
+            "Волнистый просмотр видео", "Хвильовий перегляд відео",
+            "Wavy watch indicator");
+
+    static final String WAVY_SEEK_NOTE = pick(
+            "Полоска просмотра как в Material 3 Expressive: волна растёт и ускоряется к концу видео.",
+            "Хвилястий перегляд у стилі Material 3 Expressive: хвиля росте й пришвидшується до кінця відео.",
+            "Material 3 Expressive watch bar: the wave grows and quickens toward the end of a video.");
 
     static final String VOICE = pick(
             "Голосовые комментарии", "Голосові коментарі", "Voice comments");
