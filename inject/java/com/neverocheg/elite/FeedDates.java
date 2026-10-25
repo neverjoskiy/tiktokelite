@@ -3,6 +3,8 @@ package com.neverocheg.elite;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.ss.android.ugc.aweme.feed.model.Aweme;
+
 /**
  * Leaving old posts out of the feed: nothing older than a few hours or days.
  *
@@ -49,6 +51,13 @@ final class FeedDates {
         if (limit <= 0 || created <= 0) return false;
         if (created > 100000000000L) created /= 1000L;
         return System.currentTimeMillis() / 1000L - created > limit * 3600L;
+    }
+
+    /** A post's age in seconds, read through the model's own getter; zero when unknown. */
+    static long created(Object item) {
+        Object post = item instanceof Aweme ? item : NativeRead.get(item, "getAweme");
+        if (post == null) return 0;
+        return NativeRead.number(NativeRead.get(post, "getCreateTime"));
     }
 
     /** "6 hours", "3 days", or "off". */

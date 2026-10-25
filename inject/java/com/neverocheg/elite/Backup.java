@@ -42,6 +42,7 @@ public final class Backup {
             Download.KEY, Download.KEY_ALWAYS, Avatars.KEY, Stickers.KEY,
             Comments.KEY_COPY,
             Flags.KEY_VOICE, Flags.KEY_BANNER,
+            "date_filter_hours","hide_watched",
             Streaks.KEY_ON, Streaks.KEY_MODE, Streaks.KEY_TEXT,
             Updater.KEY_REMIND
     };
@@ -198,6 +199,7 @@ public final class Backup {
         };
         else if (group == 3) keys = new String[] {
                 Feed.KEY, Feed.KEY_LIVE, Feed.KEY_PHOTOS, Flags.KEY_VOICE, Flags.KEY_BANNER,
+                "date_filter_hours","hide_watched",
                 "rail_show_like","rail_show_comment","rail_show_fav","rail_show_share",
             "streak_send_minute","repost_btn","repost_pos","notify_messages","notify_promos","notify_other","notify_no_prompts",
                 "feed_blocked_authors","feed_blocked_cards",Feed.KEY_STORIES,Feed.KEY_SUGGESTIONS,

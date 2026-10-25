@@ -395,6 +395,9 @@ public class SettingsActivity extends Activity {
         feed.addView(liveToggleRow("visibility_off",Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS),on->Feed.setHides(Feed.KEY_SUGGESTIONS,on)));
         feed.addView(line());
         feed.addView(toggleRow("history", Text.HIDE_WATCHED, Watched.hides(), Watched::setHidden));
+        feed.addView(line());
+        feed.addView(actionRow("history", Text.DATE_FILTER, FeedDates.describe(FeedDates.hours()), this::showDateFilter));
+        feed.addView(caption(Text.DATE_FILTER_NOTE));
         column.addView(wrap(feed));
 
         column.addView(section(Text.TAGS));
@@ -3089,6 +3092,7 @@ public class SettingsActivity extends Activity {
         found+=searchControl(results,Text.FEED,Text.HIDE_STORIES,Feed.hides(Feed.KEY_STORIES));
         found+=searchControl(results,Text.FEED,Text.HIDE_SUGGESTIONS,Feed.hides(Feed.KEY_SUGGESTIONS));
         found+=searchControl(results,Text.FEED,Text.HIDE_WATCHED,Watched.hides());
+        found+=searchHit(results,Text.FEED,Text.DATE_FILTER+" "+FeedDates.describe(FeedDates.hours()),this::showDateFilter);
         found+=searchControl(results,Text.PRIVACY,Text.NO_HISTORY,Watched.historyOff());
         found+=searchHit(results,Text.PINNED_FRIENDS,Text.PINNED_FRIENDS+" "+Text.MESSAGE_TIMES,()->{});
         found+=searchControl(results,Text.DM,Text.HIDE_TYPING,Typing.hides());
@@ -3261,6 +3265,16 @@ public class SettingsActivity extends Activity {
      * Which shelf a section lives on.
      * 1 look, 2 profile, 3 feed and video, 4 tools, 5 about, 6 plugins, 7 friends and chats.
      */
+    private void showDateFilter() {
+        CharSequence[] names = new CharSequence[FeedDates.HOURS.length];
+        for (int i = 0; i < FeedDates.HOURS.length; i++) names[i] = FeedDates.describe(FeedDates.HOURS[i]);
+        new ModDialog.Builder(this).setTitle(Text.DATE_FILTER)
+                .setItems(names, (dialog, index) -> {
+                    FeedDates.setHours(FeedDates.HOURS[index]);
+                    rebuild();
+                }).show();
+    }
+
     private int groupOf(String section) {
         if (section.equals("Разделы")) return 0;
         if (section.equals(Text.PLUGINS)) return 6;

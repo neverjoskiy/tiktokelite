@@ -392,6 +392,11 @@ final class Text {
     static final String PRIVACY = pick("Конфиденциальность", "Конфіденційність", "Privacy");
     static final String HIDE_WATCHED = pick("Скрывать просмотренные", "Ховати переглянуті",
             "Hide watched videos");
+    static final String DATE_FILTER = pick("Скрывать старое", "Ховати старе", "Hide old posts");
+    static final String DATE_FILTER_NOTE = pick(
+            "Лента без постов старше выбранного срока. Свои посты, эфиры и реклама остаются.",
+            "Стрічка без дописів старших за обраний термін. Свої дописи, ефіри та реклама лишаються.",
+            "Leaves posts older than the chosen age out of the feed. Your own posts, live rooms and adverts stay.");
     static final String NO_HISTORY = pick("Не вести историю просмотров", "Не вести історію переглядів",
             "Don't keep watch history");
     static final String TAB_READ_ALL = pick("Прочитать все?", "Прочитати все?", "Mark all as read?");

@@ -6,7 +6,7 @@ STUBS={
 'android/view/View.java':'package android.view;public class View {public Object tag;public void setTag(int k,Object v){tag=v;}public boolean isAttachedToWindow(){return true;}public void post(Runnable r){r.run();}}',
 'com/neverocheg/elite/Account.java': 'package com.neverocheg.elite;class Account {static String live;static String activeId(){return live;}static String id(){return live;}}',
 'android/content/Context.java': 'package android.content; public class Context {public static int MODE_PRIVATE=0; public SharedPreferences getSharedPreferences(String n,int m){return null;}}',
-'android/content/SharedPreferences.java': 'package android.content; public interface SharedPreferences {boolean getBoolean(String k,boolean d);String getString(String k,String d);Editor edit();interface Editor {Editor putBoolean(String k,boolean v);Editor putString(String k,String v);void apply();}}',
+'android/content/SharedPreferences.java': 'package android.content; public interface SharedPreferences {boolean getBoolean(String k,boolean d);String getString(String k,String d);int getInt(String k,int d);Editor edit();interface Editor {Editor putBoolean(String k,boolean v);Editor putString(String k,String v);Editor putInt(String k,int v);void apply();}}',
 'android/os/SystemClock.java': 'package android.os; public class SystemClock {public static long uptimeMillis(){return 0;}}',
 'android/graphics/PorterDuff.java': 'package android.graphics; public class PorterDuff {public enum Mode {SRC_IN}}',
 'android/graphics/drawable/Drawable.java': 'package android.graphics.drawable; public class Drawable {public int colour; public Drawable mutate(){return this;}public void setColorFilter(int c,android.graphics.PorterDuff.Mode m){colour=c;}}',
@@ -57,7 +57,7 @@ class FeatureRuntimeTest(unittest.TestCase):
  def test_heart_and_ads(self):
   with tempfile.TemporaryDirectory() as directory:
    work=pathlib.Path(directory);sources=dict(STUBS)
-   for name in ('Heart','Feed','NativeRead','Watched'):
+   for name in ('Heart','Feed','NativeRead','Watched','FeedDates','Text'):
     sources['com/neverocheg/elite/'+name+'.java']=(ROOT/('inject/java/com/neverocheg/elite/'+name+'.java')).read_text(encoding='utf-8')
    sources['com/neverocheg/elite/FeatureHarness.java']=HARNESS
    __import__("android_doubles").with_mod(sources)

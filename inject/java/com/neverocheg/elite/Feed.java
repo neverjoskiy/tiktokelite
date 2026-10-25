@@ -215,7 +215,8 @@ public final class Feed {
         // a hashtag somebody blocked is a reason to look at the page too
         boolean others=!Tags.all().isEmpty();
         boolean watched=Watched.hides();
-        if (!ads && !live && !photos && !stories && !suggestions && !authors && !others && !watched) {
+        boolean stale=FeedDates.active();
+        if (!ads && !live && !photos && !stories && !suggestions && !authors && !others && !watched && !stale) {
             return Plugins.feed(items);
         }
         try {
@@ -226,6 +227,10 @@ public final class Feed {
                         || (suggestions && suggestion(item))
                         || (authors && FeedBlacklist.hides(item)));
                 if(!extra && watched && Watched.seen(aidOf(item)))extra=true;
+                if(!extra && watched && Watched.seen(aidOf(item)))extra=true;
+                // the age filter asks about posts the other reasons have not already claimed:
+                // one's own post and a live room are never old enough to leave out
+                if(!extra && stale && !mine((Aweme)item) && !isLive((Aweme)item)) extra=FeedDates.leavesOut(FeedDates.created(item));
                 if(extra || unwanted(item,ads,live,photos)) {
                     if(kept==null){kept=new ArrayList(items.size());kept.addAll(items.subList(0,index));}
                     out++;
