@@ -1,8 +1,8 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "4.1",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.1/tiktokolite.apk",
-  "notes": "Settings icon fix: glyphs the icon font writer could not parse no longer crash the settings tab, plus new icons and a schema-correct manifest. Update for 4.0 users whose settings tab crashed on open.",
-  "notes_ru": "Починка иконок настроек: глифы, которые не умел парсер, больше не роняют вкладку настроек; новые иконки и манифест по схеме. Обновление для тех, у кого 4.0 падала настройка.",
-  "notes_uk": "Виправлення іконок налаштувань: гліфи, які не вмів парсер, більше не роняють вкладку налаштувань; нові іконки та маніфест за схемою. Оновлення для тих, у кого 4.0 падало налаштування."
+  "version": "4.2",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.2/tiktokolite.apk",
+  "notes": "A Material 3 Expressive wavy progress bar for videos and an AMOLED theme: pure black instead of dark grey.",
+  "notes_ru": "Волнистая полоска просмотра видео в стиле Material 3 Expressive и тема AMOLED: чистый чёрный вместо тёмно-серого.",
+  "notes_uk": "Хвиляста смуга перегляду відео в стилі Material 3 Expressive і тема AMOLED: чистий чорний замість темно-сірого."
 }
