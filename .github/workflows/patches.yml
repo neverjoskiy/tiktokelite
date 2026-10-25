@@ -29,28 +29,20 @@ jobs:
       - name: Fetch base and release apks
         run: |
           curl -L --fail -o base-full.apk https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk
-          curl -L --fail -o base-lite.apk https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk
           curl -L --fail -o elite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.full_tag }}/tiktokolite.apk
-          curl -L --fail -o tikelite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.lite_tag }}/tikelite.apk
           echo "base-full=$(sha256sum base-full.apk | cut -d' ' -f1)"
-          echo "base-lite=$(sha256sum base-lite.apk | cut -d' ' -f1)"
 
-      - name: Make patches
+      - name: Make patch
         run: |
           python -m margyt.delta make base-full.apk elite.apk -o elite.mpatch
-          python -m margyt.delta make base-lite.apk tikelite.apk -o tikelite.mpatch
-          ls -la *.mpatch
+          ls -la elite.mpatch
           echo "elite-mpatch-sha256=$(sha256sum elite.mpatch | cut -d' ' -f1)"
-          echo "tikelite-mpatch-sha256=$(sha256sum tikelite.mpatch | cut -d' ' -f1)"
 
-      - name: Verify patches
+      - name: Verify patch
         run: |
           python -m margyt.delta apply base-full.apk elite.mpatch rebuilt-elite.apk
-          python -m margyt.delta apply base-lite.apk tikelite.mpatch rebuilt-tikelite.apk
           echo "rebuilt-elite=$(sha256sum rebuilt-elite.apk | cut -d' ' -f1)"
-          echo "rebuilt-tikelite=$(sha256sum rebuilt-tikelite.apk | cut -d' ' -f1)"
           echo "expect-elite=$(sha256sum elite.apk | cut -d' ' -f1)"
-          echo "expect-tikelite=$(sha256sum tikelite.apk | cut -d' ' -f1)"
 
       - uses: actions/upload-artifact@v4
         with:
