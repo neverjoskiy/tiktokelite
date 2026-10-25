@@ -100,16 +100,32 @@ def _difference(pair: Tuple[bytes, bytes]) -> Tuple[bytes, bytes, bytes]:
 
     old, new = pair
     control, difference, extra = core.diff(old, new)
-    # bsdiff4 1.3.x hands the control back as packed little-endian rows of
-    # three; 1.4.x and earlier pack the rows themselves in Python
-    if not isinstance(control, (bytes, bytearray)):
-        if not control:
-            raise DeltaError("bsdiff produced no control rows")
-        packed = b"".join(struct.pack("<qqq", *row) for row in control)
-    else:
+    if not control:
+        raise DeltaError("bsdiff produced no control rows")
+    # bsdiff4 1.3.x hands the control back already packed, and it signs its
+    # numbers in sign-magnitude (top bit of the last byte says minus); the
+    # reader downstream wants plain two's complement, so bytes get decoded
+    # and repacked whatever shape they came in
+    if isinstance(control, (bytes, bytearray)):
         if len(control) % 24:
             raise DeltaError("bsdiff control stream is not a triple count")
-        packed = bytes(control)
+        rows = []
+        for at in range(0, len(control), 24):
+            row = []
+            for cell in range(3):
+                value = int.from_bytes(control[at + cell * 8:at + cell * 8 + 8],
+                                       "little")
+                row.append(-(value & 0x7FFFFFFFFFFFFFFF) if value >> 63 else value)
+            rows.append(tuple(row))
+    elif isinstance(control[0], int):
+        # other releases hand back a flat list of ints; the earliest ones
+        # packed rows of tuples in Python
+        if len(control) % 3:
+            raise DeltaError("bsdiff control stream is not a triple count")
+        rows = [tuple(control[at:at + 3]) for at in range(0, len(control), 3)]
+    else:
+        rows = control
+    packed = b"".join(struct.pack("<qqq", *row) for row in rows)
     return (lzma.compress(packed, **_XZ), lzma.compress(difference, **_XZ),
             lzma.compress(extra, **_XZ))
 
@@ -243,9 +259,13 @@ def _bspatch(old: bytes, size: int, control: bytes, difference: bytes, extra: by
     for row in range(0, len(control), 24):
         add, copy, seek = struct.unpack_from("<qqq", control, row)
         piece = bytearray(difference[from_diff:from_diff + add])
-        span = old[from_old:from_old + add] if 0 <= from_old else b""
-        for i in range(min(len(span), add)):
-            piece[i] = (piece[i] + span[i]) & 0xFF
+        # a negative seek happens BEFORE the copy from old, so the span that
+        # gets added can hang off the left edge of old; the reference patcher
+        # just skips bytes that fall outside, and so do we
+        span = old[max(from_old, 0):from_old + add]
+        skip = max(0, -from_old)
+        for i in range(len(span)):
+            piece[skip + i] = (piece[skip + i] + span[i]) & 0xFF
         new[at:at + add] = piece
         at += add
         from_diff += add
