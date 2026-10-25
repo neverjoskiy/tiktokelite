@@ -28,7 +28,7 @@ jobs:
 
       - name: Fetch base and release apks
         run: |
-          curl -L --fail -o base-full.apk https://margy.narez.xyz/original/tiktok-47-2-41.apk
+          curl -L --fail -o base-full.apk https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk
           curl -L --fail -o base-lite.apk https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk
           curl -L --fail -o elite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.full_tag }}/tiktokolite.apk
           curl -L --fail -o tikelite.apk https://github.com/neverjoskiy/tiktokelite/releases/download/${{ inputs.lite_tag }}/tikelite.apk
