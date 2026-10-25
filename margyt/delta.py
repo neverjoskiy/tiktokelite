@@ -100,7 +100,16 @@ def _difference(pair: Tuple[bytes, bytes]) -> Tuple[bytes, bytes, bytes]:
 
     old, new = pair
     control, difference, extra = core.diff(old, new)
-    packed = b"".join(struct.pack("<qqq", *row) for row in control)
+    # bsdiff4 1.3.x hands the control back as packed little-endian rows of
+    # three; 1.4.x and earlier pack the rows themselves in Python
+    if not isinstance(control, (bytes, bytearray)):
+        if not control:
+            raise DeltaError("bsdiff produced no control rows")
+        packed = b"".join(struct.pack("<qqq", *row) for row in control)
+    else:
+        if len(control) % 24:
+            raise DeltaError("bsdiff control stream is not a triple count")
+        packed = bytes(control)
     return (lzma.compress(packed, **_XZ), lzma.compress(difference, **_XZ),
             lzma.compress(extra, **_XZ))
 
