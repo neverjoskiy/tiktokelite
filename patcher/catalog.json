@@ -25,6 +25,36 @@
    },
    "releases": [
     {
+     "version": "4.2",
+     "beta": false,
+     "base": {
+      "name": "TikTok 47.2.41",
+      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+      "size": 346017026,
+      "sources": [
+       {
+        "name": "TikTok",
+        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "direct": true
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.2/elite.mpatch",
+      "sha256": "5388df972044dda933b6f61388e23ac0a9fa8b58322f1318f09b4bd1bf77fca6",
+      "size": 72719988
+     },
+     "result": {
+      "sha256": "f297e2106d3c515b0763e56643da1b05b53d3cf4366e00a075503c1262f8b1e5",
+      "size": 396411732
+     },
+     "notes": {
+      "ru": "Волнистый индикатор видео в стиле M3 Expressive и тема AMOLED.",
+      "uk": "Хвилястий індикатор відео в стилі M3 Expressive і тема AMOLED.",
+      "en": "An M3 Expressive wavy video-progress indicator and an AMOLED theme."
+     }
+    },
+    {
      "version": "4.1",
      "beta": false,
      "base": {
