@@ -24,21 +24,27 @@
     "en": "A TikTok mod: looks, downloads without a watermark, a region of your choice, badges and a lot more."
    },
    "releases": [
-    {
-     "version": "4.2",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "TikTok",
-        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
-        "direct": true
-       }
-      ]
-     },
+     {
+      "version": "4.2",
+      "beta": false,
+      "base": {
+       "name": "TikTok 47.2.41",
+       "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+       "size": 346017026,
+       "sources": [
+        {
+         "name": "GitHub",
+         "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+         "direct": true
+        },
+        {
+         "name": "GitFlic",
+         "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+         "direct": true,
+         "patchUrl": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/e30bc9c8-b179-4880-9cf3-ff926fd01019/download"
+        }
+       ]
+      },
      "patch": {
       "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.2/elite.mpatch",
       "sha256": "5388df972044dda933b6f61388e23ac0a9fa8b58322f1318f09b4bd1bf77fca6",
@@ -63,8 +69,13 @@
       "size": 346017026,
       "sources": [
        {
-        "name": "TikTok",
-        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "name": "GitHub",
+        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+        "direct": true
+       },
+       {
+        "name": "GitFlic",
+        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
         "direct": true
        }
       ]
@@ -93,8 +104,13 @@
       "size": 346017026,
       "sources": [
        {
-        "name": "TikTok",
-        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "name": "GitHub",
+        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+        "direct": true
+       },
+       {
+        "name": "GitFlic",
+        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
         "direct": true
        }
       ]
@@ -123,8 +139,13 @@
       "size": 346017026,
       "sources": [
        {
-        "name": "TikTok",
-        "url": "https://margy.narez.xyz/original/tiktok-47-2-41.apk",
+        "name": "GitHub",
+        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+        "direct": true
+       },
+       {
+        "name": "GitFlic",
+        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
         "direct": true
        }
       ]
