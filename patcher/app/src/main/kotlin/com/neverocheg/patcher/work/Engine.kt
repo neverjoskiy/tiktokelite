@@ -83,7 +83,7 @@ object Engine {
     val busy: Boolean get() = flow.value is State.Working
 
     /** Begin: with the original already here it goes straight on, otherwise it asks. */
-    fun start(context: Context, mod: Mod, release: Release) {
+    fun start(context: Context, mod: Mod, release: Release, source: Source? = null) {
         if (busy) return
         val app = context.applicationContext
         val ready = made(app, mod, release)
@@ -92,7 +92,8 @@ object Engine {
             return
         }
         if (release.whole) whole(app, mod, release)
-        else if (original(app, release).exists()) run(app, mod, release) { }
+        else if (original(app, release).exists()) run(app, mod, release, source) { }
+        else if (source != null) fetch(app, mod, release, source!!)
         else flow.value = State.Asking(mod, release)
     }
 
@@ -100,7 +101,7 @@ object Engine {
     fun fetch(context: Context, mod: Mod, release: Release, source: Source) {
         if (busy) return
         val app = context.applicationContext
-        run(app, mod, release) {
+        run(app, mod, release, source) {
             flow.value = State.Working(mod, release, Stage.ORIGINAL, 0, release.baseSize)
             val unchecked = File(original(app, release).path + ".new")
             unchecked.delete()
@@ -115,7 +116,7 @@ object Engine {
     fun pick(context: Context, mod: Mod, release: Release, chosen: Uri) {
         if (busy) return
         val app = context.applicationContext
-        run(app, mod, release) {
+            run(app, mod, release, null) {
             flow.value = State.Working(mod, release, Stage.ORIGINAL, 0, release.baseSize)
             val unchecked = File(original(app, release).path + ".new")
             unchecked.parentFile?.mkdirs()
@@ -192,7 +193,7 @@ object Engine {
         }
     }
 
-    private fun run(context: Context, mod: Mod, release: Release, first: () -> Unit) {
+    private fun run(context: Context, mod: Mod, release: Release, source: Source?, first: () -> Unit) {
         stop = false
         flow.value = State.Working(mod, release, Stage.ORIGINAL, 0, release.baseSize)
         WorkService.start(context)
@@ -202,9 +203,10 @@ object Engine {
                 val base = original(context, release)
 
                 val patch = patch(context, release)
+                val patchUrl = source?.patchUrl?.ifEmpty { release.patchUrl } ?: release.patchUrl
                 if (!patch.exists()) {
                     flow.value = State.Working(mod, release, Stage.PATCH, 0, release.patchSize)
-                    Net.file(release.patchUrl, patch, release.patchSize, { stop }) { done, _ ->
+                    Net.file(patchUrl, patch, release.patchSize, { stop }) { done, _ ->
                         flow.value = State.Working(mod, release, Stage.PATCH, done, release.patchSize)
                     }
                     if (Patch.sha256(patch, { stop }) != release.patchSha256) {

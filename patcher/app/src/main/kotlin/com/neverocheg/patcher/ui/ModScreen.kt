@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.neverocheg.patcher.data.Installed
 import com.neverocheg.patcher.data.Prefs
+import com.neverocheg.patcher.data.Source
 import com.neverocheg.patcher.data.Standing
 import com.neverocheg.patcher.data.Versions
 import com.neverocheg.patcher.work.Engine
@@ -89,7 +90,9 @@ fun ModScreen(id: String, back: () -> Unit) {
     }
     val standing = remember(mod, looked, prefs.beta) { Standing.of(context, mod, prefs.beta) }
     val release = standing.latest
+    val directSources = release?.sources?.filter { it.direct } ?: emptyList()
     var removing by remember { mutableStateOf(false) }
+    var chooseSource by remember { mutableStateOf(false) }
 
     // what was made has been installed: nothing more to keep of it
     val mine = (state as? Engine.State.Ready)?.takeIf { it.mod.id == mod.id }
@@ -285,13 +288,19 @@ fun ModScreen(id: String, back: () -> Unit) {
                                         }
                                         Spacer(Modifier.height(8.dp))
                                         FilledTonalButton(enabled = shown != "busy",
-                                            onClick = { Engine.start(context, mod, release) },
+                                            onClick = {
+                                                if (directSources.size > 1) chooseSource = true
+                                                else Engine.start(context, mod, release)
+                                            },
                                             modifier = Modifier.fillMaxWidth().height(56.dp)) {
                                             Text(label, style = MaterialTheme.typography.titleMedium)
                                         }
                                     } else {
                                         Button(enabled = shown != "busy",
-                                            onClick = { Engine.start(context, mod, release) },
+                                            onClick = {
+                                                if (directSources.size > 1) chooseSource = true
+                                                else Engine.start(context, mod, release)
+                                            },
                                             modifier = Modifier.fillMaxWidth().height(56.dp)) {
                                             Text(label, style = MaterialTheme.typography.titleMedium)
                                         }
@@ -388,6 +397,28 @@ fun ModScreen(id: String, back: () -> Unit) {
                 }
             },
             dismissButton = { TextButton(onClick = { removing = false }) { Text(words.cancel) } },
+        )
+    }
+
+    if (chooseSource) {
+        AlertDialog(
+            onDismissRequest = { chooseSource = false },
+            title = { Text(words.downloadSourceTitle) },
+            text = {
+                Column(Modifier.padding(horizontal = 24.dp)) {
+                    for (source in directSources) {
+                        TextButton(
+                            onClick = {
+                                chooseSource = false
+                                Engine.start(context, mod, release, source)
+                            },
+                        ) {
+                            Text(source.name)
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            }
         )
     }
 }

@@ -6,7 +6,8 @@ import org.json.JSONObject
 import java.io.File
 
 /** Somewhere an apk can be had from. */
-data class Source(val name: String, val url: String, val direct: Boolean)
+data class Source(val name: String, val url: String, val direct: Boolean,
+    val patchUrl: String = "")
 
 /** One release of a mod: which apk it is made from, and the patch that makes it. */
 data class Release(
@@ -146,7 +147,7 @@ data class Catalog(val patcher: PatcherRelease?, val channel: String, val mods: 
             for (i in 0 until list.length()) {
                 val source = list.getJSONObject(i)
                 sources.add(Source(source.getString("name"), source.getString("url"),
-                    source.optBoolean("direct", false)))
+                    source.optBoolean("direct", false), source.optString("patchUrl", "")))
             }
             return Release(
                 given.getString("version"), given.optBoolean("beta", false),

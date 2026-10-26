@@ -106,6 +106,7 @@ class Strings(
     val original: String,
     val patch: String,
     val finishedApk: String,
+    val downloadSourceTitle: String,
     val signOutNote: String,
 ) {
     fun stage(stage: Engine.Stage) = when (stage) {
@@ -228,6 +229,7 @@ class Strings(
             original = "Оригинал",
             patch = "Патч",
             finishedApk = "Готовый апк",
+            downloadSourceTitle = "Откуда скачать?",
             signOutNote = "Выйти из аккаунта",
         )
 
@@ -325,6 +327,7 @@ class Strings(
             original = "Оригінал",
             patch = "Патч",
             finishedApk = "Готовий апк",
+            downloadSourceTitle = "З куди завантажити?",
             signOutNote = "Вийти з акаунта",
         )
 
@@ -422,6 +425,7 @@ class Strings(
             original = "Original",
             patch = "Patch",
             finishedApk = "Finished apk",
+            downloadSourceTitle = "Download from?",
             signOutNote = "Sign out of the account",
         )
     }
