@@ -29,4 +29,7 @@ tools/jadx/
 
 .opencode/
 
+.kilo/
+.zcode/
+
 MAX_HANDOFF.md

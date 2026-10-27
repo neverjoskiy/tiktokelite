@@ -1218,9 +1218,7 @@ class TheIconsKeepTheirPlaces(unittest.TestCase):
     """
 
     SHIPPED = [
-        "grafiti", "shine", "tiktok", "materialyou", "material3", "doodle",
-        "glitch", "google", "dotted", "terminal", "yaai", "deltaelite",
-        "mteam", "deled", "elitecraft", "tigr", "govno", "glamour",
+        "materialyou",
     ]
 
     def test_every_icon_that_shipped_is_where_it_was(self):

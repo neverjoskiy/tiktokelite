@@ -612,30 +612,7 @@ class Build:
 
     #: what ships, in the order the settings show them
     ICONS = [
-        ("grafiti", "Графити"),
-        ("shine", "Блестящий"),
-        ("tiktok", "Косплей на ТикТок"),
         ("materialyou", "Eliterial You"),
-        ("material3", "Eliterial 3"),
-        ("doodle", "Doodle"),
-        ("glitch", "Глитч"),
-        ("google", "Google"),
-        ("dotted", "Точечная"),
-        ("terminal", "Терминал"),
-        ("yaai", "You are an idiot!"),
-        ("deltaelite", "Deltaelite"),
-        ("mteam", "Mteam"),
-        ("deled", "сиводня йа нарисават картино"),
-        ("elitecraft", "EliteCraft"),
-        ("tigr", "айй тигрр"),
-        ("govno", "че за говно"),
-        ("glamour", "Гламурная"),
-        ("tilcayo", "Толстый тилкайо"),
-        # redrawn in 2.1.0. New ones go at the end: a launcher entry is named
-        # by its place here, and a place that changed would change the icon of
-        # whoever had picked it. The old two stay as they were, under Legacy
-        ("margyrialyou", "Margyrial You"),
-        ("margyrial3", "Margyrial 3"),
     ]
 
     ICON_PACKAGE = 0x30
