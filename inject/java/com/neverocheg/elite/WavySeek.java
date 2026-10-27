@@ -31,6 +31,11 @@ import java.lang.ref.WeakReference;
  * back is one call, and the switch in the settings goes through here first.
  *
  * Off unless switched on. Not built for Lite.
+ *
+ * The progress itself is smoothed: TikTok (and the official drawable) report
+ * progress in jumps, so the bar jitters. `Smooth` always sits on the SeekBar
+ * and interpolates between reports, so the line moves evenly whether the
+ * wave is on or off.
  */
 final class WavySeek {
 
@@ -104,12 +109,7 @@ final class WavySeek {
                 bar = new WeakReference<SeekBar>(null);
                 known = null;
             }
-            if (!enabled()) {
-                if (known != null && known.getProgressDrawable() instanceof Wave && original != null) {
-                    known.setProgressDrawable(original);
-                }
-                return;
-            }            if (known == null) {
+            if (known == null) {
                 long now = SystemClock.uptimeMillis();
                 if (now - looked < 700) return;
                 looked = now;
@@ -118,9 +118,10 @@ final class WavySeek {
                 known = (SeekBar) found;
                 bar = new WeakReference<>(known);
             }
-            if (!(known.getProgressDrawable() instanceof Wave)) {
+            // Always smooth the progress, on or off.
+            if (!(known.getProgressDrawable() instanceof Smooth)) {
                 original = known.getProgressDrawable();
-                known.setProgressDrawable(new Wave(known));
+                known.setProgressDrawable(new Smooth(known, original));
             }
         } catch (Throwable error) {
             Diary.note("wavy seek: " + error);
@@ -139,6 +140,74 @@ final class WavySeek {
             }
         }
         return null;
+    }
+
+    /**
+     * Always-on progress smoothing. Interpolates between progress reports so
+     * the bar glides instead of jumping, and paints either the wave (when the
+     * switch is on) or TikTok's own drawable (when it is off).
+     */
+    private static final class Smooth extends Drawable {
+        private final WeakReference<SeekBar> owner;
+        private final Drawable original;
+        /** Where the progress was last reported, for interpolation. */
+        private float target;
+        /** Where the progress is right now on screen. */
+        private float smooth;
+        private long last;
+        /** The wave painter, used only while the switch is on. */
+        private final Wave wave;
+
+        Smooth(SeekBar seek, Drawable original) {
+            owner = new WeakReference<>(seek);
+            this.original = original;
+            float p = 0f;
+            try {
+                int max = Math.max(1, seek.getMax());
+                p = Math.max(0f, Math.min(1f, seek.getProgress() / (float) max));
+            } catch (Throwable ignored) {}
+            target = p;
+            smooth = p;
+            wave = new Wave(seek);
+        }
+
+        private float progress(SeekBar seek) {
+            try {
+                int max = Math.max(1, seek.getMax());
+                return Math.max(0f, Math.min(1f, seek.getProgress() / (float) max));
+            } catch (Throwable ignored) {
+                return target;
+            }
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            SeekBar seek = owner.get();
+            if (seek == null) return;
+            android.graphics.Rect box = getBounds();
+            long now = SystemClock.uptimeMillis();
+            float dt = last == 0 ? 0f : Math.min(0.05f, (now - last) / 1000f);
+            last = now;
+
+            target = progress(seek);
+            smooth += (target - smooth) * Math.min(1f, dt * 12f);
+
+            if (WavySeek.enabled()) {
+                wave.drawWave(canvas, seek, box, smooth);
+            } else if (original != null) {
+                original.setLevel((int) (smooth * 10000f));
+                original.draw(canvas);
+            }
+
+            if (seek.isShown() && Math.abs(smooth - target) > 0.001f) {
+                scheduleSelf(this::invalidateSelf, now + 16);
+            }
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+        @Override protected boolean onLevelChange(int level) { invalidateSelf(); return true; }
     }
 
     /**
@@ -204,13 +273,10 @@ final class WavySeek {
             return 0.8f + 1.4f * Math.max(0f, Math.min(1f, progress));
         }
 
-        @Override public void draw(Canvas canvas) {
-            SeekBar seek = owner.get();
-            if (seek == null) return;
-            android.graphics.Rect box = getBounds();
+        void drawWave(Canvas canvas, SeekBar seek, android.graphics.Rect box, float progress) {
             float left = box.left, right = box.right, cy = box.exactCenterY();
             int max = Math.max(1, seek.getMax());
-            float progress = Math.max(0f, Math.min(1f, seek.getProgress() / (float) max));
+            progress = Math.max(0f, Math.min(1f, progress));
             long now = SystemClock.uptimeMillis();
             float dt = last == 0 ? 0f : Math.min(0.05f, (now - last) / 1000f);
             last = now;
@@ -250,16 +316,11 @@ final class WavySeek {
                 line.setStrokeWidth(thick);
                 canvas.drawPath(path, line);
             }
-
-            // keep drawing while the wave has somewhere to go, about thirty a second
-            if (seek.isShown() && (Math.abs(amplitude - wanted) > 0.005f || (amplitude > 0.01f && moving))) {
-                scheduleSelf(this::invalidateSelf, now + 33);
-            }
         }
 
+        @Override public void draw(Canvas canvas) {}
         @Override public void setAlpha(int alpha) {}
         @Override public void setColorFilter(ColorFilter filter) {}
         @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
-        @Override protected boolean onLevelChange(int level) { invalidateSelf(); return true; }
     }
 }

@@ -44,6 +44,12 @@ jobs:
           echo "rebuilt-elite=$(sha256sum rebuilt-elite.apk | cut -d' ' -f1)"
           echo "expect-elite=$(sha256sum elite.apk | cut -d' ' -f1)"
 
+      - name: Publish patch to GitHub Release
+        run: |
+          gh release upload "${{ inputs.full_tag }}" elite.mpatch --clobber --repo neverjoskiy/tiktokelite
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: elite-patches
