@@ -113,6 +113,11 @@ public final class Dim {
         long now = android.os.SystemClock.uptimeMillis();
         View root = activity.getWindow().getDecorView();
         View previousRoot = lastRoot == null ? null : lastRoot.get();
+        // Leaving one screen for another: put back what was dimmed, so the
+        // next screen starts from its own brightness instead of inheriting
+        // the previous one's (views get recycled, and alpha would otherwise
+        // compound pass after pass).
+        if (previousRoot != null && previousRoot != root) restore();
         if (!immediate && previousRoot == root && now - last < QUIET) return;
         last = now;
         lastRoot = new java.lang.ref.WeakReference<View>(root);
