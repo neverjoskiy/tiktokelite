@@ -113,12 +113,13 @@ public final class Dim {
         long now = android.os.SystemClock.uptimeMillis();
         View root = activity.getWindow().getDecorView();
         View previousRoot = lastRoot == null ? null : lastRoot.get();
-        // Leaving one screen for another: put back what was dimmed, so the
-        // next screen starts from its own brightness instead of inheriting
-        // the previous one's (views get recycled, and alpha would otherwise
-        // compound pass after pass).
-        if (previousRoot != null && previousRoot != root) restore();
-        if (!immediate && previousRoot == root && now - last < QUIET) return;
+        // Leaving one screen for another, or switching tabs on the same screen
+        // (e.g. inbox -> home): put back what was dimmed first, so recycled
+        // views do not inherit a compounded alpha.
+        int currentTabs = main ? selectedTabs(root, 0) : 0;
+        if ((previousRoot != null && previousRoot != root) || (previousRoot == root && currentTabs != lastTabs)) restore();
+        lastTabs = currentTabs;
+        if (!immediate && previousRoot == root && now - last < QUIET && currentTabs == lastTabs) return;
         last = now;
         lastRoot = new java.lang.ref.WeakReference<View>(root);
         long probe=Probe.start();
@@ -403,6 +404,7 @@ public final class Dim {
     /** Kept for the apply() verdict bookkeeping only; the periodic tick no longer depends on it. */
     private static volatile boolean retryEye=true;
     private static volatile java.lang.ref.WeakReference<View> lastRoot;
+    private static volatile int lastTabs;
     private static volatile int viewportWidth;
     private static volatile int viewportHeight;
 
