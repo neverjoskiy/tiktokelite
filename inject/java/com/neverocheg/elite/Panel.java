@@ -277,14 +277,13 @@ final class Panel {
         row.setFocusable(true);
         row.setContentDescription(detail == null ? title : title + ", " + detail);
 
-        Expressive.Badge badge = new Expressive.Badge(context, shapeFor(icon), SettingsGlyph.make(icon, hero ? ink : tone),
-                compact ? (hero ? 38 : 32) : (hero ? 44 : 40),
-                hero ? (ink & 0xFFFFFF) | 0x2E000000 : (tone & 0xFFFFFF) | 0x26000000,
-                hero ? (ink & 0xFFFFFF) | 0x2E000000 : (tone & 0xFFFFFF) | 0x26000000,
-                hero ? ink : tone, hero ? ink : tone);
-        LinearLayout.LayoutParams badgeWhere = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        android.widget.ImageView badge = new android.widget.ImageView(context);
+        badge.setImageDrawable(SettingsGlyph.make(icon, hero ? ink : tone));
+        int iconSize = compact ? (hero ? 26 : 22) : (hero ? 28 : 24);
+        badge.setColorFilter(hero ? ink : tone, android.graphics.PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams badgeWhere = new LinearLayout.LayoutParams(dp(iconSize), dp(iconSize));
         badgeWhere.rightMargin = dp(compact ? 10 : 14);
+        badgeWhere.gravity = Gravity.CENTER_VERTICAL;
         row.addView(badge, badgeWhere);
 
         LinearLayout words = new LinearLayout(context);
@@ -336,12 +335,6 @@ final class Panel {
             segments().addView(row, where);
         }
         return this;
-    }
-
-    /** A shape per icon, so a menu is not a column of identical circles. */
-    private static int shapeFor(String icon) {
-        int[] kinds = {Expressive.COOKIE9, Expressive.CLOVER4, Expressive.SUNNY, Expressive.FLOWER6, Expressive.COOKIE7};
-        return kinds[Math.abs(icon == null ? 0 : icon.hashCode()) % kinds.length];
     }
 
     /** A line to type in, drawn like the rest of the card. */

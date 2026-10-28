@@ -17,7 +17,7 @@ final class Version {
 
     private Version() {}
 
-    static final String MOD = "4.3";
+    static final String MOD = "4.4";
     static final String TIKTOK = "47.2.41";
     static final boolean TEST = false;
     /** Built into TikTok Lite: only what does not need TikTok's own classes runs. */

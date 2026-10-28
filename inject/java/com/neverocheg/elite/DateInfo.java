@@ -102,24 +102,9 @@ final class DateInfo {
                 .info("article", numeric, pick("Дата и время публикации", "Дата й час публікації", "Published"), copy(context, numeric))
                 .info("schedule", clock, pick("Время до секунды", "Час до секунди", "Time to the second"), copy(context, clock))
                 .info("timeline", weekday, pick("День недели", "День тижня", "Day of the week"), copy(context, weekday))
-                .info("language", offset + " · " + zone.getID(), pick("Часовой пояс", "Часовий пояс", "Time zone"), copy(context, offset + " " + zone.getID()))
                 .info("public", utc, pick("По Гринвичу", "За Грінвічем", "In UTC"), copy(context, utc));
 
-        panel.section(pick("Технические данные", "Технічні дані", "Technical"))
-                .info("update", String.valueOf(data.seconds), "Unix timestamp", copy(context, String.valueOf(data.seconds)));
-        if (data.aid.length() > 0) {
-            panel.info("fingerprint", data.aid, pick("ID видео", "ID відео", "Video ID"), copy(context, data.aid));
-        }
-        if (data.author.length() > 0 || data.handle.length() > 0) {
-            String who = data.author.length() > 0 ? data.author : "@" + data.handle;
-            String sub = pick("Автор", "Автор", "Author") + (data.handle.length() > 0 && data.author.length() > 0 ? " · @" + data.handle : "");
-            panel.info("account_circle", who, sub, copy(context, who));
-        }
-
-        final String all = date + ", " + weekday + ", " + clock + "\n" + numeric + "\n" + offset + " " + zone.getID() + "\n"
-                + utc + "\nUnix: " + data.seconds + (data.aid.length() > 0 ? "\nID: " + data.aid : "");
-        panel.primary(pick("Скопировать всё", "Скопіювати все", "Copy everything"), () -> copy(context, all).on())
-                .quiet(pick("Закрыть", "Закрити", "Close"), null)
+        panel.quiet(pick("Закрыть", "Закрити", "Close"), null)
                 .show();
     }
 
@@ -149,14 +134,14 @@ final class DateInfo {
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
 
-        Expressive.Badge badge = new Expressive.Badge(context, Expressive.COOKIE9,
-                SettingsGlyph.make("schedule", accent), 72,
-                (accent & 0xFFFFFF) | 0x33000000, accent, accent, onAccent(accent));
+        android.widget.ImageView badge = new android.widget.ImageView(context);
+        badge.setImageDrawable(SettingsGlyph.make("schedule", accent));
+        badge.setColorFilter(accent, android.graphics.PorterDuff.Mode.SRC_IN);
         LinearLayout.LayoutParams badgeWhere = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                Math.round(40 * unit), Math.round(40 * unit));
         badgeWhere.rightMargin = Math.round(16 * unit);
+        badgeWhere.gravity = Gravity.CENTER_VERTICAL;
         top.addView(badge, badgeWhere);
-        badge.set(true, true);
 
         LinearLayout words = new LinearLayout(context);
         words.setOrientation(LinearLayout.VERTICAL);
