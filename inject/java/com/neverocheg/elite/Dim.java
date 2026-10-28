@@ -113,10 +113,9 @@ public final class Dim {
         long now = android.os.SystemClock.uptimeMillis();
         View root = activity.getWindow().getDecorView();
         View previousRoot = lastRoot == null ? null : lastRoot.get();
-        // Leaving one screen for another, or switching tabs on the same screen
-        // (e.g. inbox -> home): put back what was dimmed first, so recycled
-        // views do not inherit a compounded alpha.
-        int currentTabs = main ? selectedTabs(root, 0) : 0;
+        String activityNameEarly = activity.getClass().getName();
+        boolean mainEarly = activityNameEarly.equals("com.ss.android.ugc.aweme.main.MainActivity");
+        int currentTabs = mainEarly ? selectedTabs(root, 0) : 0;
         if ((previousRoot != null && previousRoot != root) || (previousRoot == root && currentTabs != lastTabs)) restore();
         lastTabs = currentTabs;
         if (!immediate && previousRoot == root && now - last < QUIET && currentTabs == lastTabs) return;
