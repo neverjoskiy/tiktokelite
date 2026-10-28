@@ -25,6 +25,42 @@
    },
    "releases": [
     {
+     "version": "4.5",
+     "beta": false,
+     "base": {
+      "name": "TikTok 47.2.41",
+      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+      "size": 346017026,
+      "sources": [
+       {
+        "name": "GitHub",
+        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+        "direct": true
+       },
+       {
+        "name": "GitFlic",
+        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+        "direct": true,
+        "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/6feb4362-f770-410a-88b0-6d4dbd5f8da8/c95208b5-2f7d-44c0-ad53-6e2950058fed/download"
+       }
+      ]
+     },
+     "patch": {
+      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.5/elite.mpatch",
+      "sha256": "79bfefc00659ff06d87d9f192a30a65067cf25e62c6f8dff62231041f81bdce2",
+      "size": 71713520
+     },
+     "result": {
+      "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
+      "size": 395406874
+     },
+     "notes": {
+      "ru": "",
+      "uk": "",
+      "en": ""
+     }
+    },
+    {
      "version": "4.4",
      "beta": false,
      "base": {
