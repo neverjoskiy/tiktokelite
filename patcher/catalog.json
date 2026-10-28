@@ -40,8 +40,7 @@
        {
         "name": "GitFlic",
         "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true,
-        "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/6feb4362-f770-410a-88b0-6d4dbd5f8da8/c95208b5-2f7d-44c0-ad53-6e2950058fed/download"
+        "direct": true
        }
       ]
      },
