@@ -378,49 +378,6 @@
           }
         }
       ]
-    },
-    {
-      "id": "tikelite",
-      "name": "TikeLite",
-      "icon": "tikelite",
-      "package": "com.zhiliaoapp.musically.go",
-      "about": {
-        "ru": "Лёгкий мод на TikTok Lite: подмена региона, тема и акцент, значки.",
-        "uk": "Легкий мод на TikTok Lite: підміна регіону, тема й акцент, значки.",
-        "en": "A light mod of TikTok Lite: a region of your choice, theme and accent, badges."
-      },
-      "releases": [
-        {
-          "version": "0.1",
-          "beta": false,
-          "base": {
-            "name": "TikTok Lite 47.1.4",
-            "sha256": "634c596e9f2c54b4e77600d4d1bdd96f1d0adad8bb661476a9df7cd21d3c6057",
-            "size": 90464759,
-            "sources": [
-              {
-                "name": "TikTok Lite",
-                "url": "https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk",
-                "direct": true
-              }
-            ]
-          },
-          "patch": {
-            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.mpatch",
-            "sha256": "60b0b428082d170bb3bc962c71409800336e391d734b96e835f98f9ef100ce70",
-            "size": 33869815
-          },
-          "result": {
-            "sha256": "17547e46446b833e0d8f2e2e654d566ad0ed04a2bc31396e6deda16721e82891",
-            "size": 122988831
-          },
-          "notes": {
-            "ru": "Первая версия. Подмена региона, тема, акцент, значки.",
-            "uk": "Перша версія. Підміна регіону, тема, акцент, значки.",
-            "en": "The first version. A region of your choice, theme, accent, badges."
-          }
-        }
-      ]
     }
   ]
 }

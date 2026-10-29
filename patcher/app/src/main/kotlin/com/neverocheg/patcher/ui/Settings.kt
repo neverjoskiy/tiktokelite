@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Info
@@ -199,6 +200,7 @@ fun SettingsScreen(back: () -> Unit) {
             Group(words.about) {
                 row(Icons.Rounded.Info, words.version(BuildConfig.VERSION_NAME), "@tiktelite",
                     pressed = { Launch.link(context, "https://t.me/tiktelite") })
+                row(Icons.Rounded.Code, "License", "GPL-3.0-or-later")
             }
             Spacer(Modifier.height(24.dp))
         }

@@ -180,6 +180,23 @@ fun HomeScreen(open: (String) -> Unit, settings: () -> Unit) {
                         }
                     }
                 }
+                item {
+                    Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                        Column(Modifier.fillMaxWidth().padding(20.dp)) {
+                            Text("Elite Patcher ${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                            Spacer(Modifier.height(4.dp))
+                            Text("TikTokElite · GPL-3.0-or-later",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.height(4.dp))
+                            Text("t.me/tiktelite",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
             }
         }
     }

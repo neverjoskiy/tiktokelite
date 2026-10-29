@@ -18,7 +18,7 @@
     <application
         android:name=".App"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_crown"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:networkSecurityConfig="@xml/network"

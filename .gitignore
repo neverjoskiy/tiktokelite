@@ -1,4 +1,3 @@
-
 # Someone else's: the original apk and anything derived from it.
 apk/
 work/
@@ -28,7 +27,8 @@ __pycache__/
 tools/jadx/
 
 .opencode/
-
+.claude/
+CLAUDE.md
 .kilo/
 .zcode/
 

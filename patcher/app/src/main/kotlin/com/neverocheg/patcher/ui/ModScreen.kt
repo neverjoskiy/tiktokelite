@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -153,6 +154,12 @@ fun ModScreen(id: String, back: () -> Unit) {
                 Text(about, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp))
+            }
+            Group {
+                row(Icons.Rounded.Android, "Package", mod.packageName)
+                if (release != null) row(Icons.Rounded.Inventory2, "Latest", release.version)
+                row(Icons.Rounded.CheckCircle, "License", "GPL-3.0-or-later")
+                row(Icons.Rounded.AccountCircle, "Developer", "@neverocheg")
             }
             if (release == null) {
                 Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(
