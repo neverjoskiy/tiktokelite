@@ -417,7 +417,7 @@ fun ModScreen(id: String, back: () -> Unit) {
                         TextButton(
                             onClick = {
                                 chooseSource = false
-                                Engine.start(context, mod, release, source)
+                                Engine.start(context, mod, release!!, source)
                             },
                         ) {
                             Text(source.name)
