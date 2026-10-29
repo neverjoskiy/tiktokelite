@@ -417,7 +417,7 @@ fun ModScreen(id: String, back: () -> Unit) {
                         TextButton(
                             onClick = {
                                 chooseSource = false
-                                Engine.start(context, mod, release!!, source)
+                                release?.let { Engine.start(context, mod, it, source) }
                             },
                         ) {
                             Text(source.name)
@@ -425,7 +425,8 @@ fun ModScreen(id: String, back: () -> Unit) {
                         Spacer(Modifier.height(8.dp))
                     }
                 }
-            }
+            },
+            confirmButton = {}
         )
     }
 }
