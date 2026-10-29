@@ -1,391 +1,426 @@
 {
- "_comment": "What Elite Patcher reads to know which mods there are, what each is made from and where the patch is.",
- "patcher": {
-  "version": "1.0",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/patcher-v1.0/elite-patcher.apk",
-  "sha256": "79e2b8a9be2931a84db8b1b1a367ffe88e54460056e06e0a354ac90c1f5d69e9",
-  "size": 1334923,
-  "notes": {
-   "ru": "Первая версия.",
-   "uk": "Перша версія.",
-   "en": "The first version."
-  }
- },
- "channel": "https://t.me/tiktelite",
- "mods": [
-  {
-   "id": "elite",
-   "name": "TikTokElite",
-   "icon": "elite",
-   "package": "com.zhiliaoapp.musically",
-   "about": {
-    "ru": "Мод TikTok: оформление, скачивание без водяного знака, подмена региона, значки и многое другое.",
-    "uk": "Мод TikTok: оформлення, завантаження без водяного знака, підміна регіону, значки та багато іншого.",
-    "en": "A TikTok mod: looks, downloads without a watermark, a region of your choice, badges and a lot more."
-   },
-   "releases": [
-    {
-     "version": "4.7",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.7/elite.mpatch",
-      "sha256": "3af5de23b771a104b7ac1f9795f8662383431a1b86626546719ddecd743abba6",
-      "size": 71717908
-     },
-     "result": {
-      "sha256": "98bf21d3683a375f8861e5310e2f09f9141913c091c97ff43a9e7758afa1a463",
-      "size": 395406874
-     },
-     "notes": {
-      "ru": "",
-      "uk": "",
-      "en": ""
-     }
-    },
-    {
-     "version": "4.6",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.6/elite.mpatch",
-      "sha256": "e544894445f2936c3dffac3a7591a19e092372ca381ca622bed9423d183652b0",
-      "size": 71713520
-     },
-     "result": {
-      "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
-      "size": 395406874
-     },
-     "notes": {
-      "ru": "",
-      "uk": "",
-      "en": ""
-     }
-    },
-    {
-     "version": "4.5",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.5/elite.mpatch",
-      "sha256": "79bfefc00659ff06d87d9f192a30a65067cf25e62c6f8dff62231041f81bdce2",
-      "size": 71713520
-     },
-     "result": {
-      "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
-      "size": 395406874
-     },
-     "notes": {
-      "ru": "",
-      "uk": "",
-      "en": ""
-     }
-    },
-    {
-     "version": "4.4",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true,
-        "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/6feb4362-f770-410a-88b0-6d4dbd5f8da8/c95208b5-2f7d-44c0-ad53-6e2950058fed/download"
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.4/elite.mpatch",
-      "sha256": "eba46ab8e154608cc12fc81a812c91ae0267e02d5a0bd9f5caa768c274eff0ca",
-      "size": 71713652
-     },
-     "notes": {
-      "ru": "",
-      "uk": "",
-      "en": ""
-     },
-     "result": {
-      "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
-      "size": 395406874
-     }
-    },
-    {
-     "version": "4.3",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true,
-        "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/2181f389-43ef-40a1-9ae0-f4ed0688eb4f/64115574-8843-49db-8dc6-a7446d3c9934/download"
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.3/elite.mpatch",
-      "sha256": "dca8f5ee861de2b431c033d3fc74cfef6c2002d7951007bd6321d7c222abf95b",
-      "size": 71714304
-     },
-     "result": {
-      "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
-      "size": 395406874
-     },
-     "notes": {
-      "ru": "",
-      "uk": "",
-      "en": ""
-     }
-    },
-    {
-     "version": "4.2",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true,
-        "patchUrl": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/e30bc9c8-b179-4880-9cf3-ff926fd01019/download"
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.2/elite.mpatch",
-      "sha256": "5388df972044dda933b6f61388e23ac0a9fa8b58322f1318f09b4bd1bf77fca6",
-      "size": 72719988
-     },
-     "result": {
-      "sha256": "f297e2106d3c515b0763e56643da1b05b53d3cf4366e00a075503c1262f8b1e5",
-      "size": 396411732
-     },
-     "notes": {
-      "ru": "Волнистый индикатор видео в стиле M3 Expressive и тема AMOLED.",
-      "uk": "Хвилястий індикатор відео в стилі M3 Expressive і тема AMOLED.",
-      "en": "An M3 Expressive wavy video-progress indicator and an AMOLED theme."
-     }
-    },
-    {
-     "version": "4.1",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.1/elite.mpatch",
-      "sha256": "a96fb1526f93a5d23692e4182a43e8e0e3ea78691519cfb0d3331268a9725ba2",
-      "size": 72713432
-     },
-     "result": {
-      "sha256": "37d2a70a344b7b423ac45f1c68fe768768722adc699726239569803e2ff7bbb1",
-      "size": 396403540
-     },
-     "notes": {
-      "ru": "Починка краша вкладки настроек 4.0: глифы переписаны под грамматику парсера, добавлены новые иконки; <queries> объявлен по схеме (видимость стора на Android 11+).",
-      "uk": "Виправлення крашу вкладки налаштувань 4.0: гліфи переписані під граматику парсера, додано нові іконки; <queries> оголошено за схемою (видимість стора на Android 11+).",
-      "en": "Fixes the 4.0 settings-tab crash: glyphs rewritten to the parser's grammar, new icons; <queries> declared where the schema puts it (store visibility on Android 11+)."
-     }
-    },
-    {
-     "version": "4.0",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.0/elite.mpatch",
-      "sha256": "0be432b5da68ea648c6d06ca44ebbd9a1989963710362ae809a3e4cb0460f923",
-      "size": 72713460
-     },
-     "result": {
-      "sha256": "105de535bd36a72b443cbabdf6f23c4b713589b61ef70f383ba9b38dea1de212",
-      "size": 396551001
-     },
-     "notes": {
-      "ru": "Порт 2.1.0/2.1.1: новый профиль, несколько фото, фильтр по дате, телесуфлёр и вспышка, окно скачивания, анти-выгорание, перф, флаги.",
-      "uk": "Порт 2.1.0/2.1.1: новий профіль, кілька фото, фільтр за датою, телесуфлер і спалах, вікно завантаження, анти-вигорання, перф, прапорці.",
-      "en": "Port of 2.1.0/2.1.1: new profile, multiple photos, date filter, teleprompter and flash, download window, anti-burn, perf, flags."
-     }
-    },
-    {
-     "version": "3.4",
-     "beta": false,
-     "base": {
-      "name": "TikTok 47.2.41",
-      "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
-      "size": 346017026,
-      "sources": [
-       {
-        "name": "GitHub",
-        "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
-        "direct": true
-       },
-       {
-        "name": "GitFlic",
-        "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
-        "direct": true
-       }
-      ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.4/elite.mpatch",
-      "sha256": "5add4477487722b2a27252143fc1640b399609d5dabe5dc20bca8df61b31810b",
-      "size": 72650588
-     },
-     "result": {
-      "sha256": "f6e0b31859706fa4eee69a9270a945956fb3a7b35671ed51a5458c5c636ca7aa",
-      "size": 396551001
-     },
-     "notes": {
-      "ru": "Приватность и порядок: скрытие набора текста и «прочитано» в личке, скрытие просмотренных.",
-      "uk": "Приватність і порядок: ховати набір тексту й «прочитано» в особистих, ховати переглянуті.",
-      "en": "Privacy and order: hide typing status and read receipts in DMs, hide watched videos."
-     }
+  "_comment": "What Elite Patcher reads to know which mods there are, what each is made from and where the patch is.",
+  "patcher": {
+    "version": "1.0",
+    "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/patcher-v1.0/elite-patcher.apk",
+    "sha256": "79e2b8a9be2931a84db8b1b1a367ffe88e54460056e06e0a354ac90c1f5d69e9",
+    "size": 1334923,
+    "notes": {
+      "ru": "Первая версия.",
+      "uk": "Перша версія.",
+      "en": "The first version."
     }
-   ]
   },
-  {
-   "id": "tikelite",
-   "name": "TikeLite",
-   "icon": "tikelite",
-   "package": "com.zhiliaoapp.musically.go",
-   "about": {
-    "ru": "Лёгкий мод на TikTok Lite: подмена региона, тема и акцент, значки.",
-    "uk": "Легкий мод на TikTok Lite: підміна регіону, тема й акцент, значки.",
-    "en": "A light mod of TikTok Lite: a region of your choice, theme and accent, badges."
-   },
-   "releases": [
+  "channel": "https://t.me/tiktelite",
+  "mods": [
     {
-     "version": "0.1",
-     "beta": false,
-     "base": {
-      "name": "TikTok Lite 47.1.4",
-      "sha256": "634c596e9f2c54b4e77600d4d1bdd96f1d0adad8bb661476a9df7cd21d3c6057",
-      "size": 90464759,
-      "sources": [
-       {
-        "name": "TikTok Lite",
-        "url": "https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk",
-        "direct": true
-       }
+      "id": "elite",
+      "name": "TikTokElite",
+      "icon": "elite",
+      "package": "com.zhiliaoapp.musically",
+      "about": {
+        "ru": "Мод TikTok: оформление, скачивание без водяного знака, подмена региона, значки и многое другое.",
+        "uk": "Мод TikTok: оформлення, завантаження без водяного знака, підміна регіону, значки та багато іншого.",
+        "en": "A TikTok mod: looks, downloads without a watermark, a region of your choice, badges and a lot more."
+      },
+      "releases": [
+        {
+          "version": "4.8",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.8/elite.mpatch",
+            "sha256": "67fe99d89b358730574cd87c459aceb7e6cf6080f5d3fe69a46862c3ec8ba15b",
+            "size": 71714756
+          },
+          "result": {
+            "sha256": "719c1db0e719bfb00bc4ccc25136a2dffe227b0c2bbdc92515849bac26b88e8e",
+            "size": 395406874
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          }
+        },
+        {
+          "version": "4.7",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.7/elite.mpatch",
+            "sha256": "3af5de23b771a104b7ac1f9795f8662383431a1b86626546719ddecd743abba6",
+            "size": 71717908
+          },
+          "result": {
+            "sha256": "98bf21d3683a375f8861e5310e2f09f9141913c091c97ff43a9e7758afa1a463",
+            "size": 395406874
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          }
+        },
+        {
+          "version": "4.6",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.6/elite.mpatch",
+            "sha256": "e544894445f2936c3dffac3a7591a19e092372ca381ca622bed9423d183652b0",
+            "size": 71713520
+          },
+          "result": {
+            "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
+            "size": 395406874
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          }
+        },
+        {
+          "version": "4.5",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.5/elite.mpatch",
+            "sha256": "79bfefc00659ff06d87d9f192a30a65067cf25e62c6f8dff62231041f81bdce2",
+            "size": 71713520
+          },
+          "result": {
+            "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
+            "size": 395406874
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          }
+        },
+        {
+          "version": "4.4",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true,
+                "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/6feb4362-f770-410a-88b0-6d4dbd5f8da8/c95208b5-2f7d-44c0-ad53-6e2950058fed/download"
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.4/elite.mpatch",
+            "sha256": "eba46ab8e154608cc12fc81a812c91ae0267e02d5a0bd9f5caa768c274eff0ca",
+            "size": 71713652
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          },
+          "result": {
+            "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
+            "size": 395406874
+          }
+        },
+        {
+          "version": "4.3",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true,
+                "patchUrl": "https://gitflic.ru/project/nvrchg/files-repo/release/2181f389-43ef-40a1-9ae0-f4ed0688eb4f/64115574-8843-49db-8dc6-a7446d3c9934/download"
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.3/elite.mpatch",
+            "sha256": "dca8f5ee861de2b431c033d3fc74cfef6c2002d7951007bd6321d7c222abf95b",
+            "size": 71714304
+          },
+          "result": {
+            "sha256": "f8c9fc33c8add39edacdff384aabfcbcc65fa36b88141ccb91d660ca12a94997",
+            "size": 395406874
+          },
+          "notes": {
+            "ru": "",
+            "uk": "",
+            "en": ""
+          }
+        },
+        {
+          "version": "4.2",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true,
+                "patchUrl": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/e30bc9c8-b179-4880-9cf3-ff926fd01019/download"
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.2/elite.mpatch",
+            "sha256": "5388df972044dda933b6f61388e23ac0a9fa8b58322f1318f09b4bd1bf77fca6",
+            "size": 72719988
+          },
+          "result": {
+            "sha256": "f297e2106d3c515b0763e56643da1b05b53d3cf4366e00a075503c1262f8b1e5",
+            "size": 396411732
+          },
+          "notes": {
+            "ru": "Волнистый индикатор видео в стиле M3 Expressive и тема AMOLED.",
+            "uk": "Хвилястий індикатор відео в стилі M3 Expressive і тема AMOLED.",
+            "en": "An M3 Expressive wavy video-progress indicator and an AMOLED theme."
+          }
+        },
+        {
+          "version": "4.1",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.1/elite.mpatch",
+            "sha256": "a96fb1526f93a5d23692e4182a43e8e0e3ea78691519cfb0d3331268a9725ba2",
+            "size": 72713432
+          },
+          "result": {
+            "sha256": "37d2a70a344b7b423ac45f1c68fe768768722adc699726239569803e2ff7bbb1",
+            "size": 396403540
+          },
+          "notes": {
+            "ru": "Починка краша вкладки настроек 4.0: глифы переписаны под грамматику парсера, добавлены новые иконки; <queries> объявлен по схеме (видимость стора на Android 11+).",
+            "uk": "Виправлення крашу вкладки налаштувань 4.0: гліфи переписані під граматику парсера, додано нові іконки; <queries> оголошено за схемою (видимість стора на Android 11+).",
+            "en": "Fixes the 4.0 settings-tab crash: glyphs rewritten to the parser's grammar, new icons; <queries> declared where the schema puts it (store visibility on Android 11+)."
+          }
+        },
+        {
+          "version": "4.0",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.0/elite.mpatch",
+            "sha256": "0be432b5da68ea648c6d06ca44ebbd9a1989963710362ae809a3e4cb0460f923",
+            "size": 72713460
+          },
+          "result": {
+            "sha256": "105de535bd36a72b443cbabdf6f23c4b713589b61ef70f383ba9b38dea1de212",
+            "size": 396551001
+          },
+          "notes": {
+            "ru": "Порт 2.1.0/2.1.1: новый профиль, несколько фото, фильтр по дате, телесуфлёр и вспышка, окно скачивания, анти-выгорание, перф, флаги.",
+            "uk": "Порт 2.1.0/2.1.1: новий профіль, кілька фото, фільтр за датою, телесуфлер і спалах, вікно завантаження, анти-вигорання, перф, прапорці.",
+            "en": "Port of 2.1.0/2.1.1: new profile, multiple photos, date filter, teleprompter and flash, download window, anti-burn, perf, flags."
+          }
+        },
+        {
+          "version": "3.4",
+          "beta": false,
+          "base": {
+            "name": "TikTok 47.2.41",
+            "sha256": "4bcad2a15ac82da68d373629a9520f855781c3ec46f0e2937e605040285ba75c",
+            "size": 346017026,
+            "sources": [
+              {
+                "name": "GitHub",
+                "url": "https://github.com/neverjoskiy/bliss-site/releases/download/tiktok/tiktok-47-2-41.apk",
+                "direct": true
+              },
+              {
+                "name": "GitFlic",
+                "url": "https://gitflic.ru/project/nvrchg/tiktokelite/release/d4c55764-fd3d-495c-8688-896a24afeb92/7a1380b9-05fb-4a40-9ab8-5d78877f4623/download",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v3.4/elite.mpatch",
+            "sha256": "5add4477487722b2a27252143fc1640b399609d5dabe5dc20bca8df61b31810b",
+            "size": 72650588
+          },
+          "result": {
+            "sha256": "f6e0b31859706fa4eee69a9270a945956fb3a7b35671ed51a5458c5c636ca7aa",
+            "size": 396551001
+          },
+          "notes": {
+            "ru": "Приватность и порядок: скрытие набора текста и «прочитано» в личке, скрытие просмотренных.",
+            "uk": "Приватність і порядок: ховати набір тексту й «прочитано» в особистих, ховати переглянуті.",
+            "en": "Privacy and order: hide typing status and read receipts in DMs, hide watched videos."
+          }
+        }
       ]
-     },
-     "patch": {
-      "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.mpatch",
-      "sha256": "60b0b428082d170bb3bc962c71409800336e391d734b96e835f98f9ef100ce70",
-      "size": 33869815
-     },
-     "result": {
-      "sha256": "17547e46446b833e0d8f2e2e654d566ad0ed04a2bc31396e6deda16721e82891",
-      "size": 122988831
-     },
-     "notes": {
-      "ru": "Первая версия. Подмена региона, тема, акцент, значки.",
-      "uk": "Перша версія. Підміна регіону, тема, акцент, значки.",
-      "en": "The first version. A region of your choice, theme, accent, badges."
-     }
+    },
+    {
+      "id": "tikelite",
+      "name": "TikeLite",
+      "icon": "tikelite",
+      "package": "com.zhiliaoapp.musically.go",
+      "about": {
+        "ru": "Лёгкий мод на TikTok Lite: подмена региона, тема и акцент, значки.",
+        "uk": "Легкий мод на TikTok Lite: підміна регіону, тема й акцент, значки.",
+        "en": "A light mod of TikTok Lite: a region of your choice, theme and accent, badges."
+      },
+      "releases": [
+        {
+          "version": "0.1",
+          "beta": false,
+          "base": {
+            "name": "TikTok Lite 47.1.4",
+            "sha256": "634c596e9f2c54b4e77600d4d1bdd96f1d0adad8bb661476a9df7cd21d3c6057",
+            "size": 90464759,
+            "sources": [
+              {
+                "name": "TikTok Lite",
+                "url": "https://margy.narez.xyz/original/tiktok-lite-47-1-4.apk",
+                "direct": true
+              }
+            ]
+          },
+          "patch": {
+            "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/lite-v0.1/tikelite.mpatch",
+            "sha256": "60b0b428082d170bb3bc962c71409800336e391d734b96e835f98f9ef100ce70",
+            "size": 33869815
+          },
+          "result": {
+            "sha256": "17547e46446b833e0d8f2e2e654d566ad0ed04a2bc31396e6deda16721e82891",
+            "size": 122988831
+          },
+          "notes": {
+            "ru": "Первая версия. Подмена региона, тема, акцент, значки.",
+            "uk": "Перша версія. Підміна регіону, тема, акцент, значки.",
+            "en": "The first version. A region of your choice, theme, accent, badges."
+          }
+        }
+      ]
     }
-   ]
-  }
- ]
+  ]
 }
