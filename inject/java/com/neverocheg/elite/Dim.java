@@ -1041,6 +1041,14 @@ public final class Dim {
     private static void restore() {
         BottomChrome.restore();
         try {
+            // Cancel any restore animation still in flight from a previous pass:
+            // letting it run while a new apply() fades the same views is what
+            // compounded the alpha (a view read mid-animation became the new
+            // "original" at a fraction of its real brightness).
+            for (Returning pending : new java.util.ArrayList<Returning>(returns.values())) {
+                try { pending.animator.cancel(); } catch (Throwable ignored) {}
+            }
+            returns.clear();
             java.util.Map<View, Dimmed> originals =
                     new java.util.HashMap<View, Dimmed>(faded);
             faded.clear();
@@ -1050,10 +1058,10 @@ public final class Dim {
                 Dimmed dimmed = entry.getValue();
                 if (dimmed != null
                         && Math.abs(view.getAlpha() - dimmed.applied) < 0.001f) {
-                    restoreSmooth(view,dimmed.original);
+                    view.setAlpha(dimmed.original);
                 }
-                faded.clear();
             }
+            flattened.clear();
         } catch (Throwable ignored) {
         }
     }
