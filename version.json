@@ -1,7 +1,7 @@
 {
   "_comment": "What the app checks to know whether it is out of date. It reads this from the project's own git server at startup and every five minutes; the badges come from the same box.",
-  "version": "4.3",
-  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.3/tiktokolite.apk",
+  "version": "4.7",
+  "url": "https://github.com/neverjoskiy/tiktokelite/releases/download/v4.7/tiktokolite.apk",
   "notes": "",
   "notes_ru": "",
   "notes_uk": ""
