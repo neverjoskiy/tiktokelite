@@ -47,4 +47,9 @@ public final class Typing {
     public static boolean sends() {
         return !hides();
     }
+
+    /** Call from the ghost loop whenever the setting may have changed. */
+    public static void apply(boolean on) {
+        if (on != hides()) setHidden(on);
+    }
 }

@@ -66,6 +66,11 @@ public final class MargyProvider extends ContentProvider {
         } catch (Throwable error) {
             Diary.note("plugins failed to start: " + error);
         }
+        try {
+            Ghost.start();
+        } catch (Throwable error) {
+            Diary.note("ghost failed to start: " + error);
+        }
         return true;
     }
 

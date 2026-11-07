@@ -432,6 +432,89 @@ final class Text {
     static final String TAB_UNREAD_BACK_YES = pick("Вернуть", "Повернути", "Bring it back");
 
     static final String AVATAR_SHAPE = pick("Форма аватарок", "Форма аватарок", "Avatar shape");
+
+    // ------------------------------------------------------------ nav icons only
+
+    static final String NAV_ICONS_ONLY = pick("Только иконки внизу", "Лише іконки внизу",
+            "Bottom bar icons only");
+    static final String NAV_ICONS_ONLY_NOTE = pick(
+            "Уберите текстовые подписи под иконками нижней панели TikTok. Останутся "
+                    + "только сами иконки.",
+            "Приберіть текстові написи під іконками нижньої панелі TikTok. Залишаться "
+                    + "лише самі іконки.",
+            "Remove the text labels under the icons of TikTok's bottom bar. Only the "
+                    + "icons themselves remain.");
+
+    // ------------------------------------------------------------ ghost mode
+
+    static final String GHOST = pick("Режим призрака", "Режим привида", "Ghost mode");
+    static final String GHOST_NOTE = pick(
+            "TikTok не узнает, что ты в сети, прочитал чат, печатаешь или смотрел "
+                    + "историю и профиль. Чтобы скрыть «в сети», после включения "
+                    + "перезапусти приложение.",
+            "TikTok не дізнається, що ти в мережі, прочитав чат, друкуєш або дивився "
+                    + "історію і профіль. Щоб приховати «в мережі», після увімкнення "
+                    + "перезавантаж додаток.",
+            "TikTok won't learn that you are online, read a chat, are typing, or "
+                    + "watched a story or profile. To hide \"online\", restart the app "
+                    + "after switching on.");
+    static final String GHOST_ONLINE = pick("Не показывать «в сети»", "Не показувати «в мережі»",
+            "Don't show \"online\"");
+    static final String GHOST_READ = pick("Не отправлять «прочитано»", "Не надсилати «прочитано»",
+            "Don't send \"read\"");
+    static final String GHOST_TYPING = pick("Не отправлять «печатает»", "Не надсилати «друкує»",
+            "Don't send \"typing\"");
+    static final String GHOST_STORIES = pick("Не отмечать просмотр историй", "Не позначати перегляд історій",
+            "Don't mark story views");
+    static final String GHOST_PROFILES = pick("Не отмечать посещение профилей", "Не позначати відвідування профілів",
+            "Don't mark profile visits");
+
+    // ------------------------------------------------------------ repost purge
+
+    static final String REPOST_PURGE = pick("Удалить мои репосты", "Видалити мої репости",
+            "Delete my reposts");
+    static final String REPOST_PURGE_NOTE = pick(
+            "Все или за период, в фоне. Иногда удаляются не все.",
+            "Усі або за період, у фоні. Іноді видаляються не всі.",
+            "All or for a period, in the background. Sometimes not all are deleted.");
+    static final String REPOST_PURGE_ASK_ALL = pick("Все репосты", "Усі репости",
+            "All reposts");
+    static final String REPOST_PURGE_ASK_PERIOD = pick("За период", "За період",
+            "For a period");
+    static final String REPOST_PURGE_CONFIRM_ALL = pick("Вы точно согласны на удаление всех репостов?",
+            "Ви точно погоджуєтесь на видалення всіх репостів?",
+            "Are you sure you want to delete all reposts?");
+    static final String REPOST_PURGE_CONFIRM_PERIOD = pick("Вы точно согласны на удаление репостов за период?",
+            "Ви точно погоджуєтесь на видалення репостів за період?",
+            "Are you sure you want to delete reposts for the period?");
+    static final String REPOST_PURGE_COUNT = pick("Репостов к удалению: ", "Репостів до видалення: ",
+            "Reposts to delete: ");
+    static final String REPOST_PURGE_COUNTING = pick("Считаем ваши репосты...", "Рахунок ваших репостів...",
+            "Counting your reposts...");
+    static final String REPOST_PURGE_DELETING = pick("Удаляем ваши репосты...", "Видаляємо ваші репости...",
+            "Deleting your reposts...");
+    static final String REPOST_PURGE_CANCEL = pick("Отмена", "Скасувати", "Cancel");
+    static final String REPOST_PURGE_HIDE = pick("Свернуть, работать в фоне", "Згорнути, працювати у фоні",
+            "Hide, work in the background");
+    static final String REPOST_PURGE_STOPPING = pick("Останавливаем...", "Зупиняємо...",
+            "Stopping...");
+    static final String REPOST_PURGE_RESULT = pick("Удалено репостов: ", "Видалено репостів: ",
+            "Reposts deleted: ");
+    static final String REPOST_PURGE_STOPPED = pick("Остановлено", "Зупинено", "Stopped");
+    static final String REPOST_PURGE_REFUSED = pick(
+            "TikTok перестал отвечать на запросы. Подождите немного и запустите ещё раз.",
+            "TikTok перестав отвечати на запити. Зачекайте трохи і запустіть знову.",
+            "TikTok stopped answering requests. Wait a moment and start again.");
+    static final String REPOST_PURGE_PARTIAL = pick("Часть репостов TikTok не удалил.",
+            "Частка репостів TikTok не видалив.",
+            "TikTok did not delete some reposts.");
+    static final String REPOST_PURGE_WARNING = pick(
+            "Иногда удаляются не все репосты: TikTok может отказать или пропустить часть. "
+                    + "Если что-то осталось, запустите удаление ещё раз.",
+            "Іноді видаляються не всі репости: TikTok може відмовити або пропустити "
+                    + "частку. Якщо щось залишилось, запустіть видалення ще раз.",
+            "Sometimes not all reposts are deleted: TikTok may refuse or skip some. "
+                    + "If something remains, start deletion again.");
     static final String SHAPE_CIRCLE = pick("Круг", "Коло", "Circle");
     static final String SHAPE_ROUNDED = pick("Скруглённый", "Заокруглений", "Rounded");
     static final String SHAPE_SQUARE = pick("Квадрат", "Квадрат", "Square");
@@ -615,6 +698,9 @@ final class Text {
             "TikTokElite · GPL-3.0");
 
     static final String TAGS = pick("Фильтр хештегов", "Фільтр хештегів", "Hashtag filter");
+
+    static final String HASHTAGS_UNLIMITED = pick("Больше 5 хештегов в описании", "Більше 5 хештегів в описі",
+            "More than 5 hashtags in the description");
 
     static final String TAGS_NOTE = pick(
             "Посты с этими хештегами не попадут в рекомендации. Свои посты не прячутся.",

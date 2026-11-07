@@ -54,6 +54,8 @@ final class NavBar {
     static final String KEY = "nav_capsule";
     /** Whether the bar stays in sight, dimmed like the rest, while the screen saver is on. */
     static final String KEY_KEEP = "nav_keep_dimmed";
+    /** Whether tab text labels are hidden: icons only. */
+    static final String KEY_ICONS_ONLY = "nav_icons_only";
     /** How long a touch where the bar was brings it back for. */
     private static final long PEEK = 5000L;
 
@@ -65,6 +67,16 @@ final class NavBar {
     static void setKept(boolean kept) {
         SharedPreferences prefs = prefs();
         if (prefs != null) prefs.edit().putBoolean(KEY_KEEP, kept).apply();
+    }
+
+    static boolean isIconsOnly() {
+        SharedPreferences prefs = prefs();
+        return prefs != null && prefs.getBoolean(KEY_ICONS_ONLY, false);
+    }
+
+    static void setIconsOnly(boolean on) {
+        SharedPreferences prefs = prefs();
+        if (prefs != null) prefs.edit().putBoolean(KEY_ICONS_ONLY, on).apply();
     }
 
     private static final int HOME = 0, FRIENDS = 1, CREATE = 2, INBOX = 3, PROFILE = 4, OTHER = 5;
@@ -726,7 +738,7 @@ final class NavBar {
                     float badge = badge(tab);
                     float room = Math.max(0f, tab.right - tab.left - 2f * 8f * unit - icon - gap - badge);
                     float shrink = tab.name == null || tab.nameWide <= room ? 1f : Math.max(0.82f, room / tab.nameWide);
-                    float text = tab.name == null ? 0f : Math.min(tab.nameWide * shrink, room);
+                    float text = (tab.name == null || NavBar.isIconsOnly()) ? 0f : Math.min(tab.nameWide * shrink, room);
                     float content = icon + tab.open * (gap + text + badge);
                     float start = centre - content / 2f;
                     int colour = mix(quiet, lit, tab.open);

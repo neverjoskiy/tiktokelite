@@ -29,40 +29,42 @@ public final class Watch implements Application.ActivityLifecycleCallbacks {
         }
     }
 
-    @Override
-    public void onActivityResumed(Activity activity) {
-        here = new java.lang.ref.WeakReference<Activity>(activity);
-        try {
-            Rate.apply(activity);
-        } catch (Throwable ignored) {
-        }
-        try {
-            Brightness.apply(activity);
-        } catch (Throwable ignored) {
-        }
-        try {
-            Tester.mark(activity);
-        } catch (Throwable ignored) {
-        }
-        Lag.frames(activity);
-        // what follows dresses TikTok's own screens, and Lite's are not those
-        if (!Version.LITE) {
-            NavBar.attach(activity);
-            Md3.attach(activity);
-            Counts.attach(activity);
+        @Override
+        public void onActivityResumed(Activity activity) {
+            here = new java.lang.ref.WeakReference<Activity>(activity);
             try {
-                TabBadges.attach(activity);
+                Rate.apply(activity);
             } catch (Throwable ignored) {
             }
+            try {
+                Brightness.apply(activity);
+            } catch (Throwable ignored) {
+            }
+            try {
+                Tester.mark(activity);
+            } catch (Throwable ignored) {
+            }
+            Lag.frames(activity);
+            Ghost.resumed(activity);
+            // what follows dresses TikTok's own screens, and Lite's are not those
+            if (!Version.LITE) {
+                NavBar.attach(activity);
+                Md3.attach(activity);
+                Counts.attach(activity);
+                try {
+                    TabBadges.attach(activity);
+                } catch (Throwable ignored) {
+                }
+            }
         }
-    }
 
-    @Override
-    public void onActivityPaused(Activity activity) {
-        if (here.get() == activity) {
-            here = new java.lang.ref.WeakReference<Activity>(null);
+        @Override
+        public void onActivityPaused(Activity activity) {
+            if (here.get() == activity) {
+                here = new java.lang.ref.WeakReference<Activity>(null);
+            }
+            Ghost.paused(activity);
         }
-    }
 
     @Override public void onActivityCreated(Activity activity, Bundle state) { LiteLogin.created(activity); }
     @Override public void onActivityStarted(Activity activity) {}

@@ -52,6 +52,7 @@ public class SettingsActivity extends Activity {
     private FrameLayout root;
     private final java.util.Map<String,View> settingTargets=new java.util.HashMap<>();
     private LinearLayout column;
+    private final java.util.Map<String, DesignPreview> previews = new java.util.HashMap<>();
     private View restartBar;
     private RestartSymbol restartSymbol;
     private TextView restartWhy, restartAction;
@@ -242,6 +243,7 @@ public class SettingsActivity extends Activity {
             } catch (Throwable ignored) {
             }
         });
+        if (settingsGroup == 0 && searchQuery.length() == 0) column.addView(new LogoMark(this));
         column.addView(title(settingsGroup == 0 ? (Version.LITE ? "TikeLite" : "TikTokElite") : groupName(settingsGroup)));
         if (settingsGroup != 0) column.addView(wrap(actionRow("info","Подсказки",null,this::showSectionHelp)));
         if (searchQuery.length() > 0) {
@@ -273,6 +275,7 @@ public class SettingsActivity extends Activity {
         column.addView(section(Text.ACCENT));
         LinearLayout accent = card();
         accent.addView(accentHead());
+        accent.addView(preview("accent", DesignPreview.ACCENT));
         if (accentOpen) {
             if (Accent.fromWallpaper() != 0) {
                 accent.addView(line());
@@ -288,14 +291,22 @@ public class SettingsActivity extends Activity {
                 Loading::setEnabled));
         loading.addView(quiet(Text.LOADING_NOTE));
         loading.addView(line());
+        loading.addView(preview("loading", DesignPreview.LOADING));
         loading.addView(actionRow("account_circle", Text.AVATAR_SHAPE,
                 AvatarShape.nameOf(AvatarShape.chosen()), this::chooseAvatarShape));
         loading.addView(line());
-        loading.addView(toggleRow("view_compact", Text.NEW_PROFILE, Flags.isOn(Flags.KEY_NEW_PROFILE),
+        loading.addView(preview("grid", DesignPreview.GRID));
+        loading.addView(toggleRow("view_compact", Text.NEW_PROFILE,
+                Flags.isOn(Flags.KEY_NEW_PROFILE),
                 on -> Flags.set(Flags.KEY_NEW_PROFILE, on)));
         loading.addView(line());
         loading.addView(toggleRow("tune", Text.NAV_CAPSULE, NavBar.isEnabled(), NavBar::setEnabled));
         loading.addView(line());
+        loading.addView(preview("nav", DesignPreview.NAV));
+        loading.addView(line());
+        loading.addView(toggleRow("tune", Text.NAV_ICONS_ONLY, NavBar.isIconsOnly(),
+                on -> NavBar.setIconsOnly(on)));
+        loading.addView(quiet(Text.NAV_ICONS_ONLY_NOTE));
         loading.addView(toggleRow("tune", Text.MD3_FEED, Md3.isOn(Md3.KEY_FEED), on -> Md3.set(Md3.KEY_FEED, on)));
         loading.addView(line());
         loading.addView(toggleRow("tune", Text.MD3_ICONS, Md3.isOn(Md3.KEY_ICONS), on -> Md3.set(Md3.KEY_ICONS, on)));
@@ -441,6 +452,7 @@ public class SettingsActivity extends Activity {
             final int kind=i;
             rail.addView(liveToggleRow(railIcons[i],railNames[i],FeedRail.shown(i),on->FeedRail.setShown(kind,on)));
         }
+        rail.addView(preview("rail", DesignPreview.RAIL));
         column.addView(wrap(rail));
 
         column.addView(section(Text.VIDEO));
@@ -458,6 +470,7 @@ public class SettingsActivity extends Activity {
                         WavySeek.reloadSettings();
                         WavySeek.attach(Watch.here());
                     }));
+            video.addView(preview("wave", DesignPreview.NAV));
             video.addView(caption(Text.WAVY_SEEK_NOTE));
             video.addView(line());
         }
@@ -502,6 +515,9 @@ public class SettingsActivity extends Activity {
         features.addView(line());
         features.addView(toggleRow("repeat", Text.SELF_REPOST, Flags.isOn(Flags.KEY_SELF_REPOST),
                 on -> Flags.set(Flags.KEY_SELF_REPOST, on)));
+        features.addView(line());
+        features.addView(liveToggleRow("tag", Text.HASHTAGS_UNLIMITED, Flags.isOn(Flags.KEY_HASHTAGS),
+                on -> Flags.set(Flags.KEY_HASHTAGS, on)));
         column.addView(wrap(features));
 
         column.addView(section(BURN));
@@ -513,6 +529,7 @@ public class SettingsActivity extends Activity {
         if (Dim.isConfigured()) {
             burn.addView(line());
             burn.addView(slider("contrast", Text.DIM_HOW, Dim.strength(), 90, 0, "%", value -> Dim.setStrength(value)));
+            burn.addView(preview("dim", DesignPreview.DIM));
             burn.addView(line());
             burn.addView(toggleRow("visibility_off", Text.KEEP_BAR, NavBar.isKept(), NavBar::setKept));
         }
@@ -620,7 +637,30 @@ public class SettingsActivity extends Activity {
         LinearLayout messages=card();
         messages.addView(toggleRow("chat",Text.HIDE_TYPING,Typing.hides(),on->Typing.setHidden(on),false));
         messages.addView(toggleRow("done_all",Text.HIDE_READ,Read.hides(),on->Read.setHidden(on),false));
+        messages.addView(preview("inbox", DesignPreview.INBOX));
+        messages.addView(preview("chat", DesignPreview.CHAT));
         column.addView(wrap(messages));
+
+        column.addView(section(Text.GHOST));
+        LinearLayout ghost=card();
+        ghost.addView(quiet(Text.GHOST_NOTE));
+        ghost.addView(toggleRow("visibility_off", Text.GHOST, Ghost.on(Ghost.KEY),
+                on -> Ghost.set(Ghost.KEY, on)));
+        if (Ghost.on(Ghost.KEY)) {
+            String[][] parts = {
+                    {Ghost.ONLINE, Text.GHOST_ONLINE},
+                    {Ghost.READ, Text.GHOST_READ},
+                    {Ghost.TYPING, Text.GHOST_TYPING},
+                    {Ghost.STORIES, Text.GHOST_STORIES},
+                    {Ghost.PROFILES, Text.GHOST_PROFILES}};
+            for (String[] part : parts) {
+                final String key = part[0];
+                ghost.addView(line());
+                ghost.addView(liveToggleRow("eye_open", part[1], Ghost.on(key),
+                        on -> Ghost.set(key, on)));
+            }
+        }
+        column.addView(wrap(ghost));
 
         column.addView(section(Text.CHANNEL));
         column.addView(channelBanner());
@@ -773,8 +813,17 @@ public class SettingsActivity extends Activity {
     }
 
     /** A live preview based on the identity TikTok has loaded for this account. */
+    private View preview(String id, int kind) {
+        DesignPreview made = previews.get(id);
+        if (made == null) {
+            made = new DesignPreview(this, skin, kind);
+            previews.put(id, made);
+        }
+        made.setSkin(skin);
+        return made;
+    }
 
-    // ------------------------------------------------- what MargyT brings along
+    // ----------------------------------------------------------- the rows
 
     /** Counted in preferences: asked on the third visit and then never again. */
     private static final String VISITS = "settings_visits";
@@ -1305,6 +1354,10 @@ public class SettingsActivity extends Activity {
             rows.addView(sized(row, 60));
         }
 
+        rows.addView(line());
+        rows.addView(actionRow("repeat", Text.REPOST_PURGE, Text.REPOST_PURGE_NOTE,
+                () -> RepostPurge.begin(this)));
+        rows.addView(line());
         rows.addView(button(Text.MINE_SAVE, () -> Mine.save(ordering,
                 (ok, trouble) -> {
                     if (needsProof(ok, trouble)) return;
